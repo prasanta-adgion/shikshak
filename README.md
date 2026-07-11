@@ -1,4 +1,4 @@
-# Shiksha
+# Shikshak
 
 **Find the Right Teacher. Learn Without Limits.**
 

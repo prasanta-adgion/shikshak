@@ -12,7 +12,6 @@ import '../../../../shared/widgets/initials_avatar.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../auth/presentation/widgets/logout_button.dart';
-import '../dummy/teacher_dummy_data.dart';
 import '../widgets/availability_card.dart';
 import '../widgets/class_request_tile.dart';
 import '../widgets/earnings_card.dart';
@@ -99,6 +98,52 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
 class _TeacherHomeTab extends ConsumerWidget {
   const _TeacherHomeTab();
 
+  // Static placeholder content, shown until the analytics and bookings
+  // APIs provide real numbers and requests.
+  static const _stats = [
+    DashboardStat(
+      label: 'Total Students',
+      value: '0',
+      icon: AppIcons.students,
+      color: AppColors.primary,
+    ),
+    DashboardStat(
+      label: 'Classes This Week',
+      value: '0',
+      icon: AppIcons.schedule,
+      color: AppColors.tertiary,
+    ),
+    DashboardStat(
+      label: 'Average Rating',
+      value: '—',
+      icon: AppIcons.rating,
+      color: AppColors.secondary,
+    ),
+    DashboardStat(
+      label: 'Hours Taught',
+      value: '0',
+      icon: AppIcons.hours,
+      color: AppColors.info,
+    ),
+  ];
+
+  static const _recentRequests = [
+    ClassRequest(
+      studentName: 'Student Name',
+      subject: 'Subject',
+      grade: 'Class',
+      schedule: 'Schedule',
+      mode: 'Online',
+    ),
+    ClassRequest(
+      studentName: 'Student Name',
+      subject: 'Subject',
+      grade: 'Class',
+      schedule: 'Schedule',
+      mode: 'Home Visit',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -156,8 +201,7 @@ class _TeacherHomeTab extends ConsumerWidget {
                   crossAxisSpacing: AppSpacing.md,
                   childAspectRatio: context.isTablet ? 1.2 : 1.15,
                   children: [
-                    for (final stat in TeacherDummyData.stats)
-                      StatCard(stat: stat),
+                    for (final stat in _stats) StatCard(stat: stat),
                   ],
                 ),
                 AppSpacing.gapXl,
@@ -170,7 +214,7 @@ class _TeacherHomeTab extends ConsumerWidget {
                   actionLabel: 'See All',
                 ),
                 AppSpacing.gapMd,
-                for (final request in TeacherDummyData.recentRequests) ...[
+                for (final request in _recentRequests) ...[
                   ClassRequestTile(request: request),
                   AppSpacing.gapMd,
                 ],
@@ -218,7 +262,7 @@ class _WelcomeBanner extends StatelessWidget {
                 ),
                 AppSpacing.gapXs,
                 Text(
-                  'You have 3 classes scheduled today.',
+                  "Here's an overview of your teaching activity.",
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.9),
                   ),

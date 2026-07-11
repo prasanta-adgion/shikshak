@@ -4,7 +4,7 @@ import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
-import '../dummy/student_dummy_data.dart';
+import '../models/tutor_info.dart';
 
 /// Row tile in the "Recent Tutors" list.
 class RecentTutorTile extends StatelessWidget {

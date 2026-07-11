@@ -43,7 +43,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    ref.read(authNotifierProvider.notifier).login(
+    ref
+        .read(authNotifierProvider.notifier)
+        .login(
           identifier: _identifierController.text,
           password: _passwordController.text,
           role: widget.role,
@@ -52,22 +54,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$feature is coming soon')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('$feature is coming soon')));
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isSubmitting =
-        ref.watch(authNotifierProvider.select((s) => s.isSubmitting));
+    final isSubmitting = ref.watch(
+      authNotifierProvider.select((s) => s.isSubmitting),
+    );
 
     // Navigate to the dashboard on successful login. The isCurrent check
     // keeps this page from also reacting when the register page (pushed on
     // top of it) completes the auth flow.
-    ref.listen(authNotifierProvider.select((s) => s.status),
-        (previous, next) {
+    ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
       final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
       if (next == AuthStatus.authenticated && isCurrent) {
         final role = ref.read(authNotifierProvider).user?.role ?? widget.role;
@@ -76,8 +78,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     // Surface auth errors as a snackbar exactly once per failure.
-    ref.listen(authNotifierProvider.select((s) => s.errorMessage),
-        (previous, next) {
+    ref.listen(authNotifierProvider.select((s) => s.errorMessage), (
+      previous,
+      next,
+    ) {
       if (next != null && next != previous) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -90,7 +94,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     return AuthScaffold(
       title: 'Welcome Back, ${widget.role.label}',
-      subtitle: 'Log in to continue your ${widget.role == UserRole.teacher ? 'teaching' : 'learning'} journey',
+      subtitle:
+          'Log in to continue your ${widget.role == UserRole.teacher ? 'teaching' : 'learning'} journey',
       form: Form(
         key: _formKey,
         child: AutofillGroup(
@@ -105,39 +110,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: AppIcons.identifier,
                 autofillHints: const [AutofillHints.username],
+                inputFormatters: [],
               ),
               AppSpacing.gapXl,
               AppPasswordField(
                 controller: _passwordController,
                 hint: 'Enter your password',
-                validator: (value) => Validators.required(
-                  value,
-                  field: 'Password',
-                ),
+                validator: (value) =>
+                    Validators.required(value, field: 'Password'),
                 onFieldSubmitted: (_) => _submit(),
               ),
-              AppSpacing.gapMd,
-              Row(
-                children: [
-                  SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: Checkbox(
-                      value: _rememberMe,
-                      onChanged: (value) =>
-                          setState(() => _rememberMe = value ?? true),
-                    ),
-                  ),
-                  AppSpacing.hGapSm,
-                  Text('Remember me', style: theme.textTheme.bodyMedium),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => _showComingSoon('Password reset'),
-                    child: const Text('Forgot Password?'),
-                  ),
-                ],
+
+              Align(
+                alignment: AlignmentGeometry.topRight,
+                child: TextButton(
+                  onPressed: () => _showComingSoon('Password reset'),
+                  child: const Text('Forgot Password?'),
+                ),
               ),
-              AppSpacing.gapXl,
+              AppSpacing.gapMd,
               AppLoadingButton(
                 label: 'Login',
                 isLoading: isSubmitting,
@@ -173,7 +164,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'New to Shiksha?',
+            'New to Shikshak?',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

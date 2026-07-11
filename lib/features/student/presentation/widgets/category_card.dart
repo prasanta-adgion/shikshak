@@ -3,7 +3,20 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_card.dart';
-import '../dummy/student_dummy_data.dart';
+
+/// View model for a subject category tile. Populated with static data for
+/// now; will be built from the discovery API once it exists.
+class SubjectCategory {
+  const SubjectCategory({
+    required this.name,
+    required this.icon,
+    required this.color,
+  });
+
+  final String name;
+  final IconData icon;
+  final Color color;
+}
 
 /// Single tile in the categories grid.
 class CategoryCard extends StatelessWidget {

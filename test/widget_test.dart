@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shiksha/core/theme/app_theme.dart';
-import 'package:shiksha/core/utils/validators.dart';
-import 'package:shiksha/shared/widgets/app_loading_button.dart';
+import 'package:Shikshak/core/theme/app_theme.dart';
+import 'package:Shikshak/core/utils/validators.dart';
+import 'package:Shikshak/shared/widgets/app_loading_button.dart';
 
 void main() {
   group('Validators', () {
@@ -38,8 +38,9 @@ void main() {
   });
 
   group('AppLoadingButton', () {
-    testWidgets('shows label when idle and spinner when loading',
-        (tester) async {
+    testWidgets('shows label when idle and spinner when loading', (
+      tester,
+    ) async {
       var pressed = false;
 
       await tester.pumpWidget(

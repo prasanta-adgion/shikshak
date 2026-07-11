@@ -4,7 +4,7 @@
 /// gateway once the backend is live. Paths are kept relative so the base URL
 /// can vary per flavor (dev / staging / prod).
 abstract final class ApiEndpoints {
-  static const String baseUrl = 'https://api.shiksha.app/v1';
+  static const String baseUrl = 'https://api.Shikshak.app/v1';
 
   // Auth
   static const String login = '/auth/login';

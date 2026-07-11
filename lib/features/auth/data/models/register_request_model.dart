@@ -1,27 +1,43 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'register_request_model.freezed.dart';
-part 'register_request_model.g.dart';
-
 /// Body sent to the register endpoint. Role-specific fields are optional
 /// and omitted from JSON when null.
-@freezed
-abstract class RegisterRequestModel with _$RegisterRequestModel {
-  const factory RegisterRequestModel({
-    @JsonKey(name: 'full_name') required String fullName,
-    required String email,
-    @JsonKey(name: 'mobile_number') required String mobileNumber,
-    required String password,
-    required String role,
-    required String city,
-    @JsonKey(includeIfNull: false) String? qualification,
-    @JsonKey(includeIfNull: false) String? experience,
-    @JsonKey(includeIfNull: false) List<String>? subjects,
-    @JsonKey(name: 'student_class', includeIfNull: false) String? studentClass,
-    @JsonKey(name: 'preferred_subjects', includeIfNull: false)
-    List<String>? preferredSubjects,
-  }) = _RegisterRequestModel;
+class RegisterRequestModel {
+  const RegisterRequestModel({
+    required this.fullName,
+    required this.email,
+    required this.mobileNumber,
+    required this.password,
+    required this.role,
+    required this.city,
+    this.qualification,
+    this.experience,
+    this.subjects,
+    this.studentClass,
+    this.preferredSubjects,
+  });
 
-  factory RegisterRequestModel.fromJson(Map<String, dynamic> json) =>
-      _$RegisterRequestModelFromJson(json);
+  final String fullName;
+  final String email;
+  final String mobileNumber;
+  final String password;
+  final String role;
+  final String city;
+  final String? qualification;
+  final String? experience;
+  final List<String>? subjects;
+  final String? studentClass;
+  final List<String>? preferredSubjects;
+
+  Map<String, dynamic> toJson() => {
+        'full_name': fullName,
+        'email': email,
+        'mobile_number': mobileNumber,
+        'password': password,
+        'role': role,
+        'city': city,
+        if (qualification != null) 'qualification': qualification,
+        if (experience != null) 'experience': experience,
+        if (subjects != null) 'subjects': subjects,
+        if (studentClass != null) 'student_class': studentClass,
+        if (preferredSubjects != null) 'preferred_subjects': preferredSubjects,
+      };
 }

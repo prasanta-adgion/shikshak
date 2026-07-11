@@ -16,7 +16,7 @@ abstract interface class AuthRemoteDataSource {
   Future<UserModel> fetchProfile();
 }
 
-/// Real implementation that talks to the Shiksha backend through
+/// Real implementation that talks to the Shikshak backend through
 /// [IApiClient].
 ///
 /// The endpoints are placeholders — this class is fully wired and becomes

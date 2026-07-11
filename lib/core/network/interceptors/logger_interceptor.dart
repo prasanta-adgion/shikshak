@@ -8,15 +8,12 @@ import 'package:flutter/foundation.dart';
 /// Uses `dart:developer` so logs are visible in DevTools without polluting
 /// release builds or leaking payloads in production.
 class LoggerInterceptor extends Interceptor {
-  static const _name = 'shiksha.network';
+  static const _name = 'Shikshak.network';
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (kDebugMode) {
-      developer.log(
-        '→ ${options.method} ${options.uri}',
-        name: _name,
-      );
+      developer.log('→ ${options.method} ${options.uri}', name: _name);
     }
     handler.next(options);
   }

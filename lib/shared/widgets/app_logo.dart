@@ -4,7 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_icons.dart';
 import '../../core/theme/app_shadows.dart';
 
-/// Shiksha brand mark: a gradient rounded square with the book icon.
+/// Shikshak brand mark: a gradient rounded square with the book icon.
 ///
 /// Wrapped in a [Hero] by default so the logo glides between splash, role
 /// selection and auth screens.
@@ -20,7 +20,7 @@ class AppLogo extends StatelessWidget {
   final bool withHero;
   final bool withGlow;
 
-  static const String _heroTag = 'shiksha-logo';
+  static const String _heroTag = 'Shikshak-logo';
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +32,7 @@ class AppLogo extends StatelessWidget {
         borderRadius: BorderRadius.circular(size * 0.28),
         boxShadow: withGlow ? AppShadows.primaryGlow : null,
       ),
-      child: Icon(
-        AppIcons.logo,
-        color: Colors.white,
-        size: size * 0.5,
-      ),
+      child: Icon(AppIcons.logo, color: Colors.white, size: size * 0.5),
     );
 
     return withHero ? Hero(tag: _heroTag, child: mark) : mark;

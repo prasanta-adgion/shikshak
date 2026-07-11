@@ -1,25 +1,42 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'user_model.freezed.dart';
-part 'user_model.g.dart';
-
 /// Transport model for a user as returned by the API.
-@freezed
-abstract class UserModel with _$UserModel {
-  const factory UserModel({
-    required String id,
-    @JsonKey(name: 'full_name') required String fullName,
-    required String email,
-    @JsonKey(name: 'mobile_number') required String mobileNumber,
-    required String role,
-    String? city,
-    String? qualification,
-    String? experience,
-    List<String>? subjects,
-    @JsonKey(name: 'student_class') String? studentClass,
-    @JsonKey(name: 'preferred_subjects') List<String>? preferredSubjects,
-  }) = _UserModel;
+class UserModel {
+  const UserModel({
+    required this.id,
+    required this.fullName,
+    required this.email,
+    required this.mobileNumber,
+    required this.role,
+    this.city,
+    this.qualification,
+    this.experience,
+    this.subjects,
+    this.studentClass,
+    this.preferredSubjects,
+  });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+        id: json['id'] as String,
+        fullName: json['full_name'] as String,
+        email: json['email'] as String,
+        mobileNumber: json['mobile_number'] as String,
+        role: json['role'] as String,
+        city: json['city'] as String?,
+        qualification: json['qualification'] as String?,
+        experience: json['experience'] as String?,
+        subjects: (json['subjects'] as List?)?.cast<String>(),
+        studentClass: json['student_class'] as String?,
+        preferredSubjects: (json['preferred_subjects'] as List?)?.cast<String>(),
+      );
+
+  final String id;
+  final String fullName;
+  final String email;
+  final String mobileNumber;
+  final String role;
+  final String? city;
+  final String? qualification;
+  final String? experience;
+  final List<String>? subjects;
+  final String? studentClass;
+  final List<String>? preferredSubjects;
 }

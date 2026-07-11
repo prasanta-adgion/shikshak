@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_card.dart';
-import '../dummy/teacher_dummy_data.dart';
 
 /// Weekly availability overview with toggleable day chips (local UI state
 /// only — persistence comes with the availability feature).
@@ -15,9 +14,15 @@ class AvailabilityCard extends StatefulWidget {
 }
 
 class _AvailabilityCardState extends State<AvailabilityCard> {
-  late final Map<String, bool> _days = {
-    for (final entry in TeacherDummyData.availability)
-      entry.day: entry.available,
+  // Static initial selection, shown until the availability API exists.
+  final Map<String, bool> _days = {
+    'Mon': true,
+    'Tue': true,
+    'Wed': false,
+    'Thu': true,
+    'Fri': true,
+    'Sat': true,
+    'Sun': false,
   };
 
   @override

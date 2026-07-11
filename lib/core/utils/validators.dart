@@ -1,8 +1,3 @@
-/// Form validators used across auth and profile flows.
-///
-/// Each validator returns `null` when the value is valid, or a
-/// human-readable error message otherwise (the [FormFieldValidator]
-/// contract).
 abstract final class Validators {
   static final RegExp _emailPattern = RegExp(
     r"^[\w.!#$%&'*+/=?^`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"

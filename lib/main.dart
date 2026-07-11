@@ -15,5 +15,5 @@ void main() {
     ),
   );
 
-  runApp(const ProviderScope(child: ShikshaApp()));
+  runApp(const ProviderScope(child: ShikshakApp()));
 }

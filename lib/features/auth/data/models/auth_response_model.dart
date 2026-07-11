@@ -1,19 +1,21 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
 import 'user_model.dart';
 
-part 'auth_response_model.freezed.dart';
-part 'auth_response_model.g.dart';
-
 /// Payload returned by login/register endpoints.
-@freezed
-abstract class AuthResponseModel with _$AuthResponseModel {
-  const factory AuthResponseModel({
-    @JsonKey(name: 'access_token') required String accessToken,
-    @JsonKey(name: 'refresh_token') required String refreshToken,
-    required UserModel user,
-  }) = _AuthResponseModel;
+class AuthResponseModel {
+  const AuthResponseModel({
+    required this.accessToken,
+    required this.refreshToken,
+    required this.user,
+  });
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) =>
-      _$AuthResponseModelFromJson(json);
+      AuthResponseModel(
+        accessToken: json['access_token'] as String,
+        refreshToken: json['refresh_token'] as String,
+        user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      );
+
+  final String accessToken;
+  final String refreshToken;
+  final UserModel user;
 }

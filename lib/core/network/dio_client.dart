@@ -13,8 +13,9 @@ import 'interceptors/logger_interceptor.dart';
 /// interceptor chain. Converts every transport failure into [ApiException]
 /// so nothing Dio-specific leaks upward.
 class DioClient implements IApiClient {
+  final Dio _dio;
   DioClient({required SecureStorageService storage, Dio? dio})
-      : _dio = dio ?? Dio() {
+    : _dio = dio ?? Dio() {
     _dio.options = BaseOptions(
       baseUrl: ApiEndpoints.baseUrl,
       connectTimeout: const Duration(seconds: 15),
@@ -22,27 +23,21 @@ class DioClient implements IApiClient {
       sendTimeout: const Duration(seconds: 15),
       headers: const {'Accept': 'application/json'},
     );
-    _dio.interceptors.addAll([
-      AuthInterceptor(storage),
-      LoggerInterceptor(),
-    ]);
+    _dio.interceptors.addAll([AuthInterceptor(storage), LoggerInterceptor()]);
   }
-
-  final Dio _dio;
 
   @override
   Future<T> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
-  }) =>
-      _request(
-        () => _dio.get<T>(
-          path,
-          queryParameters: queryParameters,
-          options: Options(headers: headers),
-        ),
-      );
+  }) => _request(
+    () => _dio.get<T>(
+      path,
+      queryParameters: queryParameters,
+      options: Options(headers: headers),
+    ),
+  );
 
   @override
   Future<T> post<T>(
@@ -50,15 +45,14 @@ class DioClient implements IApiClient {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
-  }) =>
-      _request(
-        () => _dio.post<T>(
-          path,
-          data: data,
-          queryParameters: queryParameters,
-          options: Options(headers: headers),
-        ),
-      );
+  }) => _request(
+    () => _dio.post<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: Options(headers: headers),
+    ),
+  );
 
   @override
   Future<T> put<T>(
@@ -66,15 +60,14 @@ class DioClient implements IApiClient {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
-  }) =>
-      _request(
-        () => _dio.put<T>(
-          path,
-          data: data,
-          queryParameters: queryParameters,
-          options: Options(headers: headers),
-        ),
-      );
+  }) => _request(
+    () => _dio.put<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: Options(headers: headers),
+    ),
+  );
 
   @override
   Future<T> delete<T>(
@@ -82,15 +75,14 @@ class DioClient implements IApiClient {
     Object? data,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
-  }) =>
-      _request(
-        () => _dio.delete<T>(
-          path,
-          data: data,
-          queryParameters: queryParameters,
-          options: Options(headers: headers),
-        ),
-      );
+  }) => _request(
+    () => _dio.delete<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: Options(headers: headers),
+    ),
+  );
 
   Future<T> _request<T>(Future<Response<T>> Function() send) async {
     try {

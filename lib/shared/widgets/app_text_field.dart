@@ -71,11 +71,11 @@ class AppTextField extends StatelessWidget {
           autofillHints: autofillHints,
           onFieldSubmitted: onFieldSubmitted,
           style: theme.textTheme.bodyLarge,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: prefixIcon == null
-                ? null
-                : Icon(prefixIcon, size: 22),
+            prefixIcon: prefixIcon == null ? null : Icon(prefixIcon, size: 22),
             suffixIcon: suffixIcon,
           ),
         ),

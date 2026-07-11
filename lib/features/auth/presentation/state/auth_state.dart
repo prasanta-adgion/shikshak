@@ -1,9 +1,5 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/user_role.dart';
-
-part 'auth_state.freezed.dart';
 
 /// Session lifecycle.
 enum AuthStatus {
@@ -18,27 +14,66 @@ enum AuthStatus {
 }
 
 /// Immutable state for the whole authentication feature.
-@freezed
-abstract class AuthState with _$AuthState {
-  const AuthState._();
+class AuthState {
+  final AuthStatus status;
 
-  const factory AuthState({
-    @Default(AuthStatus.checking) AuthStatus status,
+  /// True while a login/register request is in flight.
+  final bool isSubmitting;
 
-    /// True while a login/register request is in flight.
-    @Default(false) bool isSubmitting,
+  /// The authenticated user (null until [status] is authenticated).
+  final UserEntity? user;
 
-    /// The authenticated user (null until [status] is authenticated).
-    UserEntity? user,
+  /// Role picked on the role-selection screen; carried through the
+  /// login/registration flow.
+  final UserRole? selectedRole;
 
-    /// Role picked on the role-selection screen; carried through the
-    /// login/registration flow.
-    UserRole? selectedRole,
+  /// Last auth error, surfaced by the UI as a snackbar. Cleared on the
+  /// next submission.
+  final String? errorMessage;
 
-    /// Last auth error, surfaced by the UI as a snackbar. Cleared on the
-    /// next submission.
-    String? errorMessage,
-  }) = _AuthState;
+  const AuthState({
+    this.status = AuthStatus.checking,
+    this.isSubmitting = false,
+    this.user,
+    this.selectedRole,
+    this.errorMessage,
+  });
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
+
+  static const _unset = Object();
+
+  /// Nullable fields default to a sentinel so callers can either keep the
+  /// current value (omit the argument) or clear it (pass null explicitly).
+  AuthState copyWith({
+    AuthStatus? status,
+    bool? isSubmitting,
+    Object? user = _unset,
+    Object? selectedRole = _unset,
+    Object? errorMessage = _unset,
+  }) => AuthState(
+    status: status ?? this.status,
+    isSubmitting: isSubmitting ?? this.isSubmitting,
+    user: identical(user, _unset) ? this.user : user as UserEntity?,
+    selectedRole: identical(selectedRole, _unset)
+        ? this.selectedRole
+        : selectedRole as UserRole?,
+    errorMessage: identical(errorMessage, _unset)
+        ? this.errorMessage
+        : errorMessage as String?,
+  );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AuthState &&
+          other.status == status &&
+          other.isSubmitting == isSubmitting &&
+          other.user == user &&
+          other.selectedRole == selectedRole &&
+          other.errorMessage == errorMessage;
+
+  @override
+  int get hashCode =>
+      Object.hash(status, isSubmitting, user, selectedRole, errorMessage);
 }

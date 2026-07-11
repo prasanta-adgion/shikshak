@@ -22,8 +22,8 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   /// (a real backend derives the user from the bearer token instead).
   final SecureStorageService _storage;
 
-  static const _mockAccessToken = 'mock-access-token-shiksha';
-  static const _mockRefreshToken = 'mock-refresh-token-shiksha';
+  static const _mockAccessToken = 'mock-access-token-Shikshak';
+  static const _mockRefreshToken = 'mock-refresh-token-Shikshak';
 
   @override
   Future<AuthResponseModel> login(LoginRequestModel request) async {
@@ -35,7 +35,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     return AuthResponseModel(
       accessToken: _mockAccessToken,
       refreshToken: _mockRefreshToken,
-      user: _dummyUser(
+      user: _placeholderUser(
         role: role,
         email: isEmail ? request.identifier : null,
         mobileNumber: isEmail ? null : request.identifier,
@@ -78,28 +78,22 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
         statusCode: 401,
       );
     }
-    return _dummyUser(role: storedRole);
+    return _placeholderUser(role: storedRole);
   }
 
-  UserModel _dummyUser({
+  /// Minimal placeholder profile; the real API returns the actual user.
+  UserModel _placeholderUser({
     required UserRole role,
     String? email,
     String? mobileNumber,
   }) {
     final isTeacher = role == UserRole.teacher;
     return UserModel(
-      id: isTeacher ? 'usr_teacher_001' : 'usr_student_001',
-      fullName: isTeacher ? 'Priya Sharma' : 'Aarav Mehta',
-      email: email ??
-          (isTeacher ? 'priya.sharma@shiksha.app' : 'aarav.mehta@shiksha.app'),
-      mobileNumber: mobileNumber ?? (isTeacher ? '9876543210' : '9812345670'),
+      id: isTeacher ? 'usr_teacher' : 'usr_student',
+      fullName: isTeacher ? 'Teacher' : 'Student',
+      email: email ?? 'user@example.com',
+      mobileNumber: mobileNumber ?? '0000000000',
       role: role.name,
-      city: isTeacher ? 'Kolkata' : 'Bengaluru',
-      qualification: isTeacher ? 'M.Sc. Mathematics, B.Ed.' : null,
-      experience: isTeacher ? '8+ years' : null,
-      subjects: isTeacher ? const ['Mathematics', 'Physics'] : null,
-      studentClass: isTeacher ? null : 'Class 10',
-      preferredSubjects: isTeacher ? null : const ['Mathematics', 'Science'],
     );
   }
 }

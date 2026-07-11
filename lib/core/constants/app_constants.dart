@@ -1,6 +1,6 @@
 /// Application-wide constants.
 abstract final class AppConstants {
-  static const String appName = 'Shiksha';
+  static const String appName = 'Shikshak';
   static const String tagline = 'Find the Right Teacher. Learn Without Limits.';
   static const String appVersion = '1.0.0';
 

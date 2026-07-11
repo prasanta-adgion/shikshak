@@ -9,7 +9,7 @@ import '../../../../shared/widgets/initials_avatar.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../auth/presentation/widgets/logout_button.dart';
-import '../dummy/student_dummy_data.dart';
+import '../models/tutor_info.dart';
 import '../widgets/category_card.dart';
 import '../widgets/dashboard_search_bar.dart';
 import '../widgets/featured_teacher_card.dart';
@@ -96,6 +96,92 @@ class _StudentDashboardPageState extends ConsumerState<StudentDashboardPage> {
 class _StudentHomeTab extends ConsumerWidget {
   const _StudentHomeTab();
 
+  // Static placeholder content, shown until the discovery API provides
+  // real categories and tutors.
+  static const _categories = [
+    SubjectCategory(
+      name: 'Mathematics',
+      icon: Icons.calculate_rounded,
+      color: Color(0xFF6366F1),
+    ),
+    SubjectCategory(
+      name: 'Science',
+      icon: Icons.science_rounded,
+      color: Color(0xFF14B8A6),
+    ),
+    SubjectCategory(
+      name: 'English',
+      icon: Icons.translate_rounded,
+      color: Color(0xFFF59E0B),
+    ),
+    SubjectCategory(
+      name: 'Coding',
+      icon: Icons.code_rounded,
+      color: Color(0xFF8B5CF6),
+    ),
+    SubjectCategory(
+      name: 'Music',
+      icon: Icons.music_note_rounded,
+      color: Color(0xFFEC4899),
+    ),
+    SubjectCategory(
+      name: 'Arts',
+      icon: Icons.palette_rounded,
+      color: Color(0xFFF97316),
+    ),
+  ];
+
+  static const _featuredTeachers = [
+    TutorInfo(
+      name: 'Teacher Name',
+      subject: 'Mathematics',
+      qualification: 'Qualification',
+      rating: 4.9,
+      reviews: 128,
+      experience: '8 yrs',
+      feePerHour: 600,
+    ),
+    TutorInfo(
+      name: 'Teacher Name',
+      subject: 'Physics',
+      qualification: 'Qualification',
+      rating: 4.8,
+      reviews: 96,
+      experience: '6 yrs',
+      feePerHour: 750,
+    ),
+    TutorInfo(
+      name: 'Teacher Name',
+      subject: 'English',
+      qualification: 'Qualification',
+      rating: 4.7,
+      reviews: 84,
+      experience: '5 yrs',
+      feePerHour: 450,
+    ),
+  ];
+
+  static const _recentTutors = [
+    TutorInfo(
+      name: 'Teacher Name',
+      subject: 'Chemistry',
+      qualification: 'Qualification',
+      rating: 4.6,
+      reviews: 58,
+      experience: '4 yrs',
+      feePerHour: 500,
+    ),
+    TutorInfo(
+      name: 'Teacher Name',
+      subject: 'Biology',
+      qualification: 'Qualification',
+      rating: 4.8,
+      reviews: 72,
+      experience: '3 yrs',
+      feePerHour: 550,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -157,7 +243,7 @@ class _StudentHomeTab extends ConsumerWidget {
                   crossAxisSpacing: AppSpacing.md,
                   childAspectRatio: 1.05,
                   children: [
-                    for (final category in StudentDummyData.categories)
+                    for (final category in _categories)
                       CategoryCard(category: category),
                   ],
                 ),
@@ -172,17 +258,17 @@ class _StudentHomeTab extends ConsumerWidget {
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
-                    itemCount: StudentDummyData.featuredTeachers.length,
+                    itemCount: _featuredTeachers.length,
                     separatorBuilder: (_, _) => AppSpacing.hGapMd,
                     itemBuilder: (context, index) => FeaturedTeacherCard(
-                      tutor: StudentDummyData.featuredTeachers[index],
+                      tutor: _featuredTeachers[index],
                     ),
                   ),
                 ),
                 AppSpacing.gapXxl,
                 const SectionHeader(title: 'Recent Tutors'),
                 AppSpacing.gapMd,
-                for (final tutor in StudentDummyData.recentTutors) ...[
+                for (final tutor in _recentTutors) ...[
                   RecentTutorTile(tutor: tutor),
                   AppSpacing.gapMd,
                 ],

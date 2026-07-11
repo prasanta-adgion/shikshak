@@ -4,7 +4,7 @@ import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
-import '../dummy/student_dummy_data.dart';
+import '../models/tutor_info.dart';
 
 /// Card in the horizontally scrolling "Featured Teachers" list.
 class FeaturedTeacherCard extends StatelessWidget {

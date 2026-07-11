@@ -1,18 +1,9 @@
-# Static analysis configuration for Shiksha.
+# Static analysis configuration for Shikshak.
 #
-# Based on the recommended Flutter lint set, with generated code excluded
-# and a couple of project-wide conventions enforced.
+# Based on the recommended Flutter lint set, with a couple of project-wide
+# conventions enforced.
 
 include: package:flutter_lints/flutter.yaml
-
-analyzer:
-  exclude:
-    - "**/*.g.dart"
-    - "**/*.freezed.dart"
-  errors:
-    # Freezed factory-constructor parameters legitimately carry @JsonKey;
-    # the annotation is copied onto the generated fields.
-    invalid_annotation_target: ignore
 
 linter:
   rules:

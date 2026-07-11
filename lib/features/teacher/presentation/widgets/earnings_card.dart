@@ -5,12 +5,18 @@ import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_card.dart';
-import '../dummy/teacher_dummy_data.dart';
 
 /// Monthly earnings summary with a lightweight bar sparkline
 /// (plain containers — no chart dependency).
 class EarningsCard extends StatelessWidget {
   const EarningsCard({super.key});
+
+  // Static placeholder content, shown until the earnings API exists.
+  static const _earningsThisMonth = '₹0';
+  static const _earningsGrowth = '— vs last month';
+
+  /// Relative weekly earnings used to draw the mini bar chart (0..1).
+  static const _weeklyEarnings = [0.45, 0.6, 0.38, 0.75, 0.55, 0.9, 0.7];
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +39,7 @@ class EarningsCard extends StatelessWidget {
                 ),
                 AppSpacing.gapSm,
                 Text(
-                  TeacherDummyData.earningsThisMonth,
+                  _earningsThisMonth,
                   style: theme.textTheme.displaySmall?.copyWith(
                     color: Colors.white,
                   ),
@@ -49,7 +55,7 @@ class EarningsCard extends StatelessWidget {
                     AppSpacing.hGapXs,
                     Flexible(
                       child: Text(
-                        TeacherDummyData.earningsGrowth,
+                        _earningsGrowth,
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: Colors.white,
                         ),
@@ -67,7 +73,7 @@ class EarningsCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                for (final value in TeacherDummyData.weeklyEarnings) ...[
+                for (final value in _weeklyEarnings) ...[
                   Container(
                     width: 8,
                     height: 88 * value,

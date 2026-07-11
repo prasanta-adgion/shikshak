@@ -3,7 +3,24 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
-import '../dummy/teacher_dummy_data.dart';
+
+/// View model for an incoming class request. Populated with static data for
+/// now; will be built from the bookings API once it exists.
+class ClassRequest {
+  const ClassRequest({
+    required this.studentName,
+    required this.subject,
+    required this.grade,
+    required this.schedule,
+    required this.mode,
+  });
+
+  final String studentName;
+  final String subject;
+  final String grade;
+  final String schedule;
+  final String mode;
+}
 
 /// Incoming class request with accept/decline actions (UI only).
 class ClassRequestTile extends StatelessWidget {
