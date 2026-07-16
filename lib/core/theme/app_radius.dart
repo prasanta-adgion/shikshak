@@ -11,7 +11,7 @@ abstract final class AppRadius {
 
   static const BorderRadius input = BorderRadius.all(Radius.circular(sm + 2));
   static const BorderRadius button = BorderRadius.all(Radius.circular(sm + 2));
-  static const BorderRadius card = BorderRadius.all(Radius.circular(lg));
+  static const BorderRadius card = BorderRadius.all(Radius.circular(xs));
   static const BorderRadius sheet = BorderRadius.vertical(
     top: Radius.circular(xl),
   );

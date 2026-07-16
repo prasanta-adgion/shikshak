@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
+import '../../../../shared/widgets/app_outlined_button.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
 
 /// View model for an incoming class request. Populated with static data for
@@ -63,8 +65,9 @@ class ClassRequestTile extends StatelessWidget {
                 labelStyle: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                 ),
-                backgroundColor:
-                    theme.colorScheme.primary.withValues(alpha: 0.10),
+                backgroundColor: theme.colorScheme.primary.withValues(
+                  alpha: 0.10,
+                ),
                 side: BorderSide.none,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.sm,
@@ -74,34 +77,19 @@ class ClassRequestTile extends StatelessWidget {
             ],
           ),
           AppSpacing.gapMd,
-          Text(
-            request.schedule,
-            style: theme.textTheme.bodyMedium,
-          ),
+          Text(request.schedule, style: theme.textTheme.bodyMedium),
           AppSpacing.gapLg,
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
+                child: AppOutlinedButton(
+                  label: 'Decline',
                   onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(0, 42),
-                    foregroundColor: theme.colorScheme.error,
-                    side: BorderSide(
-                      color: theme.colorScheme.error.withValues(alpha: 0.4),
-                    ),
-                  ),
-                  child: const Text('Decline'),
+                  color: theme.colorScheme.error,
                 ),
               ),
               AppSpacing.hGapMd,
-              Expanded(
-                child: FilledButton(
-                  onPressed: () {},
-                  style: FilledButton.styleFrom(minimumSize: const Size(0, 42)),
-                  child: const Text('Accept'),
-                ),
-              ),
+              Expanded(child: AppButton(label: 'Accept', onPressed: () {})),
             ],
           ),
         ],

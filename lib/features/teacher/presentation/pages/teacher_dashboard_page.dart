@@ -33,19 +33,19 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
   static const _placeholderTabs = [
     (
       title: 'Schedule',
-      message: 'Your class calendar and time slots will appear here.'
+      message: 'Your class calendar and time slots will appear here.',
     ),
     (
       title: 'My Students',
-      message: 'All your enrolled students will be listed here.'
+      message: 'All your enrolled students will be listed here.',
     ),
     (
       title: 'Earnings',
-      message: 'Detailed payout history and invoices are on the way.'
+      message: 'Detailed payout history and invoices are on the way.',
     ),
     (
       title: 'Profile',
-      message: 'Manage your public profile, subjects and pricing.'
+      message: 'Manage your public profile, subjects and pricing.',
     ),
   ];
 
@@ -200,9 +200,7 @@ class _TeacherHomeTab extends ConsumerWidget {
                   mainAxisSpacing: AppSpacing.md,
                   crossAxisSpacing: AppSpacing.md,
                   childAspectRatio: context.isTablet ? 1.2 : 1.15,
-                  children: [
-                    for (final stat in _stats) StatCard(stat: stat),
-                  ],
+                  children: [for (final stat in _stats) StatCard(stat: stat)],
                 ),
                 AppSpacing.gapXl,
                 const EarningsCard(),
@@ -279,11 +277,7 @@ class _WelcomeBanner extends StatelessWidget {
                 Radius.circular(AppRadius.sm),
               ),
             ),
-            child: const Icon(
-              AppIcons.schedule,
-              color: Colors.white,
-              size: 28,
-            ),
+            child: const Icon(AppIcons.schedule, color: Colors.white, size: 28),
           ),
         ],
       ),

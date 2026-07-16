@@ -1,6 +1,4 @@
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/network/api_exception.dart';
-import '../../../../core/storage/secure_storage_service.dart';
 import '../../domain/entities/user_role.dart';
 import '../models/auth_response_model.dart';
 import '../models/login_request_model.dart';
@@ -16,11 +14,7 @@ import 'auth_remote_datasource.dart';
 ///   would with the real data source, so swapping to
 ///   [AuthRemoteDataSourceImpl] requires zero changes elsewhere.
 class MockAuthRemoteDataSource implements AuthRemoteDataSource {
-  MockAuthRemoteDataSource(this._storage);
-
-  /// Needed only to reconstruct a dummy profile for a persisted session
-  /// (a real backend derives the user from the bearer token instead).
-  final SecureStorageService _storage;
+  MockAuthRemoteDataSource();
 
   static const _mockAccessToken = 'mock-access-token-Shikshak';
   static const _mockRefreshToken = 'mock-refresh-token-Shikshak';
@@ -64,21 +58,6 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
         preferredSubjects: request.preferredSubjects,
       ),
     );
-  }
-
-  @override
-  Future<UserModel> fetchProfile() async {
-    await Future<void>.delayed(AppConstants.mockNetworkDelay);
-
-    final storedRole = UserRole.tryParse(await _storage.getRole());
-    if (storedRole == null) {
-      throw const ApiException(
-        message: 'Session expired. Please log in again.',
-        type: ApiExceptionType.unauthorized,
-        statusCode: 401,
-      );
-    }
-    return _placeholderUser(role: storedRole);
   }
 
   /// Minimal placeholder profile; the real API returns the actual user.

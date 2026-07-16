@@ -18,6 +18,7 @@ class AppTextField extends StatelessWidget {
     this.keyboardType,
     this.textInputAction = TextInputAction.next,
     this.prefixIcon,
+    this.prefixImage,
     this.suffixIcon,
     this.obscureText = false,
     this.enabled = true,
@@ -35,6 +36,10 @@ class AppTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextInputAction textInputAction;
   final IconData? prefixIcon;
+
+  /// Asset path for a custom leading image (e.g. a brand icon), used instead
+  /// of [prefixIcon] when set.
+  final String? prefixImage;
   final Widget? suffixIcon;
   final bool obscureText;
   final bool enabled;
@@ -75,11 +80,24 @@ class AppTextField extends StatelessWidget {
 
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: prefixIcon == null ? null : Icon(prefixIcon, size: 22),
+            prefixIcon: _buildPrefix(),
             suffixIcon: suffixIcon,
           ),
         ),
       ],
     );
+  }
+
+  Widget? _buildPrefix() {
+    if (prefixImage != null) {
+      return Padding(
+        padding: const EdgeInsets.all(12),
+        child: Image.asset(prefixImage!, fit: BoxFit.contain),
+      );
+    }
+    if (prefixIcon != null) {
+      return Icon(prefixIcon, size: 22);
+    }
+    return null;
   }
 }

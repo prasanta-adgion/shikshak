@@ -19,7 +19,7 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   // The backend does not exist yet, so the app runs on the mock.
   // To go live, replace with:
   //   return AuthRemoteDataSourceImpl(ref.watch(apiClientProvider));
-  return MockAuthRemoteDataSource(ref.watch(secureStorageServiceProvider));
+  return MockAuthRemoteDataSource();
 });
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

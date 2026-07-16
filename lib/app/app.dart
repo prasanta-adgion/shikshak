@@ -4,11 +4,6 @@ import '../core/constants/app_constants.dart';
 import '../core/theme/app_theme.dart';
 import 'router/app_router.dart';
 
-/// Root widget of the Shikshak application.
-///
-/// Wires the design system ([AppTheme]) and navigation ([AppRouter]) into a
-/// [MaterialApp.router]. Kept intentionally thin: all behaviour lives in
-/// features, all configuration in `core/`.
 class ShikshakApp extends StatelessWidget {
   const ShikshakApp({super.key});
 
@@ -17,10 +12,23 @@ class ShikshakApp extends StatelessWidget {
     return MaterialApp.router(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: AppTheme.light.copyWith(
+        textTheme: AppTheme.light.textTheme.apply(fontFamily: 'Outfit'),
+      ),
+      darkTheme: AppTheme.dark.copyWith(
+        textTheme: AppTheme.dark.textTheme.apply(fontFamily: 'Outfit'),
+      ),
       themeMode: ThemeMode.system,
       routerConfig: AppRouter.router,
+
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(minScaleFactor: 0.85, maxScaleFactor: 1.3),
+        ),
+        child: child!,
+      ),
     );
   }
 }

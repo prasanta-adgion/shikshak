@@ -14,7 +14,7 @@ abstract final class AppSpacing {
   static const double giant = 56;
 
   /// Default horizontal padding for page content.
-  static const EdgeInsets pagePadding = EdgeInsets.symmetric(horizontal: xl);
+  static const EdgeInsets pagePadding = EdgeInsets.symmetric(horizontal: lg);
 
   /// Default padding inside cards.
   static const EdgeInsets cardPadding = EdgeInsets.all(lg);

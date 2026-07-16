@@ -2,6 +2,10 @@ import 'user_model.dart';
 
 /// Payload returned by login/register endpoints.
 class AuthResponseModel {
+  final String accessToken;
+  final String refreshToken;
+  final UserModel user;
+
   const AuthResponseModel({
     required this.accessToken,
     required this.refreshToken,
@@ -14,8 +18,4 @@ class AuthResponseModel {
         refreshToken: json['refresh_token'] as String,
         user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
       );
-
-  final String accessToken;
-  final String refreshToken;
-  final UserModel user;
 }

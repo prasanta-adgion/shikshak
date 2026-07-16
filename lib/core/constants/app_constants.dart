@@ -1,7 +1,8 @@
 /// Application-wide constants.
 abstract final class AppConstants {
-  static const String appName = 'Shikshak';
-  static const String tagline = 'Find the Right Teacher. Learn Without Limits.';
+  static const String appName = 'Shiksak';
+  static const String tagline =
+      'Find the Right Teacher.\nEmpowering Minds. Building Futures.';
   static const String appVersion = '1.0.0';
 
   /// Minimum time the splash screen stays visible, so the intro animation

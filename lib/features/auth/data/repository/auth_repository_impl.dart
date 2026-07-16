@@ -62,12 +62,6 @@ class AuthRepositoryImpl implements AuthRepository {
       });
 
   @override
-  Future<ApiResult<UserEntity>> fetchProfile() => _guard(() async {
-        final user = await _remote.fetchProfile();
-        return user.toEntity();
-      });
-
-  @override
   Future<bool> hasValidSession() async {
     final token = await _storage.getToken();
     return token != null && token.isNotEmpty;

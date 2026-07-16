@@ -19,24 +19,23 @@ class AuthNotifier extends Notifier<AuthState> {
 
   /// Splash entry point: restores a persisted session (if any) while
   /// guaranteeing the splash animation gets its minimum screen time.
+  ///
+  /// Only checks whether a token/role are stored — it never calls the API,
+  /// so [AuthState.user] stays null until the next login/register.
   Future<void> checkAuthStatus() async {
-    final (result, _) = await (
+    final (role, _) = await (
       ref.read(checkAuthStatusUseCaseProvider).call(),
       Future<void>.delayed(AppConstants.splashMinDuration),
     ).wait;
 
-    if (result == null) {
+    if (role == null) {
       state = state.copyWith(status: AuthStatus.unauthenticated);
       return;
     }
 
-    result.fold(
-      onSuccess: _setAuthenticated,
-      onFailure: (_) async {
-        // Stored token is unusable — clear it and start fresh.
-        await ref.read(logoutUseCaseProvider).call();
-        state = state.copyWith(status: AuthStatus.unauthenticated);
-      },
+    state = state.copyWith(
+      status: AuthStatus.authenticated,
+      selectedRole: role,
     );
   }
 

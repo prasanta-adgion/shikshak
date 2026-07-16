@@ -5,15 +5,12 @@ import '../../../../core/network/i_api_client.dart';
 import '../models/auth_response_model.dart';
 import '../models/login_request_model.dart';
 import '../models/register_request_model.dart';
-import '../models/user_model.dart';
 
 /// Contract for the auth API.
 abstract interface class AuthRemoteDataSource {
   Future<AuthResponseModel> login(LoginRequestModel request);
 
   Future<AuthResponseModel> register(RegisterRequestModel request);
-
-  Future<UserModel> fetchProfile();
 }
 
 /// Real implementation that talks to the Shikshak backend through
@@ -49,15 +46,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return _unwrap(
       json,
       (data) => AuthResponseModel.fromJson(data as Map<String, dynamic>),
-    );
-  }
-
-  @override
-  Future<UserModel> fetchProfile() async {
-    final json = await _client.get<Map<String, dynamic>>(ApiEndpoints.profile);
-    return _unwrap(
-      json,
-      (data) => UserModel.fromJson(data as Map<String, dynamic>),
     );
   }
 

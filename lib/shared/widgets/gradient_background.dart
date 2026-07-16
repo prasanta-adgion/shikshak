@@ -7,11 +7,7 @@ import '../../core/theme/app_colors.dart';
 /// Pass a custom [gradient] (e.g. [AppColors.splashGradient]) to override
 /// the default subtle wash.
 class GradientBackground extends StatelessWidget {
-  const GradientBackground({
-    super.key,
-    required this.child,
-    this.gradient,
-  });
+  const GradientBackground({super.key, required this.child, this.gradient});
 
   final Widget child;
   final Gradient? gradient;
@@ -22,10 +18,9 @@ class GradientBackground extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: gradient ??
-            (isDark
-                ? AppColors.darkPageGradient
-                : AppColors.lightPageGradient),
+        gradient:
+            gradient ??
+            (isDark ? AppColors.darkPageGradient : AppColors.lightPageGradient),
       ),
       child: child,
     );

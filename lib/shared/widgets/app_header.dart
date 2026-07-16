@@ -26,7 +26,7 @@ class AppHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: theme.textTheme.headlineMedium,
+          style: theme.textTheme.headlineSmall,
           textAlign: centered ? TextAlign.center : TextAlign.start,
         ),
         if (subtitle != null) ...[

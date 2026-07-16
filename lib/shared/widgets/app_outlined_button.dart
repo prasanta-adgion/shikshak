@@ -11,12 +11,16 @@ class AppOutlinedButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.expanded = true,
+    this.color,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
   final bool expanded;
+
+  /// Optional text/border color override (e.g. for a destructive action).
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +35,16 @@ class AppOutlinedButton extends StatelessWidget {
             ],
           );
 
-    final button = OutlinedButton(onPressed: onPressed, child: child);
+    final button = OutlinedButton(
+      onPressed: onPressed,
+      style: color == null
+          ? null
+          : OutlinedButton.styleFrom(
+              foregroundColor: color,
+              side: BorderSide(color: color!.withValues(alpha: 0.4)),
+            ),
+      child: child,
+    );
 
     return expanded ? SizedBox(width: double.infinity, child: button) : button;
   }

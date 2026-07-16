@@ -4,11 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_paths.dart';
 import '../../../../core/theme/app_icons.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../providers/auth_providers.dart';
 
 /// App-bar logout action with a confirmation dialog.
 /// Shared by both dashboards. Clears the session, then returns to the
-/// role-selection screen.
+/// login screen.
 class LogoutButton extends ConsumerWidget {
   const LogoutButton({super.key});
 
@@ -26,9 +27,10 @@ class LogoutButton extends ConsumerWidget {
                 onPressed: () => Navigator.of(context).pop(false),
                 child: const Text('Cancel'),
               ),
-              FilledButton(
+              AppButton(
+                label: 'Log out',
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Log out'),
+                expanded: false,
               ),
             ],
           ),
@@ -36,7 +38,7 @@ class LogoutButton extends ConsumerWidget {
         if (confirmed ?? false) {
           await ref.read(authNotifierProvider.notifier).logout();
           if (context.mounted) {
-            context.go(RoutePaths.roleSelection);
+            context.go(RoutePaths.login);
           }
         }
       },

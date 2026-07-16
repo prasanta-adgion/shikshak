@@ -11,7 +11,7 @@ abstract final class AppColors {
   static const Color primaryDark = Color(0xFF4338CA);
   static const Color primaryLight = Color(0xFF818CF8);
   static const Color secondary = Color(0xFFF59E0B);
-  static const Color tertiary = Color(0xFF14B8A6);
+  static const Color tertiary = Color(0xFF2E9958);
 
   // ── Semantic ─────────────────────────────────────────────────────────────
   static const Color success = Color(0xFF22C55E);
@@ -20,7 +20,7 @@ abstract final class AppColors {
   static const Color info = Color(0xFF3B82F6);
 
   // ── Light neutrals ───────────────────────────────────────────────────────
-  static const Color lightBackground = Color(0xFFF8FAFC);
+  static const Color lightBackground = Color(0xFFFAFAFD);
   static const Color lightSurface = Color(0xFFFFFFFF);
   static const Color lightSurfaceVariant = Color(0xFFF1F5F9);
   static const Color lightBorder = Color(0xFFE2E8F0);

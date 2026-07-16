@@ -6,16 +6,15 @@ import '../../features/auth/domain/entities/user_role.dart';
 /// path change is a single-line edit.
 abstract final class RoutePaths {
   static const String splash = '/';
-  static const String roleSelection = '/role-selection';
+
+  /// Role is chosen inline on the login screen, not via the route.
+  static const String login = '/login';
 
   /// `:role` is `teacher` or `student` — see [UserRole.tryParse].
-  static const String login = '/login/:role';
   static const String register = '/register/:role';
 
   static const String studentDashboard = '/student/dashboard';
   static const String teacherDashboard = '/teacher/dashboard';
-
-  static String loginFor(UserRole role) => '/login/${role.name}';
 
   static String registerFor(UserRole role) => '/register/${role.name}';
 
@@ -28,7 +27,6 @@ abstract final class RoutePaths {
 /// Route names used for named navigation and analytics screen tracking.
 abstract final class RouteNames {
   static const String splash = 'splash';
-  static const String roleSelection = 'roleSelection';
   static const String login = 'login';
   static const String register = 'register';
   static const String studentDashboard = 'studentDashboard';

@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_icons.dart';
 import 'app_text_field.dart';
 
-/// Password input with a visibility toggle.
-///
-/// Owns only the obscure/reveal state; everything else is delegated to
-/// [AppTextField] so styling stays consistent.
 class AppPasswordField extends StatefulWidget {
   const AppPasswordField({
     super.key,

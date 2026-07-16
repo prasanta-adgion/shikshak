@@ -28,7 +28,11 @@ class FeaturedTeacherCard extends StatelessWidget {
               children: [
                 InitialsAvatar(name: tutor.name, size: 48),
                 const Spacer(),
-                Icon(AppIcons.star, color: theme.colorScheme.secondary, size: 18),
+                Icon(
+                  AppIcons.star,
+                  color: theme.colorScheme.secondary,
+                  size: 18,
+                ),
                 AppSpacing.hGapXs,
                 Text(
                   tutor.rating.toStringAsFixed(1),

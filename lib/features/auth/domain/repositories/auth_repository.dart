@@ -4,8 +4,6 @@ import '../entities/user_role.dart';
 import '../usecases/login_usecase.dart';
 import '../usecases/register_usecase.dart';
 
-/// Contract for authentication operations.
-///
 /// The presentation layer only ever sees this abstraction; the concrete
 /// implementation (remote API + secure storage) lives in the data layer.
 abstract interface class AuthRepository {
@@ -14,9 +12,6 @@ abstract interface class AuthRepository {
 
   /// Creates an account and persists the session on success.
   Future<ApiResult<UserEntity>> register(RegisterParams params);
-
-  /// Loads the profile for the currently stored session.
-  Future<ApiResult<UserEntity>> fetchProfile();
 
   /// Whether a persisted access token exists.
   Future<bool> hasValidSession();

@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_paths.dart';
+import '../../../../core/constants/app_images_const.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/validators.dart';
@@ -12,15 +14,15 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../../domain/entities/user_role.dart';
 import '../providers/auth_providers.dart';
 import '../state/auth_state.dart';
+import '../widgets/auth_hero_banner.dart';
 import '../widgets/auth_scaffold.dart';
+import '../widgets/role_check_dailog.dart';
 import '../widgets/social_login_button.dart';
 
-/// Role-aware login screen — the same page serves teachers and students,
-/// adapting its copy from [role].
+/// Login screen. The student/teacher toggle at the top lets the same form
+/// serve both roles without a separate role-selection screen.
 class LoginPage extends ConsumerStatefulWidget {
-  const LoginPage({super.key, required this.role});
-
-  final UserRole role;
+  const LoginPage({super.key});
 
   @override
   ConsumerState<LoginPage> createState() => _LoginPageState();
@@ -30,7 +32,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _rememberMe = true;
+  final bool _rememberMe = true;
+  UserRole _role = UserRole.student;
 
   @override
   void dispose() {
@@ -48,9 +51,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         .login(
           identifier: _identifierController.text,
           password: _passwordController.text,
-          role: widget.role,
+          role: _role,
           rememberMe: _rememberMe,
         );
+  }
+
+  Future<void> _openRegister(BuildContext context) async {
+    final role = await showRoleCheckDialog(context, initialRole: _role);
+    if (role == null || !context.mounted) return;
+    context.push(RoutePaths.registerFor(role));
   }
 
   void _showComingSoon(String feature) {
@@ -72,7 +81,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
       final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
       if (next == AuthStatus.authenticated && isCurrent) {
-        final role = ref.read(authNotifierProvider).user?.role ?? widget.role;
+        final role = ref.read(authNotifierProvider).user?.role ?? _role;
         context.go(RoutePaths.dashboardFor(role));
       }
     });
@@ -93,9 +102,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     return AuthScaffold(
-      title: 'Welcome Back, ${widget.role.label}',
+      banner: const AuthHeroBanner(
+        headline: 'Welcome',
+        headlineAccent: 'Back!',
+        subtitle: 'Welcome back! Continue your journey with Shikshak.',
+        image: AppImagesConst.loginScreenImage,
+      ),
+      title: 'Hello Again! 👋',
       subtitle:
-          'Log in to continue your ${widget.role == UserRole.teacher ? 'teaching' : 'learning'} journey',
+          'Login to continue your ${_role == UserRole.teacher ? 'teaching' : 'learning'} journey',
       form: Form(
         key: _formKey,
         child: AutofillGroup(
@@ -112,7 +127,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 autofillHints: const [AutofillHints.username],
                 inputFormatters: [],
               ),
-              AppSpacing.gapXl,
+              AppSpacing.gapMd,
               AppPasswordField(
                 controller: _passwordController,
                 hint: 'Enter your password',
@@ -125,7 +140,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 alignment: AlignmentGeometry.topRight,
                 child: TextButton(
                   onPressed: () => _showComingSoon('Password reset'),
-                  child: const Text('Forgot Password?'),
+                  child: Text(
+                    'Forgot Password?',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
                 ),
               ),
               AppSpacing.gapMd,
@@ -133,6 +153,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 label: 'Login',
                 isLoading: isSubmitting,
                 onPressed: _submit,
+                trailingIcon: CupertinoIcons.arrow_right,
               ),
               AppSpacing.gapXl,
               Row(
@@ -170,9 +191,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
           ),
           TextButton(
-            onPressed: isSubmitting
-                ? null
-                : () => context.push(RoutePaths.registerFor(widget.role)),
+            onPressed: isSubmitting ? null : () => _openRegister(context),
             child: const Text('Register'),
           ),
         ],

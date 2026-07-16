@@ -11,12 +11,14 @@ class AppLoadingButton extends StatelessWidget {
     required this.isLoading,
     this.onPressed,
     this.icon,
+    this.trailingIcon,
   });
 
   final String label;
   final bool isLoading;
   final VoidCallback? onPressed;
   final IconData? icon;
+  final IconData? trailingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +51,10 @@ class AppLoadingButton extends StatelessWidget {
                       const SizedBox(width: 8),
                     ],
                     Text(label),
+                    if (trailingIcon != null) ...[
+                      const SizedBox(width: 8),
+                      Icon(trailingIcon, size: 20),
+                    ],
                   ],
                 ),
         ),

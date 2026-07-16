@@ -1,24 +1,16 @@
+import 'package:Shikshak/core/constants/app_constants.dart';
+import 'package:Shikshak/core/constants/app_images_const.dart';
+import 'package:Shikshak/features/splash/presentation/widgets/section_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../app/router/route_paths.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/app_logo.dart';
-import '../../../../shared/widgets/gradient_background.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../auth/presentation/state/auth_state.dart';
 
-/// Animated brand splash.
-///
-/// Responsibilities:
-///  * play the intro animation (fade + scale),
-///  * kick off the session restore ([AuthNotifier.checkAuthStatus]),
-///  * navigate with GoRouter once the session check resolves:
-///    token found → role's dashboard, otherwise → role selection.
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
@@ -33,6 +25,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
   late final Animation<double> _logoScale;
   late final Animation<double> _textFade;
   late final Animation<Offset> _textSlide;
+  late final Animation<double> _indicatorFade;
+  late final Animation<Offset> _rightIndicatorSlide;
+  late final Animation<Offset> _leftIndicatorSlide;
 
   @override
   void initState() {
@@ -57,15 +52,31 @@ class _SplashPageState extends ConsumerState<SplashPage>
       parent: _controller,
       curve: const Interval(0.35, 0.8, curve: Curves.easeOut),
     );
-    _textSlide = Tween<Offset>(
-      begin: const Offset(0, 0.35),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.35, 0.85, curve: Curves.easeOutCubic),
-      ),
+    _textSlide = Tween<Offset>(begin: const Offset(0, 0.35), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.35, 0.85, curve: Curves.easeOutCubic),
+          ),
+        );
+    _indicatorFade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.55, 1, curve: Curves.easeOut),
     );
+    _rightIndicatorSlide =
+        Tween<Offset>(begin: const Offset(3.5, 0), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.55, 1, curve: Curves.easeOutCubic),
+          ),
+        );
+    _leftIndicatorSlide =
+        Tween<Offset>(begin: const Offset(-3.5, 0), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.55, 1, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _controller.forward();
 
@@ -85,100 +96,124 @@ class _SplashPageState extends ConsumerState<SplashPage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final taglineStyle = theme.textTheme.labelSmall?.copyWith(
+      fontSize: 11,
+      color: const Color(0xFF5B6EF5),
+      fontStyle: FontStyle.italic,
+      letterSpacing: 0.3,
+    );
 
     // Navigate as soon as the session check completes.
-    ref.listen(authNotifierProvider.select((s) => s.status),
-        (previous, next) {
+    ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
       switch (next) {
         case AuthStatus.authenticated:
           final role =
-              ref.read(authNotifierProvider).user?.role ?? UserRole.student;
-          context.go(RoutePaths.dashboardFor(role));
+              ref.read(authNotifierProvider).selectedRole ?? UserRole.student;
+        //  context.go(RoutePaths.dashboardFor(role));
         case AuthStatus.unauthenticated:
-          context.go(RoutePaths.roleSelection);
+        // context.go(RoutePaths.login);
         case AuthStatus.checking:
           break;
       }
     });
 
     return Scaffold(
-      body: GradientBackground(
-        gradient: AppColors.splashGradient,
-        child: SafeArea(
-          child: SizedBox.expand(
-            child: Column(
-              children: [
-                const Spacer(flex: 3),
-                FadeTransition(
-                  opacity: _logoFade,
-                  child: ScaleTransition(
-                    scale: _logoScale,
-                    child: const AppLogo(size: 116),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(AppImagesConst.splashScreen, fit: BoxFit.cover),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: ScaleTransition(
+                      scale: _logoScale,
+                      child: const AppLogo(
+                        image: AppImagesConst.onlyLogoWithoutText,
+                        size: 116,
+                      ),
+                    ),
                   ),
-                ),
-                AppSpacing.gapXxl,
-                FadeTransition(
-                  opacity: _textFade,
-                  child: SlideTransition(
-                    position: _textSlide,
-                    child: Column(
-                      children: [
-                        Text(
-                          AppConstants.appName,
-                          style: theme.textTheme.displayMedium?.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                        AppSpacing.gapMd,
-                        Padding(
-                          padding: AppSpacing.pagePadding,
-                          child: Text(
-                            AppConstants.tagline,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.85),
+                  FadeTransition(
+                    opacity: _textFade,
+                    child: SlideTransition(
+                      position: _textSlide,
+                      child: Column(
+                        children: [
+                          Text(
+                            AppConstants.appName.toUpperCase(),
+                            style: theme.textTheme.headlineLarge?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontFamily: 'Audiowide',
                             ),
                           ),
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                // fontWeight: FontWeight.w800,
+                                height: 1.2,
+                                fontSize: 18,
+                              ),
+                              children: const [
+                                TextSpan(
+                                  text: 'Learn. ',
+                                  style: TextStyle(color: AppColors.primary),
+                                ),
+                                TextSpan(
+                                  text: 'Grow. ',
+                                  style: TextStyle(color: AppColors.success),
+                                ),
+                                TextSpan(
+                                  text: 'Succeed.',
+                                  style: TextStyle(color: AppColors.primary),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  AppSpacing.gapSm,
+                  FadeTransition(
+                    opacity: _indicatorFade,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SlideTransition(
+                          position: _leftIndicatorSlide,
+                          child: const SectionIndicator(),
+                        ),
+                        AppSpacing.hGapSm,
+                        Text(
+                          AppConstants.tagline,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontSize: 11,
+                            color: const Color(0xFF5B6EF5),
+                            fontStyle: FontStyle.italic,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        AppSpacing.hGapSm,
+                        SlideTransition(
+                          position: _rightIndicatorSlide,
+                          child: const SectionIndicator(reversed: true),
                         ),
                       ],
                     ),
                   ),
-                ),
-                const Spacer(flex: 3),
-                FadeTransition(
-                  opacity: _textFade,
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 28,
-                        width: 28,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.6,
-                          color: Colors.white,
-                        ),
-                      ),
-                      AppSpacing.gapLg,
-                      Text(
-                        'Preparing your experience…',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                AppSpacing.gapXxxl,
-                Text(
-                  'v${AppConstants.appVersion}',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.5),
-                  ),
-                ),
-                AppSpacing.gapLg,
-              ],
+                ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

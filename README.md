@@ -73,3 +73,64 @@ Riverpod `Notifier` (`AuthNotifier` + immutable freezed `AuthState`). Widgets ne
 - Icons are referenced semantically via `AppIcons`.
 - Routes are referenced via `RoutePaths` helpers, never string literals.
 - Generated files (`*.freezed.dart`, `*.g.dart`) are excluded from analysis and never edited by hand.
+
+
+
+
+=> Data :
+
+Responsible for fetching data.
+
+Contains -----------
+1.Repository
+
+2.Model
+
+3.Datasource
+
+4.API
+
+Example -----------
+LoginRepository
+
+LoginModel
+
+LoginRemoteDatasource
+
+
+=> Domain :
+
+Contains business rules.
+
+Contains -----------
+Entity
+Repository Interface
+UseCase
+
+Example -----------
+LoginEntity 
+LoginRepository 
+LoginUseCase 
+
+-> Can user login? / -> Can teacher create slot? / -> Can student book class?
+
+=> Presentation :
+
+Everything visible to the user.
+
+Contains -----------
+Screens
+Widgets
+Riverpod
+Bloc
+Controllers
+
+Example -----------
+LoginScreen
+LoginNotifier
+LoginProvider
+LoginButton
+
+
+presentation  ──▶  domain  ◀──  data
+   (UI, state)   (business rules)  (API/storage)

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 
 /// Gradient hero card at the top of the student dashboard.
@@ -38,17 +39,12 @@ class StudentWelcomeCard extends StatelessWidget {
                   ),
                 ),
                 AppSpacing.gapLg,
-                FilledButton(
+                AppButton(
+                  label: 'Explore Teachers',
                   onPressed: () {},
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: AppColors.primary,
-                    minimumSize: const Size(0, 44),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xl,
-                    ),
-                  ),
-                  child: const Text('Explore Teachers'),
+                  expanded: false,
+                  color: Colors.white,
+                  foregroundColor: AppColors.primary,
                 ),
               ],
             ),
