@@ -21,7 +21,7 @@ class AppButton extends StatelessWidget {
   const AppButton({
     super.key,
     required this.label,
-    this.labelColor,
+    this.labelColor = Colors.white,
     this.onPressed,
     this.icon,
     this.expanded = true,
@@ -32,10 +32,24 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final child = icon == null
-        ? Text(label, style: TextStyle(color: labelColor))
+        ? Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: labelColor),
+          )
         : Row(
             mainAxisSize: MainAxisSize.min,
-            children: [Icon(icon, size: 20), AppSpacing.hGapSm, Text(label)],
+            children: [
+              Icon(icon, size: 20),
+              AppSpacing.hGapSm,
+              Text(
+                label,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: labelColor),
+              ),
+            ],
           );
 
     final button = FilledButton(

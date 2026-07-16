@@ -19,9 +19,11 @@ abstract final class RoutePaths {
   static String registerFor(UserRole role) => '/register/${role.name}';
 
   static String dashboardFor(UserRole role) => switch (role) {
-        UserRole.teacher => teacherDashboard,
-        UserRole.student => studentDashboard,
-      };
+    UserRole.teacher => teacherDashboard,
+    UserRole.student => studentDashboard,
+  };
+
+  static const String otpVerify = '/otp-verify';
 }
 
 /// Route names used for named navigation and analytics screen tracking.
@@ -31,4 +33,5 @@ abstract final class RouteNames {
   static const String register = 'register';
   static const String studentDashboard = 'studentDashboard';
   static const String teacherDashboard = 'teacherDashboard';
+  static const String otpVerify = 'otpVerify';
 }

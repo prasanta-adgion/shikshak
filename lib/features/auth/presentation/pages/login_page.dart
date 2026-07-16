@@ -1,3 +1,4 @@
+import 'package:Shikshak/core/constants/app_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,7 +34,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
   final bool _rememberMe = true;
-  UserRole _role = UserRole.student;
+  final UserRole _role = UserRole.student;
 
   @override
   void dispose() {
@@ -105,7 +106,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       banner: const AuthHeroBanner(
         headline: 'Welcome',
         headlineAccent: 'Back!',
-        subtitle: 'Welcome back! Continue your journey with Shikshak.',
+        subtitle:
+            'Welcome back! Continue your journey with ${AppConstants.appName}.',
         image: AppImagesConst.loginScreenImage,
       ),
       title: 'Hello Again! 👋',
@@ -185,7 +187,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'New to Shikshak?',
+            'New to ${AppConstants.appName}?',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

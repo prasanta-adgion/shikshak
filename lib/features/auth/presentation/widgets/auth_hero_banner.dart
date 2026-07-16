@@ -73,9 +73,11 @@ class AuthHeroBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      AppConstants.appName,
+                      AppConstants.appName.toUpperCase(),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
+                        fontFamily: 'Audiowide',
+                        color: AppColors.primary,
                       ),
                     ),
                     Text(

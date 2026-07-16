@@ -18,6 +18,7 @@ class AuthScaffold extends StatelessWidget {
     this.footer,
     this.roleSelector,
     this.banner,
+    this.alignToTop = false,
   });
 
   final String title;
@@ -33,11 +34,15 @@ class AuthScaffold extends StatelessWidget {
   /// Full-bleed hero content shown above the card (e.g. brand + illustration).
   final Widget? banner;
 
+  /// Keeps short auth pages pinned to the top instead of vertically centered.
+  final bool alignToTop;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
-      body: Center(
+      body: Align(
+        alignment: alignToTop ? Alignment.topCenter : Alignment.center,
         child: SafeArea(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),

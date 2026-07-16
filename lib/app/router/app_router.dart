@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/otp_verify_screen.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/student/presentation/pages/student_dashboard_page.dart';
@@ -42,6 +43,18 @@ abstract final class AppRouter {
         pageBuilder: (context, state) => fadeSlidePage(
           key: state.pageKey,
           child: RegisterPage(role: _roleParam(state)),
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.otpVerify,
+        name: RouteNames.otpVerify,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: OtpVerifyScreen(
+            destination:
+                state.uri.queryParameters['destination'] ??
+                'your mobile number',
+          ),
         ),
       ),
       GoRoute(

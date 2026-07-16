@@ -1,8 +1,11 @@
+import 'package:Shikshak/app/router/route_paths.dart';
 import 'package:Shikshak/core/constants/app_constants.dart';
 import 'package:Shikshak/core/constants/app_images_const.dart';
 import 'package:Shikshak/features/splash/presentation/widgets/section_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -28,10 +31,14 @@ class _SplashPageState extends ConsumerState<SplashPage>
   late final Animation<double> _indicatorFade;
   late final Animation<Offset> _rightIndicatorSlide;
   late final Animation<Offset> _leftIndicatorSlide;
+  late final Animation<double> _bottomTextFade;
+  late final Animation<Offset> _bottomTextSlide;
 
   @override
   void initState() {
     super.initState();
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _controller = AnimationController(
       vsync: this,
@@ -77,6 +84,17 @@ class _SplashPageState extends ConsumerState<SplashPage>
             curve: const Interval(0.55, 1, curve: Curves.easeOutCubic),
           ),
         );
+    _bottomTextFade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.65, 1, curve: Curves.easeOut),
+    );
+    _bottomTextSlide =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.65, 1, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _controller.forward();
 
@@ -89,6 +107,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
 
   @override
   void dispose() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _controller.dispose();
     super.dispose();
   }
@@ -96,12 +115,6 @@ class _SplashPageState extends ConsumerState<SplashPage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final taglineStyle = theme.textTheme.labelSmall?.copyWith(
-      fontSize: 11,
-      color: const Color(0xFF5B6EF5),
-      fontStyle: FontStyle.italic,
-      letterSpacing: 0.3,
-    );
 
     // Navigate as soon as the session check completes.
     ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
@@ -109,9 +122,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
         case AuthStatus.authenticated:
           final role =
               ref.read(authNotifierProvider).selectedRole ?? UserRole.student;
-        //  context.go(RoutePaths.dashboardFor(role));
+          context.go(RoutePaths.dashboardFor(role));
         case AuthStatus.unauthenticated:
-        // context.go(RoutePaths.login);
+          context.go(RoutePaths.login);
         case AuthStatus.checking:
           break;
       }
@@ -210,6 +223,40 @@ class _SplashPageState extends ConsumerState<SplashPage>
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 50),
+                child: FadeTransition(
+                  opacity: _bottomTextFade,
+                  child: SlideTransition(
+                    position: _bottomTextSlide,
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        children: const [
+                          TextSpan(text: 'Your journey to '),
+                          TextSpan(
+                            text: 'knowledge',
+                            style: TextStyle(
+                              color: AppColors.secondary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          TextSpan(text: ' begins here.'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

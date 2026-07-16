@@ -1,3 +1,4 @@
+import 'package:Shikshak/core/constants/app_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -63,6 +64,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             city: '',
           ),
         );
+
+    context.go(RoutePaths.otpVerify, extra: []);
   }
 
   @override
@@ -100,7 +103,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       banner: AuthHeroBanner(
         image: AppImagesConst.loginScreenImage,
         headline: 'Join',
-        headlineAccent: 'Shikshak!',
+        headlineAccent: AppConstants.appName,
         subtitle:
             'Sign in to continue your ${widget.role == UserRole.teacher ? 'teaching' : 'learning'} journey.',
       ),
