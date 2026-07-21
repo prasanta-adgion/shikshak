@@ -18,4 +18,7 @@ class AppImagesConst {
   static const onlyLogoWithoutText = '${sharedRoot}only-logo.png';
   static const otpScreenImage = '${sharedRoot}otp-screen-image.png';
   static const splashScreen = '${sharedRoot}splash-screen.png';
+
+  //tabs images
+  static const loginBgOfTablet = '${sharedRoot}tab-login-bg.png';
 }

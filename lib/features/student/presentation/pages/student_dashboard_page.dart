@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
+import '../../../../shared/widgets/adaptive_navigation_scaffold.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
 import '../../../../shared/widgets/section_header.dart';
@@ -16,8 +17,6 @@ import '../widgets/featured_teacher_card.dart';
 import '../widgets/recent_tutor_tile.dart';
 import '../widgets/student_welcome_card.dart';
 
-/// Student home shell: bottom navigation + tab content.
-/// Only the Home tab has real content for now; the rest are placeholders.
 class StudentDashboardPage extends ConsumerStatefulWidget {
   const StudentDashboardPage({super.key});
 
@@ -29,66 +28,58 @@ class StudentDashboardPage extends ConsumerStatefulWidget {
 class _StudentDashboardPageState extends ConsumerState<StudentDashboardPage> {
   int _tabIndex = 0;
 
+  static const _destinations = [
+    AdaptiveNavigationDestination(
+      icon: AppIcons.homeOutlined,
+      selectedIcon: AppIcons.home,
+      label: 'Home',
+    ),
+    AdaptiveNavigationDestination(icon: AppIcons.search, label: 'Search'),
+    AdaptiveNavigationDestination(
+      icon: AppIcons.bookingsOutlined,
+      selectedIcon: AppIcons.bookings,
+      label: 'Bookings',
+    ),
+    AdaptiveNavigationDestination(
+      icon: AppIcons.materialsOutlined,
+      selectedIcon: AppIcons.materials,
+      label: 'Materials',
+    ),
+    AdaptiveNavigationDestination(
+      icon: AppIcons.profileOutlined,
+      selectedIcon: AppIcons.profile,
+      label: 'Profile',
+    ),
+  ];
+
   static const _placeholderTabs = [
     (
       title: 'Search Tutors',
-      message: 'Tutor discovery with filters is on the way.'
+      message: 'Tutor discovery with filters is on the way.',
     ),
-    (
-      title: 'My Bookings',
-      message: 'Your booked classes will show up here.'
-    ),
+    (title: 'My Bookings', message: 'Your booked classes will show up here.'),
     (
       title: 'Study Materials',
-      message: 'Purchased notes and materials will live here.'
+      message: 'Purchased notes and materials will live here.',
     ),
     (
       title: 'Profile',
-      message: 'Manage your account, preferences and payments.'
+      message: 'Manage your account, preferences and payments.',
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: _tabIndex == 0
-            ? const _StudentHomeTab()
-            : EmptyState(
-                title: _placeholderTabs[_tabIndex - 1].title,
-                message: _placeholderTabs[_tabIndex - 1].message,
-              ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tabIndex,
-        onDestinationSelected: (index) => setState(() => _tabIndex = index),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(AppIcons.homeOutlined),
-            selectedIcon: Icon(AppIcons.home),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(AppIcons.search),
-            label: 'Search',
-          ),
-          NavigationDestination(
-            icon: Icon(AppIcons.bookingsOutlined),
-            selectedIcon: Icon(AppIcons.bookings),
-            label: 'Bookings',
-          ),
-          NavigationDestination(
-            icon: Icon(AppIcons.materialsOutlined),
-            selectedIcon: Icon(AppIcons.materials),
-            label: 'Materials',
-          ),
-          NavigationDestination(
-            icon: Icon(AppIcons.profileOutlined),
-            selectedIcon: Icon(AppIcons.profile),
-            label: 'Profile',
-          ),
-        ],
-      ),
+    return AdaptiveNavigationScaffold(
+      selectedIndex: _tabIndex,
+      onDestinationSelected: (index) => setState(() => _tabIndex = index),
+      destinations: _destinations,
+      body: _tabIndex == 0
+          ? const _StudentHomeTab()
+          : EmptyState(
+              title: _placeholderTabs[_tabIndex - 1].title,
+              message: _placeholderTabs[_tabIndex - 1].message,
+            ),
     );
   }
 }
@@ -225,7 +216,7 @@ class _StudentHomeTab extends ConsumerWidget {
             ],
           ),
           SliverPadding(
-            padding: AppSpacing.pagePadding,
+            padding: context.responsivePagePadding,
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 AppSpacing.gapSm,
@@ -233,7 +224,10 @@ class _StudentHomeTab extends ConsumerWidget {
                 AppSpacing.gapXl,
                 const DashboardSearchBar(),
                 AppSpacing.gapXxl,
-                const SectionHeader(title: 'Categories', actionLabel: 'See All'),
+                const SectionHeader(
+                  title: 'Categories',
+                  actionLabel: 'See All',
+                ),
                 AppSpacing.gapMd,
                 GridView.count(
                   crossAxisCount: context.gridColumns(),
@@ -241,7 +235,13 @@ class _StudentHomeTab extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: AppSpacing.md,
                   crossAxisSpacing: AppSpacing.md,
-                  childAspectRatio: 1.05,
+                  // Cards get narrower as columns grow (3→4→6), so give them a
+                  // little more height to keep icon + label balanced.
+                  childAspectRatio: context.isDesktop
+                      ? 0.95
+                      : context.isTabletOrLarger
+                      ? 1.1
+                      : 1.05,
                   children: [
                     for (final category in _categories)
                       CategoryCard(category: category),
@@ -254,15 +254,14 @@ class _StudentHomeTab extends ConsumerWidget {
                 ),
                 AppSpacing.gapMd,
                 SizedBox(
-                  height: 190,
+                  height: context.isTabletDevice ? 210 : 190,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),
                     itemCount: _featuredTeachers.length,
                     separatorBuilder: (_, _) => AppSpacing.hGapMd,
-                    itemBuilder: (context, index) => FeaturedTeacherCard(
-                      tutor: _featuredTeachers[index],
-                    ),
+                    itemBuilder: (context, index) =>
+                        FeaturedTeacherCard(tutor: _featuredTeachers[index]),
                   ),
                 ),
                 AppSpacing.gapXxl,

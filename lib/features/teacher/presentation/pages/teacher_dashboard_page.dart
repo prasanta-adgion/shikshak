@@ -6,6 +6,7 @@ import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
+import '../../../../shared/widgets/adaptive_navigation_scaffold.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
@@ -30,6 +31,34 @@ class TeacherDashboardPage extends ConsumerStatefulWidget {
 class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
   int _tabIndex = 0;
 
+  static const _destinations = [
+    AdaptiveNavigationDestination(
+      icon: AppIcons.homeOutlined,
+      selectedIcon: AppIcons.home,
+      label: 'Home',
+    ),
+    AdaptiveNavigationDestination(
+      icon: AppIcons.scheduleOutlined,
+      selectedIcon: AppIcons.schedule,
+      label: 'Schedule',
+    ),
+    AdaptiveNavigationDestination(
+      icon: AppIcons.studentsOutlined,
+      selectedIcon: AppIcons.students,
+      label: 'Students',
+    ),
+    AdaptiveNavigationDestination(
+      icon: AppIcons.earningsOutlined,
+      selectedIcon: AppIcons.earnings,
+      label: 'Earnings',
+    ),
+    AdaptiveNavigationDestination(
+      icon: AppIcons.profileOutlined,
+      selectedIcon: AppIcons.profile,
+      label: 'Profile',
+    ),
+  ];
+
   static const _placeholderTabs = [
     (
       title: 'Schedule',
@@ -51,46 +80,16 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: _tabIndex == 0
-            ? const _TeacherHomeTab()
-            : EmptyState(
-                title: _placeholderTabs[_tabIndex - 1].title,
-                message: _placeholderTabs[_tabIndex - 1].message,
-              ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tabIndex,
-        onDestinationSelected: (index) => setState(() => _tabIndex = index),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(AppIcons.homeOutlined),
-            selectedIcon: Icon(AppIcons.home),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(AppIcons.scheduleOutlined),
-            selectedIcon: Icon(AppIcons.schedule),
-            label: 'Schedule',
-          ),
-          NavigationDestination(
-            icon: Icon(AppIcons.studentsOutlined),
-            selectedIcon: Icon(AppIcons.students),
-            label: 'Students',
-          ),
-          NavigationDestination(
-            icon: Icon(AppIcons.earningsOutlined),
-            selectedIcon: Icon(AppIcons.earnings),
-            label: 'Earnings',
-          ),
-          NavigationDestination(
-            icon: Icon(AppIcons.profileOutlined),
-            selectedIcon: Icon(AppIcons.profile),
-            label: 'Profile',
-          ),
-        ],
-      ),
+    return AdaptiveNavigationScaffold(
+      selectedIndex: _tabIndex,
+      onDestinationSelected: (index) => setState(() => _tabIndex = index),
+      destinations: _destinations,
+      body: _tabIndex == 0
+          ? const _TeacherHomeTab()
+          : EmptyState(
+              title: _placeholderTabs[_tabIndex - 1].title,
+              message: _placeholderTabs[_tabIndex - 1].message,
+            ),
     );
   }
 }
@@ -187,25 +186,23 @@ class _TeacherHomeTab extends ConsumerWidget {
             ],
           ),
           SliverPadding(
-            padding: AppSpacing.pagePadding,
+            padding: context.responsivePagePadding,
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 AppSpacing.gapSm,
                 _WelcomeBanner(firstName: firstName),
                 AppSpacing.gapXl,
                 GridView.count(
-                  crossAxisCount: context.isTablet ? 4 : 2,
+                  crossAxisCount: context.isTabletDevice ? 4 : 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: AppSpacing.md,
                   crossAxisSpacing: AppSpacing.md,
-                  childAspectRatio: context.isTablet ? 1.2 : 1.15,
+                  childAspectRatio: context.isTabletDevice ? 1.2 : 1.15,
                   children: [for (final stat in _stats) StatCard(stat: stat)],
                 ),
                 AppSpacing.gapXl,
-                const EarningsCard(),
-                AppSpacing.gapXl,
-                const AvailabilityCard(),
+                const _TeacherSummaryCards(),
                 AppSpacing.gapXxl,
                 const SectionHeader(
                   title: 'Recent Requests',
@@ -230,6 +227,32 @@ class _TeacherHomeTab extends ConsumerWidget {
     if (hour < 12) return 'morning';
     if (hour < 17) return 'afternoon';
     return 'evening';
+  }
+}
+
+class _TeacherSummaryCards extends StatelessWidget {
+  const _TeacherSummaryCards();
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < Breakpoints.tablet) {
+          return const Column(
+            children: [EarningsCard(), AppSpacing.gapXl, AvailabilityCard()],
+          );
+        }
+
+        return const Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: EarningsCard()),
+            AppSpacing.hGapXl,
+            Expanded(child: AvailabilityCard()),
+          ],
+        );
+      },
+    );
   }
 }
 

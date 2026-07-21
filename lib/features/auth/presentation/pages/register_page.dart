@@ -49,6 +49,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   }
 
   void _submit() {
+    context.go(RoutePaths.otpVerify, extra: []);
+    return;
+
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
@@ -70,7 +73,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('build register');
     final theme = Theme.of(context);
     final isSubmitting = ref.watch(
       authNotifierProvider.select((s) => s.isSubmitting),
@@ -178,8 +180,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           ],
         ),
       ),
-      footer: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      footer: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
             'Already have an account?',

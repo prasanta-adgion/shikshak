@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
 import '../models/tutor_info.dart';
@@ -17,7 +18,7 @@ class FeaturedTeacherCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SizedBox(
-      width: 200,
+      width: context.isTabletDevice ? 260 : 200,
       child: AppCard(
         onTap: () {},
         padding: const EdgeInsets.all(AppSpacing.lg),
