@@ -18,6 +18,8 @@ class AuthScaffold extends StatelessWidget {
     this.footer,
     this.roleSelector,
     this.banner,
+    this.tabletBackgroundImage,
+    this.tabletHero,
     this.alignToTop = false,
   });
 
@@ -34,6 +36,15 @@ class AuthScaffold extends StatelessWidget {
   /// Full-bleed hero content shown above the card (e.g. brand + illustration).
   final Widget? banner;
 
+  /// Asset path for a full-bleed tablet background. When set, the tablet layout
+  /// switches to an immersive design: the image fills the screen with
+  /// [tabletHero] overlaid on the left and the form card floating on the right.
+  final String? tabletBackgroundImage;
+
+  /// Left-hand hero content overlaid on [tabletBackgroundImage]. Falls back to
+  /// [banner] when omitted.
+  final Widget? tabletHero;
+
   /// Keeps short auth pages pinned to the top instead of vertically centered.
   final bool alignToTop;
 
@@ -41,33 +52,33 @@ class AuthScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
-      body: SafeArea(
-        child: ResponsiveBuilder(
-          // Branch on device class (rotation-stable) so a landscape phone keeps
-          // the single-column form; still read constraints for the tablet
-          // layout's min-height.
-          builder: (context, constraints) => context.isTabletDevice
-              ? _buildTablet(context, constraints)
-              : _buildPhone(),
-        ),
+      // Branch on device class (rotation-stable) so a landscape phone keeps the
+      // single-column form. SafeArea is applied per-layout because the
+      // immersive tablet background must extend edge-to-edge behind it.
+      body: ResponsiveBuilder(
+        builder: (context, constraints) => context.isTabletDevice
+            ? _buildTablet(context, constraints)
+            : _buildPhone(),
       ),
     );
   }
 
   Widget _buildPhone() {
-    return Align(
-      key: const Key('auth-phone-layout'),
-      alignment: alignToTop ? Alignment.topCenter : Alignment.center,
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: CenteredConstrainedBox(
-          maxWidth: Breakpoints.formMaxWidth,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (banner != null) banner! else AppSpacing.gapXl,
-              _FormContent(pagePadding: AppSpacing.pagePadding, child: this),
-            ],
+    return SafeArea(
+      child: Align(
+        key: const Key('auth-phone-layout'),
+        alignment: alignToTop ? Alignment.topCenter : Alignment.center,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: CenteredConstrainedBox(
+            maxWidth: Breakpoints.formMaxWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (banner != null) banner! else AppSpacing.gapXl,
+                _FormContent(pagePadding: AppSpacing.pagePadding, child: this),
+              ],
+            ),
           ),
         ),
       ),
@@ -75,23 +86,56 @@ class AuthScaffold extends StatelessWidget {
   }
 
   Widget _buildTablet(BuildContext context, BoxConstraints constraints) {
+    if (tabletBackgroundImage != null) {
+      return _buildTabletImmersive(context);
+    }
+
     // Fixed-height two-pane: the hero banner fills the viewport via `stretch`
     // while the form pane scrolls on its own. We intentionally avoid
     // IntrinsicHeight here — it can't measure a subtree that contains a
     // LayoutBuilder (e.g. the OTP pin field), which throws during layout.
-    return CenteredConstrainedBox(
-      key: const Key('auth-tablet-layout'),
-      maxWidth: Breakpoints.contentMaxWidth,
-      child: SizedBox(
-        height: constraints.maxHeight,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(flex: 5, child: banner ?? const SizedBox.shrink()),
-            Expanded(flex: 6, child: _buildTabletFormPane(context)),
-          ],
+    return SafeArea(
+      child: CenteredConstrainedBox(
+        key: const Key('auth-tablet-layout'),
+        maxWidth: Breakpoints.contentMaxWidth,
+        child: SizedBox(
+          height: constraints.maxHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(flex: 5, child: banner ?? const SizedBox.shrink()),
+              Expanded(flex: 6, child: _buildTabletFormPane(context)),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  /// Immersive tablet layout: a full-bleed background image with the hero
+  /// overlaid on the left and the floating form card on the right.
+  Widget _buildTabletImmersive(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(tabletBackgroundImage!, fit: BoxFit.cover),
+        SafeArea(
+          child: CenteredConstrainedBox(
+            key: const Key('auth-tablet-layout'),
+            maxWidth: Breakpoints.contentMaxWidth,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: tabletHero ?? banner ?? const SizedBox.shrink(),
+                ),
+                Expanded(flex: 5, child: _buildTabletFormPane(context)),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

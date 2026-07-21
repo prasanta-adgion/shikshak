@@ -123,9 +123,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
         case AuthStatus.authenticated:
           final role =
               ref.read(authNotifierProvider).selectedRole ?? UserRole.student;
-        //context.go(RoutePaths.dashboardFor(role));
+          context.go(RoutePaths.dashboardFor(role));
         case AuthStatus.unauthenticated:
-        //context.go(RoutePaths.login);
+          context.go(RoutePaths.login);
         case AuthStatus.checking:
           break;
       }
