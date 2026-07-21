@@ -1,9 +1,4 @@
-import 'package:Shikshak/core/constants/app_images_const.dart';
 import 'package:flutter/material.dart';
-
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_icons.dart';
-import '../../core/theme/app_shadows.dart';
 
 /// Shikshak brand mark: a gradient rounded square with the book icon.
 ///

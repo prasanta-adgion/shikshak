@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
@@ -122,9 +123,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
         case AuthStatus.authenticated:
           final role =
               ref.read(authNotifierProvider).selectedRole ?? UserRole.student;
-          context.go(RoutePaths.dashboardFor(role));
+        //context.go(RoutePaths.dashboardFor(role));
         case AuthStatus.unauthenticated:
-          context.go(RoutePaths.login);
+        //context.go(RoutePaths.login);
         case AuthStatus.checking:
           break;
       }
@@ -134,95 +135,116 @@ class _SplashPageState extends ConsumerState<SplashPage>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(AppImagesConst.splashScreen, fit: BoxFit.cover),
+          Image.asset(AppImagesConst.splashScreen, fit: BoxFit.fill),
           SafeArea(
             child: Align(
               alignment: Alignment.topCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: ScaleTransition(
-                      scale: _logoScale,
-                      child: const AppLogo(
-                        image: AppImagesConst.onlyLogoWithoutText,
-                        size: 116,
-                      ),
-                    ),
-                  ),
-                  FadeTransition(
-                    opacity: _textFade,
-                    child: SlideTransition(
-                      position: _textSlide,
-                      child: Column(
-                        children: [
-                          Text(
-                            AppConstants.appName.toUpperCase(),
-                            style: theme.textTheme.headlineLarge?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontFamily: 'Audiowide',
-                            ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: Padding(
+                  padding: context.responsivePagePadding,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      context.isTabletDevice
+                          ? AppSpacing.gapXl
+                          : const SizedBox.shrink(),
+                      FadeTransition(
+                        opacity: _logoFade,
+                        child: ScaleTransition(
+                          scale: _logoScale,
+                          child: AppLogo(
+                            image: AppImagesConst.onlyLogoWithoutText,
+                            size: context.isTabletDevice ? 144 : 116,
                           ),
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                // fontWeight: FontWeight.w800,
-                                height: 1.2,
-                                fontSize: 18,
+                        ),
+                      ),
+
+                      //app name
+                      FadeTransition(
+                        opacity: _textFade,
+                        child: SlideTransition(
+                          position: _textSlide,
+                          child: Column(
+                            children: [
+                              Text(
+                                AppConstants.appName.toUpperCase(),
+                                style: theme.textTheme.headlineLarge?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontFamily: 'Audiowide',
+                                ),
                               ),
-                              children: const [
-                                TextSpan(
-                                  text: 'Learn. ',
-                                  style: TextStyle(color: AppColors.primary),
+                              RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  style: theme.textTheme.headlineSmall
+                                      ?.copyWith(
+                                        // fontWeight: FontWeight.w800,
+                                        height: 1.2,
+                                        fontSize: 18,
+                                      ),
+                                  children: const [
+                                    TextSpan(
+                                      text: 'Learn. ',
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'Grow. ',
+                                      style: TextStyle(
+                                        color: AppColors.success,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: 'Succeed.',
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                TextSpan(
-                                  text: 'Grow. ',
-                                  style: TextStyle(color: AppColors.success),
-                                ),
-                                TextSpan(
-                                  text: 'Succeed.',
-                                  style: TextStyle(color: AppColors.primary),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                      context.isTabletDevice
+                          ? AppSpacing.gapXl
+                          : AppSpacing.gapSm,
+                      //tagline
+                      FadeTransition(
+                        opacity: _indicatorFade,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SlideTransition(
+                              position: _leftIndicatorSlide,
+                              child: const SectionIndicator(),
+                            ),
+                            AppSpacing.hGapSm,
+                            Text(
+                              AppConstants.tagline,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontSize: 11,
+                                color: const Color(0xFF5B6EF5),
+                                fontStyle: FontStyle.italic,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            AppSpacing.hGapSm,
+                            SlideTransition(
+                              position: _rightIndicatorSlide,
+                              child: const SectionIndicator(reversed: true),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  AppSpacing.gapSm,
-                  FadeTransition(
-                    opacity: _indicatorFade,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SlideTransition(
-                          position: _leftIndicatorSlide,
-                          child: const SectionIndicator(),
-                        ),
-                        AppSpacing.hGapSm,
-                        Text(
-                          AppConstants.tagline,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontSize: 11,
-                            color: const Color(0xFF5B6EF5),
-                            fontStyle: FontStyle.italic,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                        AppSpacing.hGapSm,
-                        SlideTransition(
-                          position: _rightIndicatorSlide,
-                          child: const SectionIndicator(reversed: true),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -230,7 +252,12 @@ class _SplashPageState extends ConsumerState<SplashPage>
             alignment: Alignment.bottomCenter,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 50),
+                padding: EdgeInsets.fromLTRB(
+                  Breakpoints.phonePadding,
+                  0,
+                  Breakpoints.phonePadding,
+                  context.isTabletDevice ? 72 : 50,
+                ),
                 child: FadeTransition(
                   opacity: _bottomTextFade,
                   child: SlideTransition(

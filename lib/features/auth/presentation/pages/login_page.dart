@@ -1,4 +1,5 @@
 import 'package:Shikshak/core/constants/app_constants.dart';
+import 'package:Shikshak/features/auth/presentation/widgets/google_sign_in_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,6 @@ import '../state/auth_state.dart';
 import '../widgets/auth_hero_banner.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/role_check_dailog.dart';
-import '../widgets/social_login_button.dart';
 
 /// Login screen. The student/teacher toggle at the top lets the same form
 /// serve both roles without a separate role-selection screen.
@@ -176,15 +176,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ],
               ),
               AppSpacing.gapXl,
+
+              // GoogleLoginButton(
+              //   onPressed: () => _showComingSoon('Google login'),
+              // ),
               GoogleLoginButton(
-                onPressed: () => _showComingSoon('Google login'),
+                isSubmitting: ValueNotifier(false),
+                onPressed: () {},
               ),
             ],
           ),
         ),
       ),
-      footer: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      footer: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
             'New to ${AppConstants.appName}?',
