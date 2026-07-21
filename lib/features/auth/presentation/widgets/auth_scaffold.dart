@@ -114,10 +114,10 @@ class AuthScaffold extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  flex: 6,
+                  flex: 5,
                   child: tabletHero ?? banner ?? const SizedBox.shrink(),
                 ),
-                Expanded(flex: 5, child: _buildTabletFormPane(context)),
+                Expanded(flex: 6, child: _buildTabletFormPane(context)),
               ],
             ),
           ),
@@ -139,7 +139,7 @@ class AuthScaffold extends StatelessWidget {
             alignment: alignToTop ? Alignment.topCenter : Alignment.center,
             child: ConstrainedBox(
               constraints: const BoxConstraints(
-                maxWidth: Breakpoints.formMaxWidth,
+                maxWidth: Breakpoints.tabletFormMaxWidth,
               ),
               child: _FormContent(
                 pagePadding: context.responsivePagePadding,
