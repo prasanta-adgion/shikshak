@@ -27,7 +27,10 @@ class TabletLoginHero extends StatelessWidget {
   static const _features = <_HeroFeature>[
     _HeroFeature(icon: Icons.menu_book_rounded, label: 'Learn\nAnywhere'),
     _HeroFeature(icon: Icons.school_rounded, label: 'Grow Your\nSkills'),
-    _HeroFeature(icon: Icons.emoji_events_rounded, label: 'Achieve\nYour Goals'),
+    _HeroFeature(
+      icon: Icons.emoji_events_rounded,
+      label: 'Achieve\nYour Goals',
+    ),
   ];
 
   @override
@@ -111,8 +114,8 @@ class _BrandRow extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: 44,
-          height: 44,
+          width: 60,
+          height: 60,
           child: Image.asset(AppImagesConst.onlyLogoWithoutText),
         ),
         AppSpacing.hGapSm,
@@ -183,7 +186,9 @@ class _FeatureChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.lightSurface.withValues(alpha: 0.7),
             borderRadius: const BorderRadius.all(Radius.circular(AppRadius.md)),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.12)),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.12),
+            ),
           ),
           child: Icon(feature.icon, color: AppColors.primary, size: 26),
         ),

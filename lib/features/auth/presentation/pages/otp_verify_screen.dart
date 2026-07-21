@@ -9,6 +9,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_loading_button.dart';
 import '../widgets/auth_hero_banner.dart';
 import '../widgets/auth_scaffold.dart';
+import '../widgets/tablet_login_hero.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
   /// Masked phone number or email address to which the OTP was sent.
@@ -75,6 +76,12 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
     return AuthScaffold(
       alignToTop: true,
       banner: const AuthHeroBanner(image: AppImagesConst.otpScreenImage),
+      tabletBackgroundImage: AppImagesConst.loginBgOfTablet,
+      tabletHero: const TabletLoginHero(
+        headline: 'Verify',
+        headlineAccent: 'OTP',
+        subtitle: 'Enter the code we sent to verify your account.',
+      ),
       title: 'Verify OTP',
       subtitle: 'Enter the 6-digit code sent to ${widget.destination}',
       form: Form(

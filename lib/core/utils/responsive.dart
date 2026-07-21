@@ -13,7 +13,7 @@ abstract final class Breakpoints {
 
   /// Horizontal page gutters by window size.
   static const double phonePadding = 16;
-  static const double tabletPadding = 24;
+  static const double tabletPadding = 14;
   static const double desktopPadding = 32;
 }
 

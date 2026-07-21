@@ -27,34 +27,21 @@ class AuthScaffold extends StatelessWidget {
   final String subtitle;
   final Widget form;
 
-  /// Content below the card (e.g. "New here? Register").
   final Widget? footer;
 
-  /// Content between the title and the form (e.g. a student/teacher toggle).
   final Widget? roleSelector;
 
-  /// Full-bleed hero content shown above the card (e.g. brand + illustration).
   final Widget? banner;
 
-  /// Asset path for a full-bleed tablet background. When set, the tablet layout
-  /// switches to an immersive design: the image fills the screen with
-  /// [tabletHero] overlaid on the left and the form card floating on the right.
   final String? tabletBackgroundImage;
-
-  /// Left-hand hero content overlaid on [tabletBackgroundImage]. Falls back to
-  /// [banner] when omitted.
   final Widget? tabletHero;
 
-  /// Keeps short auth pages pinned to the top instead of vertically centered.
   final bool alignToTop;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      // Branch on device class (rotation-stable) so a landscape phone keeps the
-      // single-column form. SafeArea is applied per-layout because the
-      // immersive tablet background must extend edge-to-edge behind it.
+      backgroundColor: context.isTablet ? null : AppColors.lightBackground,
       body: ResponsiveBuilder(
         builder: (context, constraints) => context.isTabletDevice
             ? _buildTablet(context, constraints)

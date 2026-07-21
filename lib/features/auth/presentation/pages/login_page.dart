@@ -107,8 +107,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       banner: const AuthHeroBanner(
         headline: 'Welcome',
         headlineAccent: 'Back!',
-        subtitle:
-            'Welcome back! Continue your journey with ${AppConstants.appName}.',
+        subtitle: 'Continue your journey with ${AppConstants.appName}.',
         image: AppImagesConst.loginScreenImage,
       ),
       // On tablets, use the immersive branded background with an overlaid hero.
