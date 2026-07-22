@@ -1,3 +1,4 @@
+import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
@@ -71,6 +72,16 @@ abstract final class AppRouter {
         pageBuilder: (context, state) => fadeSlidePage(
           key: state.pageKey,
           child: const TeacherDashboardPage(),
+        ),
+      ),
+
+      //forgot password
+      GoRoute(
+        path: RoutePaths.forgotPassword,
+        name: RouteNames.forgotPassword,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const ForgotPasswordScreen(),
         ),
       ),
     ],

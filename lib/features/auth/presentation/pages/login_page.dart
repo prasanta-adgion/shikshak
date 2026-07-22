@@ -144,7 +144,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               Align(
                 alignment: AlignmentGeometry.topRight,
                 child: TextButton(
-                  onPressed: () => _showComingSoon('Password reset'),
+                  onPressed: () {
+                    context.push(RoutePaths.forgotPassword);
+                  },
                   child: Text(
                     'Forgot Password?',
                     style: theme.textTheme.labelMedium?.copyWith(
