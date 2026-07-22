@@ -11,9 +11,13 @@ abstract final class Breakpoints {
   /// Max width for focused forms (auth screens).
   static const double formMaxWidth = 480;
 
+  /// Max width for focused forms on tablet's two-pane layout, wider than
+  /// [formMaxWidth] since the pane has more room to give the card.
+  static const double tabletFormMaxWidth = 600;
+
   /// Horizontal page gutters by window size.
   static const double phonePadding = 16;
-  static const double tabletPadding = 24;
+  static const double tabletPadding = 14;
   static const double desktopPadding = 32;
 }
 

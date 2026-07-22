@@ -19,6 +19,7 @@ import '../providers/auth_providers.dart';
 import '../state/auth_state.dart';
 import '../widgets/auth_hero_banner.dart';
 import '../widgets/auth_scaffold.dart';
+import '../widgets/tablet_login_hero.dart';
 
 /// Registration screen collecting only the core account fields.
 class RegisterPage extends ConsumerStatefulWidget {
@@ -108,6 +109,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         headlineAccent: AppConstants.appName,
         subtitle:
             'Sign in to continue your ${widget.role == UserRole.teacher ? 'teaching' : 'learning'} journey.',
+      ),
+      tabletBackgroundImage: AppImagesConst.loginBgOfTablet,
+      tabletHero: const TabletLoginHero(
+        headline: 'Join',
+        headlineAccent: AppConstants.appName,
+        subtitle: 'Sign in to continue to get started',
       ),
       title: 'Create ${widget.role.label} Account',
       subtitle: 'Create your account to get started',
