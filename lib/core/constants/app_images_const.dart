@@ -18,6 +18,9 @@ class AppImagesConst {
   static const onlyLogoWithoutText = '${sharedRoot}only-logo.png';
   static const otpScreenImage = '${sharedRoot}otp-screen-image.png';
   static const splashScreen = '${sharedRoot}splash-screen.png';
+  static const passwordForgotBg = '${sharedRoot}password-forgot-bg.png';
+  static const emailIcon = '${sharedRoot}email-icon.png';
+  static const newPasswordSet = '${sharedRoot}new-password-set.png';
 
   //tabs images
   static const loginBgOfTablet = '${sharedRoot}tab-login-bg.png';

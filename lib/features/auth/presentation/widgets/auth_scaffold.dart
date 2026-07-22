@@ -77,10 +77,6 @@ class AuthScaffold extends StatelessWidget {
       return _buildTabletImmersive(context);
     }
 
-    // Fixed-height two-pane: the hero banner fills the viewport via `stretch`
-    // while the form pane scrolls on its own. We intentionally avoid
-    // IntrinsicHeight here — it can't measure a subtree that contains a
-    // LayoutBuilder (e.g. the OTP pin field), which throws during layout.
     return SafeArea(
       child: CenteredConstrainedBox(
         key: const Key('auth-tablet-layout'),
