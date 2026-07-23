@@ -3,10 +3,11 @@ import 'package:Shikshak/core/theme/app_icons.dart';
 import 'package:Shikshak/core/theme/app_spacing.dart';
 import 'package:Shikshak/core/utils/responsive.dart';
 import 'package:Shikshak/core/utils/validators.dart';
-import 'package:Shikshak/features/forgot_password/presentation/widgets/password_set_bg.dart';
+import 'package:Shikshak/features/forgot_password/presentation/widgets/forgot_password_bg.dart';
 import 'package:Shikshak/shared/widgets/app_card.dart';
 import 'package:Shikshak/shared/widgets/app_loading_button.dart';
 import 'package:Shikshak/shared/widgets/app_text_field.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return PasswordSetBackground(
+    return ForgotPasswordBackground(
       child: ResponsiveBuilder(
         builder: (context, constraints) {
           return _buildWhiteContainer(
@@ -53,14 +54,14 @@ Widget _buildWhiteContainer({
   return ConstrainedBox(
     constraints: BoxConstraints(maxWidth: isTablet ? 550 : 420),
     child: AppCard(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: EdgeInsets.all(isTablet ? AppSpacing.xxxl : AppSpacing.xl),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Image.asset(AppImagesConst.emailIcon, height: isTablet ? 110 : 90),
 
-          AppSpacing.gapLg,
+          isTablet ? AppSpacing.gapXl : AppSpacing.gapLg,
 
           Text(
             'Reset Your Password',
@@ -68,15 +69,15 @@ Widget _buildWhiteContainer({
             style: theme.textTheme.headlineSmall,
           ),
 
-          AppSpacing.gapSm,
+          isTablet ? AppSpacing.gapMd : AppSpacing.gapSm,
 
           Text(
-            "Enter your registered email address and we'll send you instructions to reset your password.",
+            "You'll receive a one-time code (OTP) to verify it's you.",
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium,
           ),
 
-          AppSpacing.gapXl,
+          isTablet ? AppSpacing.gapXxxl : AppSpacing.gapXl,
 
           AppTextField(
             label: 'Email Address',
@@ -85,14 +86,15 @@ Widget _buildWhiteContainer({
             validator: Validators.email,
             keyboardType: TextInputType.emailAddress,
             prefixIcon: AppIcons.identifier,
+
             autofillHints: const [AutofillHints.email],
           ),
 
-          AppSpacing.gapLg,
+          isTablet ? AppSpacing.gapXl : AppSpacing.gapLg,
 
           AppLoadingButton(label: 'Send OTP', isLoading: false),
 
-          AppSpacing.gapXl,
+          isTablet ? AppSpacing.gapXxxl : AppSpacing.gapXl,
 
           Row(
             children: [
@@ -110,15 +112,19 @@ Widget _buildWhiteContainer({
             ],
           ),
 
-          AppSpacing.gapXl,
+          AppSpacing.gapSm,
 
           SizedBox(
             width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Back to Login"),
+            child: TextButton.icon(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(CupertinoIcons.arrow_left),
+              label: Text(
+                'Back to Login',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
             ),
           ),
         ],

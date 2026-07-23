@@ -145,7 +145,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 alignment: AlignmentGeometry.topRight,
                 child: TextButton(
                   onPressed: () {
-                    context.push(RoutePaths.forgotPassword);
+                    // context.push(RoutePaths.forgotPassword);
+                    context.push(RoutePaths.newPasswordSet);
                   },
                   child: Text(
                     'Forgot Password?',
@@ -182,9 +183,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
               AppSpacing.gapXl,
 
-              // GoogleLoginButton(
-              //   onPressed: () => _showComingSoon('Google login'),
-              // ),
               GoogleLoginButton(
                 isSubmitting: ValueNotifier(false),
                 onPressed: () {},
