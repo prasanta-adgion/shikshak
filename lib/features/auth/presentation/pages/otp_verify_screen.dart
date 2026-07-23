@@ -1,3 +1,4 @@
+import 'package:Shikshak/shared/widgets/app_snackbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,6 +48,10 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   }
 
   void _verifyOtp() {
+    AppSnackbar.showError(context, 'Texting error snackbar');
+    AppSnackbar.showSuccess(context, 'Texting success snackbar');
+    return;
+
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 

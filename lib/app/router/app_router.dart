@@ -1,4 +1,5 @@
 import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
+import 'package:Shikshak/features/forgot_password/presentation/screens/new_password_set.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
@@ -83,6 +84,14 @@ abstract final class AppRouter {
           key: state.pageKey,
           child: const ForgotPasswordScreen(),
         ),
+      ),
+
+      //new password set
+      GoRoute(
+        path: RoutePaths.newPasswordSet,
+        name: RouteNames.newPasswordSet,
+        pageBuilder: (context, state) =>
+            fadeSlidePage(key: state.pageKey, child: const NewPasswordSet()),
       ),
     ],
   );

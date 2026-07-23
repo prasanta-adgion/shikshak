@@ -26,6 +26,7 @@ abstract final class RoutePaths {
   static const String otpVerify = '/otp-verify';
 
   static const String forgotPassword = '/password-forgot';
+  static const String newPasswordSet = '/new-password-set';
 }
 
 /// Route names used for named navigation and analytics screen tracking.
@@ -37,4 +38,5 @@ abstract final class RouteNames {
   static const String teacherDashboard = 'teacherDashboard';
   static const String otpVerify = 'otpVerify';
   static const String forgotPassword = 'passwordForgot';
+  static const String newPasswordSet = 'newPasswordSet';
 }
