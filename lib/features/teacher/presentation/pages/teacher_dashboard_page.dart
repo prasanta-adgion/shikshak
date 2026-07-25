@@ -161,17 +161,28 @@ class _TeacherHomeTab extends ConsumerWidget {
               children: [
                 InitialsAvatar(name: user?.fullName ?? 'Teacher', size: 42),
                 AppSpacing.hGapMd,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Good ${_daypart()},',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                // Expanded + ellipsis: long names must not overflow the bar
+                // on narrow phones.
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Good ${_daypart()},',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ),
-                    Text(firstName, style: theme.textTheme.titleMedium),
-                  ],
+                      Text(
+                        firstName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -10,14 +10,14 @@ import '../../../../core/constants/app_images_const.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/validators.dart';
+import '../../../../shared/widgets/app_hero_banner.dart';
 import '../../../../shared/widgets/app_loading_button.dart';
 import '../../../../shared/widgets/app_password_field.dart';
+import '../../../../shared/widgets/app_snackbar.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../domain/entities/user_role.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../providers/auth_providers.dart';
-import '../state/auth_state.dart';
-import '../widgets/auth_hero_banner.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/tablet_login_hero.dart';
 
@@ -50,9 +50,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   }
 
   void _submit() {
-    context.go(RoutePaths.otpVerify, extra: []);
-    return;
-
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
@@ -65,11 +62,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             mobileNumber: _mobileController.text,
             password: _passwordController.text,
             role: widget.role,
-            city: '',
           ),
         );
-
-    context.go(RoutePaths.otpVerify, extra: []);
   }
 
   @override
@@ -79,12 +73,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       authNotifierProvider.select((s) => s.isSubmitting),
     );
 
-    // Navigate to the dashboard once the account is created.
-    ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
+    // Signup does not create a session — it emails a code. Move to OTP entry
+    // once the backend confirms the code was sent.
+    ref.listen(authNotifierProvider.select((s) => s.pendingSignup), (
+      previous,
+      next,
+    ) {
       final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
-      if (next == AuthStatus.authenticated && isCurrent) {
-        final role = ref.read(authNotifierProvider).user?.role ?? widget.role;
-        context.go(RoutePaths.dashboardFor(role));
+      if (next != null && next != previous && isCurrent) {
+        context.push(RoutePaths.signupOtp);
       }
     });
 
@@ -93,17 +90,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       next,
     ) {
       if (next != null && next != previous) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next),
-            backgroundColor: theme.colorScheme.error,
-          ),
-        );
+        AppSnackbar.showError(context, next);
       }
     });
 
     return AuthScaffold(
-      banner: AuthHeroBanner(
+      banner: AppHeroBanner(
         image: AppImagesConst.loginScreenImage,
         headline: 'Join',
         headlineAccent: AppConstants.appName,

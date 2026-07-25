@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/core_providers.dart';
 import '../../data/datasource/auth_remote_datasource.dart';
-import '../../data/datasource/mock_auth_remote_datasource.dart';
 import '../../data/repository/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/check_auth_status_usecase.dart';
@@ -16,10 +15,7 @@ import '../state/auth_state.dart';
 /// abstractions; only this file knows the concrete classes.
 
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
-  // The backend does not exist yet, so the app runs on the mock.
-  // To go live, replace with:
-  //   return AuthRemoteDataSourceImpl(ref.watch(apiClientProvider));
-  return MockAuthRemoteDataSource();
+  return AuthRemoteDataSourceImpl(ref.watch(apiClientProvider));
 });
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

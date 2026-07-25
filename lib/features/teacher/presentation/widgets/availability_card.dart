@@ -42,10 +42,21 @@ class _AvailabilityCardState extends State<AvailabilityCard> {
                 size: 22,
               ),
               AppSpacing.hGapSm,
-              Text('Availability', style: theme.textTheme.titleMedium),
-              const Spacer(),
+              // Expanded absorbs the slack so the title and the day count
+              // never collide at narrow widths or large text scales.
+              Expanded(
+                child: Text(
+                  'Availability',
+                  style: theme.textTheme.titleMedium,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              AppSpacing.hGapSm,
               Text(
                 '$activeDays days/week',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

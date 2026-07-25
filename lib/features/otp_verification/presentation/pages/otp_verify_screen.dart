@@ -13,8 +13,8 @@ import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_header.dart';
+import '../../../../shared/widgets/app_hero_banner.dart';
 import '../../../../shared/widgets/app_loading_button.dart';
-import '../widgets/auth_hero_banner.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
   /// Masked phone number or email address to which the OTP was sent.
@@ -48,10 +48,6 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   }
 
   void _verifyOtp() {
-    AppSnackbar.showError(context, 'Texting error snackbar');
-    AppSnackbar.showSuccess(context, 'Texting success snackbar');
-    return;
-
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
@@ -60,9 +56,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('OTP verification is not connected yet.')),
-    );
+    AppSnackbar.show(context, 'OTP verification is not connected yet.');
   }
 
   void _resendOtp() {
@@ -73,15 +67,12 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('A new OTP will be available soon.')),
-    );
+    AppSnackbar.show(context, 'A new OTP will be available soon.');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.isTablet ? null : AppColors.lightBackground,
       body: ResponsiveBuilder(
         builder: (context, constraints) => context.isTabletDevice
             ? _buildTablet(context)
@@ -101,7 +92,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const AuthHeroBanner(image: AppImagesConst.otpScreenImage),
+                const AppHeroBanner(image: AppImagesConst.otpScreenImage),
                 _buildFormCard(context, padding: AppSpacing.pagePadding),
               ],
             ),

@@ -1,10 +1,8 @@
 import '../../../../core/network/api_result.dart';
-import '../entities/user_entity.dart';
+import '../entities/signup_otp_challenge.dart';
 import '../entities/user_role.dart';
 import '../repositories/auth_repository.dart';
 
-/// Input for [RegisterUseCase]. Role-specific fields are nullable and only
-/// populated for the matching [role].
 class RegisterParams {
   const RegisterParams({
     required this.fullName,
@@ -12,12 +10,6 @@ class RegisterParams {
     required this.mobileNumber,
     required this.password,
     required this.role,
-    required this.city,
-    this.qualification,
-    this.experience,
-    this.subjects = const [],
-    this.studentClass,
-    this.preferredSubjects = const [],
   });
 
   final String fullName;
@@ -25,24 +17,15 @@ class RegisterParams {
   final String mobileNumber;
   final String password;
   final UserRole role;
-  final String city;
-
-  // Teacher-specific
-  final String? qualification;
-  final String? experience;
-  final List<String> subjects;
-
-  // Student-specific
-  final String? studentClass;
-  final List<String> preferredSubjects;
 }
 
-/// Creates a new teacher or student account.
+/// Starts signup for a new teacher or student, triggering the verification
+/// email. The account only becomes usable once the OTP is verified.
 class RegisterUseCase {
   const RegisterUseCase(this._repository);
 
   final AuthRepository _repository;
 
-  Future<ApiResult<UserEntity>> call(RegisterParams params) =>
+  Future<ApiResult<SignupOtpChallenge>> call(RegisterParams params) =>
       _repository.register(params);
 }

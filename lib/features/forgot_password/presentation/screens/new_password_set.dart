@@ -1,29 +1,35 @@
+import 'package:Shikshak/app/router/route_paths.dart';
 import 'package:Shikshak/core/theme/app_icons.dart';
 import 'package:Shikshak/core/theme/app_spacing.dart';
 import 'package:Shikshak/core/utils/responsive.dart';
 import 'package:Shikshak/core/utils/validators.dart';
+import 'package:Shikshak/features/forgot_password/presentation/providers/forgot_password_providers.dart';
+import 'package:Shikshak/features/forgot_password/presentation/state/forgot_password_state.dart';
 import 'package:Shikshak/features/forgot_password/presentation/widgets/new_password_set_bg.dart';
 import 'package:Shikshak/shared/widgets/app_card.dart';
 import 'package:Shikshak/shared/widgets/app_loading_button.dart';
+import 'package:Shikshak/shared/widgets/app_snackbar.dart';
 import 'package:Shikshak/shared/widgets/app_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class NewPasswordSet extends StatefulWidget {
+/// Step 3 of the reset flow: choose the new password.
+class NewPasswordSet extends ConsumerStatefulWidget {
   const NewPasswordSet({super.key});
 
   @override
-  State<NewPasswordSet> createState() => _NewPasswordSetState();
+  ConsumerState<NewPasswordSet> createState() => _NewPasswordSetState();
 }
 
-class _NewPasswordSetState extends State<NewPasswordSet> {
+class _NewPasswordSetState extends ConsumerState<NewPasswordSet> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _newPassword = TextEditingController();
   final TextEditingController _confirmPassword = TextEditingController();
 
   final ValueNotifier<bool> _obscureNewPassword = ValueNotifier(true);
   final ValueNotifier<bool> _obscureConfirmPassword = ValueNotifier(true);
-  final ValueNotifier<bool> _isLoading = ValueNotifier(false);
 
   @override
   void dispose() {
@@ -31,57 +37,93 @@ class _NewPasswordSetState extends State<NewPasswordSet> {
     _confirmPassword.dispose();
     _obscureNewPassword.dispose();
     _obscureConfirmPassword.dispose();
-    _isLoading.dispose();
     super.dispose();
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    _isLoading.value = true;
-    // TODO: call the set-new-password API.
+    ref
+        .read(forgotPasswordNotifierProvider.notifier)
+        .submitNewPassword(_newPassword.text);
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final isSubmitting = ref.watch(
+      forgotPasswordNotifierProvider.select((s) => s.isSubmitting),
+    );
+
+    // Flow finished — send the user back to sign in with the new password.
+    ref.listen(forgotPasswordNotifierProvider.select((s) => s.stage), (
+      previous,
+      next,
+    ) {
+      if (next == PasswordResetStage.completed && previous != next) {
+        AppSnackbar.showSuccess(
+          context,
+          'Password updated. Sign in with your new password.',
+        );
+        ref.read(forgotPasswordNotifierProvider.notifier).reset();
+        context.go(RoutePaths.login);
+      }
+    });
+
+    ref.listen(forgotPasswordNotifierProvider.select((s) => s.errorMessage), (
+      previous,
+      next,
+    ) {
+      if (next != null && next != previous) {
+        AppSnackbar.showError(context, next);
+      }
+    });
 
     return NewPasswordSetBg(
-      child: ResponsiveBuilder(
-        builder: (context, constraints) {
-          return _buildWhiteContainer(
-            context: context,
-            theme: theme,
-            isTablet: context.isTabletDevice,
-            formKey: _formKey,
-            newPassword: _newPassword,
-            confirmPassword: _confirmPassword,
-            obscureNewPassword: _obscureNewPassword,
-            obscureConfirmPassword: _obscureConfirmPassword,
-            isLoading: _isLoading,
-            onSubmit: _submit,
-          );
-        },
+      child: _NewPasswordCard(
+        formKey: _formKey,
+        newPassword: _newPassword,
+        confirmPassword: _confirmPassword,
+        obscureNewPassword: _obscureNewPassword,
+        obscureConfirmPassword: _obscureConfirmPassword,
+        isLoading: isSubmitting,
+        onSubmit: _submit,
       ),
     );
   }
 }
 
-Widget _buildWhiteContainer({
-  required BuildContext context,
-  required ThemeData theme,
-  required bool isTablet,
-  required GlobalKey<FormState> formKey,
-  required TextEditingController newPassword,
-  required TextEditingController confirmPassword,
-  required ValueNotifier<bool> obscureNewPassword,
-  required ValueNotifier<bool> obscureConfirmPassword,
-  required ValueNotifier<bool> isLoading,
-  required VoidCallback onSubmit,
-}) {
-  return ConstrainedBox(
-    constraints: BoxConstraints(maxWidth: isTablet ? 550 : 420),
-    child: AppCard(
+class _NewPasswordCard extends StatelessWidget {
+  const _NewPasswordCard({
+    required this.formKey,
+    required this.newPassword,
+    required this.confirmPassword,
+    required this.obscureNewPassword,
+    required this.obscureConfirmPassword,
+    required this.isLoading,
+    required this.onSubmit,
+  });
+
+  final GlobalKey<FormState> formKey;
+  final TextEditingController newPassword;
+  final TextEditingController confirmPassword;
+  final ValueNotifier<bool> obscureNewPassword;
+  final ValueNotifier<bool> obscureConfirmPassword;
+  final bool isLoading;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isTablet = context.isTabletDevice;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: isTablet
+            ? Breakpoints.tabletFormMaxWidth
+            : Breakpoints.formMaxWidth,
+      ),
+      child: AppCard(
       padding: EdgeInsets.all(isTablet ? AppSpacing.xxxl : AppSpacing.xl),
       child: Form(
         key: formKey,
@@ -138,15 +180,11 @@ Widget _buildWhiteContainer({
 
             isTablet ? AppSpacing.gapXl : AppSpacing.gapLg,
 
-            ValueListenableBuilder<bool>(
-              valueListenable: isLoading,
-              builder: (context, loading, _) {
-                return AppLoadingButton(
-                  label: 'Set New Password',
-                  isLoading: loading,
-                  onPressed: onSubmit,
-                );
-              },
+            AppLoadingButton(
+              label: 'Set New Password',
+              isLoading: isLoading,
+              onPressed: onSubmit,
+              trailingIcon: CupertinoIcons.arrow_right,
             ),
 
             isTablet ? AppSpacing.gapXxxl : AppSpacing.gapXl,
@@ -184,9 +222,10 @@ Widget _buildWhiteContainer({
                 ),
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }

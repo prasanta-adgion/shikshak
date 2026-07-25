@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 class GoogleLoginButton extends StatelessWidget {
   const GoogleLoginButton({
@@ -12,39 +12,37 @@ class GoogleLoginButton extends StatelessWidget {
     required this.onPressed,
   });
 
-  final ValueListenable<bool> isSubmitting;
+  final bool isSubmitting;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return ValueListenableBuilder<bool>(
-      valueListenable: isSubmitting,
-      builder: (context, submitting, _) => SizedBox(
-        width: double.infinity,
-        height: 50,
-        child: OutlinedButton(
-          onPressed: submitting ? null : onPressed,
-          style: OutlinedButton.styleFrom(
-            backgroundColor: AppColors.lightSurface,
-            side: BorderSide(color: theme.colorScheme.surfaceTint),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CustomPaint(size: Size(22, 22), painter: _GoogleGPainter()),
-              const SizedBox(width: 12),
-              Text(
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: isSubmitting ? null : onPressed,
+        style: OutlinedButton.styleFrom(
+          backgroundColor: theme.colorScheme.surface,
+          side: BorderSide(color: theme.colorScheme.outlineVariant),
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CustomPaint(size: Size(22, 22), painter: _GoogleGPainter()),
+            AppSpacing.hGapMd,
+            Flexible(
+              child: Text(
                 'Continue with Google',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

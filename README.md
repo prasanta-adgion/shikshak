@@ -8,11 +8,65 @@ A production-grade Flutter home-tutoring app connecting students with teachers. 
 
 ```bash
 flutter pub get
-dart run build_runner build   # generates freezed / json_serializable code
-flutter run
+flutter run -t lib/main_dev.dart
 ```
 
-> The backend does not exist yet: authentication runs against a **mock data source** (`MockAuthRemoteDataSource`) with realistic latency. Any well-formed credentials log you in. Swap in `AuthRemoteDataSourceImpl` inside `auth_providers.dart` when the API is live — no other file changes.
+## Flavors
+
+The environment is chosen by the entrypoint. Each `main_*.dart` only selects an
+`AppFlavor`; `bootstrap.dart` owns the shared startup path so environments
+cannot drift.
+
+| Flavor | Entrypoint | Base URL | Application ID |
+|---|---|---|---|
+| dev | `lib/main_dev.dart` | `http://192.168.1.12:5001` | `…Shikshak.dev` |
+| staging | `lib/main_staging.dart` | *(not provisioned)* | `…Shikshak.staging` |
+| prod | `lib/main_prod.dart` | *(not provisioned)* | `…Shikshak` |
+
+The Android `productFlavors` in `app/build.gradle.kts` use these same names.
+**Always pass both `--flavor` and `-t`** — Gradle picks the native flavor, `-t`
+picks the Dart entrypoint, and Flutter does not infer one from the other:
+
+```bash
+flutter run --flavor dev     -t lib/main_dev.dart
+flutter build apk --flavor prod -t lib/main_prod.dart --release
+```
+
+The `.vscode/launch.json` configurations already pair them correctly.
+
+dev and staging carry an `applicationIdSuffix` and their own launcher label
+("Shikshak Dev" / "Shikshak Staging"), so all three install side by side on one
+device. A bare `flutter run` (via `lib/main.dart`) targets **dev** but builds no
+native flavor.
+
+Hosts live in `AppFlavor` (`lib/core/flavor/app_flavor.dart`) — the single
+source of truth. `ApiEndpoints` holds paths only, and may write them with or
+without a leading slash: `DioClient` normalises the base URL to end with `/`,
+because Dio concatenates the two verbatim and `host:5001` + `api/v1/x` would
+otherwise produce `host:5001api/v1/x` (a `FormatException` on every call). The base URL is
+injected into `DioClient` through `apiClientProvider`, so nothing reads global
+state and tests can override `appFlavorProvider`. Staging and prod are
+deliberately empty: `DioClient` asserts on an empty base URL, so a
+misconfigured build fails loudly instead of issuing relative requests. Fill
+those in as the environments come online.
+
+> **Cleartext HTTP.** The dev host is `http://`, which Android blocks by
+> default (targetSdk 28+) and iOS blocks via ATS. Android permits it for the
+> dev LAN addresses only, via a `network-security-config` in the **debug**
+> source set — release builds keep the HTTPS-only default (verified: the
+> release manifest contains no `networkSecurityConfig`). iOS uses Apple's
+> `NSAllowsLocalNetworking` exception, which covers local addresses without
+> allowing arbitrary insecure traffic. When you add more LAN addresses, extend
+> `android/app/src/debug/res/xml/network_security_config.xml` rather than
+> setting a blanket `cleartextTrafficPermitted="true"`.
+
+> Authentication talks to the **real API** (`AuthRemoteDataSourceImpl`) against
+> the active flavor's host. The former mock data source has been removed — it
+> accepted any well-formed credentials, which masked integration failures.
+> Only the `dev` flavor has a host, so run
+> `flutter run --flavor dev -t lib/main_dev.dart` with the backend reachable at
+> `192.168.1.12:5001`; other flavors throw on the first API call until their
+> `baseUrl` is filled in.
 
 ## App Flow
 

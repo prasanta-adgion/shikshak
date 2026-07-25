@@ -1,17 +1,20 @@
-import 'package:Shikshak/core/constants/app_images_const.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_icons.dart';
-import '../../../../core/theme/app_spacing.dart';
+import '../../core/constants/app_constants.dart';
+import '../../core/constants/app_images_const.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_icons.dart';
+import '../../core/theme/app_spacing.dart';
 
-/// Full-bleed banner shown above the auth card: brand mark, an optional
-/// two-line headline (second line in the accent color) and a supporting
-/// illustration. Screens that put their own heading in the card below (e.g.
-/// registration) can omit the headline and show just the logo and image.
-class AuthHeroBanner extends StatelessWidget {
-  const AuthHeroBanner({
+/// Full-bleed branded banner shown above a focused form card: brand mark, an
+/// optional two-line headline (second line in the accent color) and a
+/// supporting illustration. Screens that put their own heading in the card
+/// below can omit the headline and show just the logo and image.
+///
+/// Lives in the design system rather than a feature folder because it carries
+/// no feature semantics — login, registration and OTP verification all use it.
+class AppHeroBanner extends StatelessWidget {
+  const AppHeroBanner({
     super.key,
     this.headline,
     this.headlineAccent,
@@ -50,7 +53,11 @@ class AuthHeroBanner extends StatelessWidget {
         AppSpacing.sm,
       ),
 
-      decoration: const BoxDecoration(gradient: AppColors.lightPageGradient),
+      decoration: BoxDecoration(
+        gradient: theme.brightness == Brightness.dark
+            ? AppColors.darkPageGradient
+            : AppColors.lightPageGradient,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -104,19 +111,22 @@ class AuthHeroBanner extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(headline!, style: theme.textTheme.headlineLarge),
-                      Text(
-                        headlineAccent!,
-                        style: theme.textTheme.headlineLarge?.copyWith(
-                          color: theme.colorScheme.primary,
+                      if (headlineAccent != null)
+                        Text(
+                          headlineAccent!,
+                          style: theme.textTheme.headlineLarge?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
                         ),
-                      ),
-                      AppSpacing.gapSm,
-                      Text(
-                        subtitle!,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                      if (subtitle != null) ...[
+                        AppSpacing.gapSm,
+                        Text(
+                          subtitle!,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -142,14 +152,15 @@ class _BackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Material(
-      color: AppColors.lightSurface,
+      color: colorScheme.surface,
       shape: const CircleBorder(),
       elevation: 0,
       child: IconButton(
         onPressed: onPressed,
         icon: const Icon(AppIcons.back, size: 18),
-        color: AppColors.lightTextPrimary,
+        color: colorScheme.onSurface,
       ),
     );
   }

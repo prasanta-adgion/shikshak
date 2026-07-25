@@ -10,13 +10,14 @@ import '../../../../core/constants/app_images_const.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/validators.dart';
+import '../../../../shared/widgets/app_hero_banner.dart';
 import '../../../../shared/widgets/app_loading_button.dart';
 import '../../../../shared/widgets/app_password_field.dart';
+import '../../../../shared/widgets/app_snackbar.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../domain/entities/user_role.dart';
 import '../providers/auth_providers.dart';
 import '../state/auth_state.dart';
-import '../widgets/auth_hero_banner.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/role_check_dailog.dart';
 import '../widgets/tablet_login_hero.dart';
@@ -64,12 +65,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     context.push(RoutePaths.registerFor(role));
   }
 
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$feature is coming soon')));
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -94,17 +89,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       next,
     ) {
       if (next != null && next != previous) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next),
-            backgroundColor: theme.colorScheme.error,
-          ),
-        );
+        AppSnackbar.showError(context, next);
       }
     });
 
     return AuthScaffold(
-      banner: const AuthHeroBanner(
+      banner: const AppHeroBanner(
         headline: 'Welcome',
         headlineAccent: 'Back!',
         subtitle: 'Continue your journey with ${AppConstants.appName}.',
@@ -130,7 +120,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: AppIcons.identifier,
                 autofillHints: const [AutofillHints.username],
-                inputFormatters: [],
               ),
               AppSpacing.gapMd,
               AppPasswordField(
@@ -144,10 +133,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               Align(
                 alignment: AlignmentGeometry.topRight,
                 child: TextButton(
-                  onPressed: () {
-                    // context.push(RoutePaths.forgotPassword);
-                    context.push(RoutePaths.newPasswordSet);
-                  },
+                  onPressed: () => context.push(RoutePaths.forgotPassword),
                   child: Text(
                     'Forgot Password?',
                     style: theme.textTheme.labelMedium?.copyWith(
@@ -184,8 +170,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               AppSpacing.gapXl,
 
               GoogleLoginButton(
-                isSubmitting: ValueNotifier(false),
-                onPressed: () {},
+                isSubmitting: isSubmitting,
+                onPressed: () =>
+                    AppSnackbar.show(context, 'Google sign-in is coming soon'),
               ),
             ],
           ),

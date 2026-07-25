@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:Shikshak/core/theme/app_colors.dart';
 import 'package:Shikshak/core/utils/responsive.dart';
 import 'package:Shikshak/shared/widgets/app_button.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +44,7 @@ class _RoleCheckDialogState extends State<RoleCheckDialog> {
       insetPadding: context.isTablet
           ? const EdgeInsets.all(100)
           : const EdgeInsets.all(20),
-      backgroundColor: AppColors.lightBackground,
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
       child: Padding(
         padding: EdgeInsets.all(

@@ -8,20 +8,10 @@ import '../../domain/usecases/register_usecase.dart';
 import '../providers/auth_providers.dart';
 import '../state/auth_state.dart';
 
-/// Owns all authentication behaviour.
-///
-/// Pages only call methods here and render [AuthState] — no business logic
-/// lives in widgets. Navigation stays out of this class entirely: screens
-/// observe the state and perform GoRouter navigation themselves.
 class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() => const AuthState();
 
-  /// Splash entry point: restores a persisted session (if any) while
-  /// guaranteeing the splash animation gets its minimum screen time.
-  ///
-  /// Only checks whether a token/role are stored — it never calls the API,
-  /// so [AuthState.user] stays null until the next login/register.
   Future<void> checkAuthStatus() async {
     final (role, _) = await (
       ref.read(checkAuthStatusUseCaseProvider).call(),
@@ -39,12 +29,6 @@ class AuthNotifier extends Notifier<AuthState> {
     );
   }
 
-  /// Remembers which role the user picked on the role-selection screen so
-  /// login/registration adapt automatically.
-  void selectRole(UserRole role) {
-    state = state.copyWith(selectedRole: role, errorMessage: null);
-  }
-
   Future<void> login({
     required String identifier,
     required String password,
@@ -53,7 +37,9 @@ class AuthNotifier extends Notifier<AuthState> {
   }) async {
     state = state.copyWith(isSubmitting: true, errorMessage: null);
 
-    final result = await ref.read(loginUseCaseProvider).call(
+    final result = await ref
+        .read(loginUseCaseProvider)
+        .call(
           LoginParams(
             identifier: identifier,
             password: password,
@@ -71,19 +57,33 @@ class AuthNotifier extends Notifier<AuthState> {
     );
   }
 
+  /// Submits the signup form. On success the backend has emailed a code — the
+  /// user is NOT authenticated yet, so this sets [AuthState.pendingSignup]
+  /// rather than a session. The register screen observes that and routes to
+  /// OTP entry.
   Future<void> register(RegisterParams params) async {
-    state = state.copyWith(isSubmitting: true, errorMessage: null);
+    state = state.copyWith(
+      isSubmitting: true,
+      errorMessage: null,
+      pendingSignup: null,
+    );
 
     final result = await ref.read(registerUseCaseProvider).call(params);
 
     result.fold(
-      onSuccess: _setAuthenticated,
+      onSuccess: (challenge) => state = state.copyWith(
+        isSubmitting: false,
+        pendingSignup: challenge,
+      ),
       onFailure: (exception) => state = state.copyWith(
         isSubmitting: false,
         errorMessage: exception.message,
       ),
     );
   }
+
+  /// Abandons an in-flight signup (user backed out of OTP entry).
+  void clearPendingSignup() => state = state.copyWith(pendingSignup: null);
 
   Future<void> logout() async {
     await ref.read(logoutUseCaseProvider).call();

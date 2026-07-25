@@ -51,18 +51,31 @@ class StatCard extends StatelessWidget {
             child: Icon(stat.icon, color: stat.color, size: 22),
           ),
           AppSpacing.gapMd,
-          Text(stat.value, style: theme.textTheme.headlineMedium),
-          AppSpacing.gapXs,
           Text(
-            stat.label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+            stat.value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.headlineMedium,
+          ),
+          AppSpacing.gapXs,
+          // Flexible + ellipsis: the grid gives each card a fixed height, so
+          // a long label must clip rather than overflow the tile.
+          Flexible(
+            child: Text(
+              stat.label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           if (stat.delta != null) ...[
             AppSpacing.gapXs,
             Text(
               stat.delta!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.labelSmall?.copyWith(color: stat.color),
             ),
           ],

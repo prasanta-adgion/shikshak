@@ -135,7 +135,8 @@ class _SplashPageState extends ConsumerState<SplashPage>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(AppImagesConst.splashScreen, fit: BoxFit.fill),
+          // cover, not fill: fill stretches the artwork at tablet aspect ratios.
+          Image.asset(AppImagesConst.splashScreen, fit: BoxFit.cover),
           SafeArea(
             child: Align(
               alignment: Alignment.topCenter,
@@ -224,14 +225,17 @@ class _SplashPageState extends ConsumerState<SplashPage>
                               child: const SectionIndicator(),
                             ),
                             AppSpacing.hGapSm,
-                            Text(
-                              AppConstants.tagline,
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontSize: 11,
-                                color: const Color(0xFF5B6EF5),
-                                fontStyle: FontStyle.italic,
-                                letterSpacing: 0.3,
+                            // Flexible: the tagline is multi-line, so it must
+                            // shrink rather than overflow the indicator row.
+                            Flexible(
+                              child: Text(
+                                AppConstants.tagline,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: const Color(0xFF5B6EF5),
+                                  fontStyle: FontStyle.italic,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
                             ),
                             AppSpacing.hGapSm,

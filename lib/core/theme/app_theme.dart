@@ -190,12 +190,14 @@ abstract final class AppTheme {
         space: 1,
       ),
 
+      // Fixed (not floating): the bar spans the full width and sits flush on
+      // the bottom edge. Floating adds an inset margin on every side.
       snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
+        behavior: SnackBarBehavior.fixed,
         backgroundColor:
             isDark ? AppColors.darkSurfaceVariant : AppColors.lightTextPrimary,
         contentTextStyle: textTheme.bodyMedium?.copyWith(color: Colors.white),
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.input),
+        shape: const RoundedRectangleBorder(),
       ),
 
       dropdownMenuTheme: const DropdownMenuThemeData(

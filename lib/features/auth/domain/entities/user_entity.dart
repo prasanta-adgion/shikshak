@@ -11,12 +11,6 @@ class UserEntity {
     required this.email,
     required this.mobileNumber,
     required this.role,
-    this.city,
-    this.qualification,
-    this.experience,
-    this.subjects = const [],
-    this.studentClass,
-    this.preferredSubjects = const [],
   });
 
   final String id;
@@ -24,16 +18,6 @@ class UserEntity {
   final String email;
   final String mobileNumber;
   final UserRole role;
-  final String? city;
-
-  // Teacher-specific
-  final String? qualification;
-  final String? experience;
-  final List<String> subjects;
-
-  // Student-specific
-  final String? studentClass;
-  final List<String> preferredSubjects;
 
   /// First name, for friendly greetings.
   String get firstName {
