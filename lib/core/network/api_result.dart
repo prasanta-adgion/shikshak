@@ -1,9 +1,5 @@
 import 'api_exception.dart';
 
-/// Functional result type returned by repositories.
-///
-/// Forces callers to handle both outcomes explicitly — no unchecked throws
-/// crossing the domain boundary.
 sealed class ApiResult<T> {
   const ApiResult();
 
@@ -14,25 +10,24 @@ sealed class ApiResult<T> {
   bool get isSuccess => this is ApiSuccess<T>;
 
   T? get dataOrNull => switch (this) {
-        ApiSuccess<T>(:final data) => data,
-        ApiFailure<T>() => null,
-      };
+    ApiSuccess<T>(:final data) => data,
+    ApiFailure<T>() => null,
+  };
 
   /// Exhaustively handles both cases.
   R fold<R>({
     required R Function(T data) onSuccess,
     required R Function(ApiException exception) onFailure,
-  }) =>
-      switch (this) {
-        ApiSuccess<T>(:final data) => onSuccess(data),
-        ApiFailure<T>(:final exception) => onFailure(exception),
-      };
+  }) => switch (this) {
+    ApiSuccess<T>(:final data) => onSuccess(data),
+    ApiFailure<T>(:final exception) => onFailure(exception),
+  };
 
   /// Transforms the success value while preserving failures.
   ApiResult<R> map<R>(R Function(T data) transform) => switch (this) {
-        ApiSuccess<T>(:final data) => ApiResult.success(transform(data)),
-        ApiFailure<T>(:final exception) => ApiResult.failure(exception),
-      };
+    ApiSuccess<T>(:final data) => ApiResult.success(transform(data)),
+    ApiFailure<T>(:final exception) => ApiResult.failure(exception),
+  };
 }
 
 final class ApiSuccess<T> extends ApiResult<T> {

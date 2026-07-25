@@ -6,14 +6,6 @@ import 'i_api_client.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/logger_interceptor.dart';
 
-/// Production [IApiClient] implementation backed by Dio.
-///
-/// Owns the base configuration (timeouts, default headers) and the
-/// interceptor chain. Converts every transport failure into [ApiException]
-/// so nothing Dio-specific leaks upward.
-///
-/// [baseUrl] is injected rather than read from a global, so the flavor
-/// decides the environment and tests can point this at a fake server.
 class DioClient implements IApiClient {
   final Dio _dio;
   DioClient({
@@ -22,9 +14,6 @@ class DioClient implements IApiClient {
     bool enableLogging = true,
     Dio? dio,
   }) : _dio = dio ?? Dio() {
-    // A throw, not an assert: asserts are stripped from release builds, and a
-    // release build silently issuing relative requests is far worse than one
-    // that refuses to start talking to a host it does not have.
     if (baseUrl.isEmpty) {
       throw ArgumentError.value(
         baseUrl,
@@ -34,12 +23,6 @@ class DioClient implements IApiClient {
       );
     }
 
-    // Dio joins baseUrl and path by plain concatenation. Without a separator
-    // between them the result is malformed — "http://host:5001" + "api/v1/x"
-    // becomes "http://host:5001api/v1/x", which throws FormatException
-    // ("Invalid port") on every request. Normalising the base to end with "/"
-    // keeps both relative ("api/v1/x") and rooted ("/api/v1/x") endpoint
-    // styles working, so ApiEndpoints can be written either way.
     final normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : '$baseUrl/';
 
     _dio.options = BaseOptions(

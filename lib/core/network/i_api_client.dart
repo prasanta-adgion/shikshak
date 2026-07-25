@@ -1,11 +1,3 @@
-/// Transport-agnostic HTTP contract.
-///
-/// Data sources depend on this abstraction (Dependency Inversion) — the Dio
-/// implementation lives in `dio_client.dart` and can be swapped without
-/// touching any feature code.
-///
-/// All methods return the decoded response body and throw [ApiException]
-/// on failure.
 abstract interface class IApiClient {
   Future<T> get<T>(
     String path, {

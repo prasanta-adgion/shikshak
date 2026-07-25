@@ -4,10 +4,10 @@ import '../../../../core/constants/app_constants.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/user_role.dart';
 import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/register_usecase.dart';
 import '../providers/auth_providers.dart';
 import '../state/auth_state.dart';
 
+/// Owns authenticated-session state. Registration has a focused notifier.
 class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() => const AuthState();
@@ -56,34 +56,6 @@ class AuthNotifier extends Notifier<AuthState> {
       ),
     );
   }
-
-  /// Submits the signup form. On success the backend has emailed a code — the
-  /// user is NOT authenticated yet, so this sets [AuthState.pendingSignup]
-  /// rather than a session. The register screen observes that and routes to
-  /// OTP entry.
-  Future<void> register(RegisterParams params) async {
-    state = state.copyWith(
-      isSubmitting: true,
-      errorMessage: null,
-      pendingSignup: null,
-    );
-
-    final result = await ref.read(registerUseCaseProvider).call(params);
-
-    result.fold(
-      onSuccess: (challenge) => state = state.copyWith(
-        isSubmitting: false,
-        pendingSignup: challenge,
-      ),
-      onFailure: (exception) => state = state.copyWith(
-        isSubmitting: false,
-        errorMessage: exception.message,
-      ),
-    );
-  }
-
-  /// Abandons an in-flight signup (user backed out of OTP entry).
-  void clearPendingSignup() => state = state.copyWith(pendingSignup: null);
 
   Future<void> logout() async {
     await ref.read(logoutUseCaseProvider).call();

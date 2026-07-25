@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_paths.dart';
 import '../../../../core/constants/app_images_const.dart';
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/validators.dart';
@@ -49,48 +50,41 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    ref
-        .read(authNotifierProvider.notifier)
+    final email = _emailController.text.trim();
+    final succeeded = await ref
+        .read(registerNotifierProvider.notifier)
         .register(
           RegisterParams(
             fullName: _nameController.text,
-            email: _emailController.text,
+            email: email,
             mobileNumber: _mobileController.text,
             password: _passwordController.text,
             role: widget.role,
           ),
         );
+
+    if (succeeded && mounted) {
+      context.push(RoutePaths.signupOtp, extra: email);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print('build');
     final theme = Theme.of(context);
-    final isSubmitting = ref.watch(
-      authNotifierProvider.select((s) => s.isSubmitting),
-    );
+    final registerState = ref.watch(registerNotifierProvider);
+    final isSubmitting = registerState.isLoading;
 
-    // Signup does not create a session — it emails a code. Move to OTP entry
-    // once the backend confirms the code was sent.
-    ref.listen(authNotifierProvider.select((s) => s.pendingSignup), (
-      previous,
-      next,
-    ) {
-      final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
-      if (next != null && next != previous && isCurrent) {
-        context.push(RoutePaths.signupOtp);
-      }
-    });
-
-    ref.listen(authNotifierProvider.select((s) => s.errorMessage), (
-      previous,
-      next,
-    ) {
-      if (next != null && next != previous) {
-        AppSnackbar.showError(context, next);
+    ref.listen(registerNotifierProvider, (previous, next) {
+      if (next case AsyncError(:final error)) {
+        final message = error is ApiException
+            ? error.message
+            : 'An unexpected error occurred. Please try again.';
+        AppSnackbar.showError(context, message);
       }
     });
 

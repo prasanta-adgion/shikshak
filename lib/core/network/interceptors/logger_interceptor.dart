@@ -3,10 +3,6 @@ import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-/// Logs requests/responses in debug builds only.
-///
-/// Uses `dart:developer` so logs are visible in DevTools without polluting
-/// release builds or leaking payloads in production.
 class LoggerInterceptor extends Interceptor {
   static const _name = 'Shikshak.network';
 

@@ -52,8 +52,16 @@ abstract final class AppRouter {
       GoRoute(
         path: RoutePaths.signupOtp,
         name: RouteNames.signupOtp,
-        pageBuilder: (context, state) =>
-            fadeSlidePage(key: state.pageKey, child: const SignupOtpScreen()),
+        redirect: (context, state) {
+          final email = state.extra;
+          return email is! String || email.trim().isEmpty
+              ? RoutePaths.login
+              : null;
+        },
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: SignupOtpScreen(email: state.extra! as String),
+        ),
       ),
 
       GoRoute(

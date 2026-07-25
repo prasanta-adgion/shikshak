@@ -1,12 +1,10 @@
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/network/api_result.dart';
 import '../../../../core/storage/secure_storage_service.dart';
-import '../../domain/entities/signup_otp_challenge.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/user_role.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/register_usecase.dart';
 import '../datasource/auth_remote_datasource.dart';
 import '../mapper/user_mapper.dart';
 import '../models/auth_response_model.dart';
@@ -37,21 +35,25 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<ApiResult<SignupOtpChallenge>> register(RegisterParams params) =>
-      _guard(() async {
-        final response = await _remote.register(
-          RegisterRequestModel(
-            fullName: params.fullName.trim(),
-            email: params.email.trim(),
-            mobileNumber: params.mobileNumber.trim(),
-            password: params.password,
-            role: params.role.name,
-          ),
-        );
-        // No _persistSession here on purpose: this endpoint returns no tokens.
-        // The session is established after the OTP is verified.
-        return response.toEntity();
-      });
+  Future<ApiResult<void>> register({
+    required String fullName,
+    required String email,
+    required String mobileNumber,
+    required String password,
+    required UserRole role,
+  }) => _guard(() async {
+    await _remote.register(
+      RegisterRequestModel(
+        fullName: fullName.trim(),
+        email: email.trim(),
+        mobileNumber: mobileNumber.trim(),
+        password: password,
+        role: role.name,
+      ),
+    );
+    // No _persistSession here on purpose: this endpoint returns no tokens.
+    // The session is established after the OTP is verified.
+  });
 
   @override
   Future<bool> hasValidSession() async {
@@ -72,7 +74,6 @@ class AuthRepositoryImpl implements AuthRepository {
     _storage.saveRole(response.user.role),
   ]);
 
-  /// Runs [action], normalising every failure into an [ApiResult.failure].
   Future<ApiResult<T>> _guard<T>(Future<T> Function() action) async {
     try {
       return ApiResult.success(await action());

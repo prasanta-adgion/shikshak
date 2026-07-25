@@ -5,13 +5,13 @@ import '../../../../core/network/i_api_client.dart';
 import '../models/auth_response_model.dart';
 import '../models/login_request_model.dart';
 import '../models/register_request_model.dart';
-import '../models/register_api_response_model.dart';
+import '../models/register_response_model.dart';
 
 /// Contract for the auth API.
 abstract interface class AuthRemoteDataSource {
   Future<AuthResponseModel> login(LoginRequestModel request);
 
-  Future<RegisterApiResponseModel> register(RegisterRequestModel request);
+  Future<RegisterResponseModel> register(RegisterRequestModel request);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -31,16 +31,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<RegisterApiResponseModel> register(
-    RegisterRequestModel request,
-  ) async {
+  Future<RegisterResponseModel> register(RegisterRequestModel request) async {
     final json = await _client.post<Map<String, dynamic>>(
       ApiEndpoints.register,
       data: request.toJson(),
     );
     return _unwrap(
       json,
-      (data) => RegisterApiResponseModel.fromJson(data as Map<String, dynamic>),
+      (data) => RegisterResponseModel.fromJson(data as Map<String, dynamic>),
     );
   }
 

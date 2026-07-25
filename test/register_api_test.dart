@@ -1,6 +1,6 @@
 import 'package:Shikshak/core/network/api_response.dart';
 import 'package:Shikshak/features/auth/data/models/register_request_model.dart';
-import 'package:Shikshak/features/auth/data/models/register_api_response_model.dart';
+import 'package:Shikshak/features/auth/data/models/register_response_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Pins the signup request/response contract exactly as the backend returns
@@ -36,10 +36,9 @@ void main() {
     };
 
     test('envelope decodes, including the code field', () {
-      final response = ApiResponse<RegisterApiResponseModel>.fromJson(
+      final response = ApiResponse<RegisterResponseModel>.fromJson(
         responseJson(),
-        (data) =>
-            RegisterApiResponseModel.fromJson(data as Map<String, dynamic>),
+        (data) => RegisterResponseModel.fromJson(data as Map<String, dynamic>),
       );
 
       expect(response.success, isTrue);
@@ -48,29 +47,24 @@ void main() {
       expect(response.data, isNotNull);
     });
 
-    test('payload maps onto the domain entity', () {
-      final model = RegisterApiResponseModel.fromJson(
+    test('payload parses without leaking into the domain layer', () {
+      final model = RegisterResponseModel.fromJson(
         responseJson()['data'] as Map<String, dynamic>,
       );
 
       expect(model.email, 'prasanta.adgion@gmail.com');
       expect(model.expiresInSeconds, 600);
-
-      final entity = model.toEntity();
-      expect(entity.email, 'prasanta.adgion@gmail.com');
-      expect(entity.expiresIn, const Duration(minutes: 10));
     });
 
     test('a failure envelope surfaces the server message', () {
-      final response = ApiResponse<RegisterApiResponseModel>.fromJson(
+      final response = ApiResponse<RegisterResponseModel>.fromJson(
         {
           'success': false,
           'code': 409,
           'message': 'Email already registered',
           'data': null,
         },
-        (data) =>
-            RegisterApiResponseModel.fromJson(data as Map<String, dynamic>),
+        (data) => RegisterResponseModel.fromJson(data as Map<String, dynamic>),
       );
 
       expect(response.success, isFalse);
@@ -80,10 +74,9 @@ void main() {
 
     test('a malformed body degrades to a readable error, not a TypeError', () {
       // e.g. a proxy/gateway returning its own JSON shape.
-      final response = ApiResponse<RegisterApiResponseModel>.fromJson(
+      final response = ApiResponse<RegisterResponseModel>.fromJson(
         {'error': 'Bad Gateway'},
-        (data) =>
-            RegisterApiResponseModel.fromJson(data as Map<String, dynamic>),
+        (data) => RegisterResponseModel.fromJson(data as Map<String, dynamic>),
       );
 
       expect(response.success, isFalse);

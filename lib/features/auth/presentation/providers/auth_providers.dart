@@ -9,6 +9,7 @@ import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../notifier/auth_notifier.dart';
+import '../notifier/register_notifier.dart';
 import '../state/auth_state.dart';
 
 /// Composition root for the auth feature. Everything depends on
@@ -44,3 +45,6 @@ final checkAuthStatusUseCaseProvider = Provider<CheckAuthStatusUseCase>(
 final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(
   AuthNotifier.new,
 );
+
+final registerNotifierProvider =
+    NotifierProvider<RegisterNotifier, AsyncValue<void>>(RegisterNotifier.new);

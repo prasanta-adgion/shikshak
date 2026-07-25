@@ -1,14 +1,18 @@
 import '../../../../core/network/api_result.dart';
-import '../entities/signup_otp_challenge.dart';
 import '../entities/user_entity.dart';
 import '../entities/user_role.dart';
 import '../usecases/login_usecase.dart';
-import '../usecases/register_usecase.dart';
 
 abstract interface class AuthRepository {
   Future<ApiResult<UserEntity>> login(LoginParams params);
 
-  Future<ApiResult<SignupOtpChallenge>> register(RegisterParams params);
+  Future<ApiResult<void>> register({
+    required String fullName,
+    required String email,
+    required String mobileNumber,
+    required String password,
+    required UserRole role,
+  });
 
   Future<bool> hasValidSession();
 

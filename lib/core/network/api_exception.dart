@@ -13,10 +13,6 @@ enum ApiExceptionType {
   unknown,
 }
 
-/// Domain-friendly exception thrown by the network layer.
-///
-/// Converts low-level [DioException]s into something the presentation layer
-/// can show directly ([message]) and branch on ([type]).
 class ApiException implements Exception {
   const ApiException({
     required this.message,
@@ -68,8 +64,10 @@ class ApiException implements Exception {
       401 => (ApiExceptionType.unauthorized, 'Invalid credentials.'),
       403 => (ApiExceptionType.forbidden, 'You do not have access.'),
       404 => (ApiExceptionType.notFound, 'Resource not found.'),
-      final int code when code >= 500 =>
-        (ApiExceptionType.server, 'Server error. Try again later.'),
+      final int code when code >= 500 => (
+        ApiExceptionType.server,
+        'Server error. Try again later.',
+      ),
       _ => (ApiExceptionType.unknown, 'Something went wrong.'),
     };
     return ApiException(
@@ -80,9 +78,9 @@ class ApiException implements Exception {
   }
 
   factory ApiException.unexpected([Object? error]) => const ApiException(
-        message: 'An unexpected error occurred. Please try again.',
-        type: ApiExceptionType.unknown,
-      );
+    message: 'An unexpected error occurred. Please try again.',
+    type: ApiExceptionType.unknown,
+  );
 
   /// Attempts to extract a human-readable message from a server payload.
   static String? _serverMessage(dynamic data) {

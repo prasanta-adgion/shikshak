@@ -1,5 +1,4 @@
 import '../../../../core/network/api_result.dart';
-import '../entities/signup_otp_challenge.dart';
 import '../entities/user_role.dart';
 import '../repositories/auth_repository.dart';
 
@@ -26,6 +25,11 @@ class RegisterUseCase {
 
   final AuthRepository _repository;
 
-  Future<ApiResult<SignupOtpChallenge>> call(RegisterParams params) =>
-      _repository.register(params);
+  Future<ApiResult<void>> call(RegisterParams params) => _repository.register(
+    fullName: params.fullName,
+    email: params.email,
+    mobileNumber: params.mobileNumber,
+    password: params.password,
+    role: params.role,
+  );
 }
