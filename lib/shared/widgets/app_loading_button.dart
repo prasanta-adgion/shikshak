@@ -50,7 +50,16 @@ class AppLoadingButton extends StatelessWidget {
                       Icon(icon, size: 20),
                       const SizedBox(width: 8),
                     ],
-                    Text(label),
+                    // Flexible so a long label ellipsizes instead of
+                    // overflowing on narrow phones or at large text scales.
+                    Flexible(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                     if (trailingIcon != null) ...[
                       const SizedBox(width: 8),
                       Icon(trailingIcon, size: 20),

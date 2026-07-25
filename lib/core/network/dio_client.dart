@@ -1,29 +1,39 @@
 import 'package:dio/dio.dart';
 
-import '../constants/api_endpoints.dart';
 import '../storage/secure_storage_service.dart';
 import 'api_exception.dart';
 import 'i_api_client.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/logger_interceptor.dart';
 
-/// Production [IApiClient] implementation backed by Dio.
-///
-/// Owns the base configuration (base URL, timeouts, default headers) and the
-/// interceptor chain. Converts every transport failure into [ApiException]
-/// so nothing Dio-specific leaks upward.
 class DioClient implements IApiClient {
   final Dio _dio;
-  DioClient({required SecureStorageService storage, Dio? dio})
-    : _dio = dio ?? Dio() {
+  DioClient({
+    required String baseUrl,
+    required SecureStorageService storage,
+    bool enableLogging = true,
+    Dio? dio,
+  }) : _dio = dio ?? Dio() {
+    if (baseUrl.isEmpty) {
+      throw ArgumentError.value(
+        baseUrl,
+        'baseUrl',
+        'DioClient was given an empty baseUrl. The current flavor has no API '
+            'host configured — see AppFlavor in lib/core/flavor/app_flavor.dart.',
+      );
+    }
+
+    final normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : '$baseUrl/';
+
     _dio.options = BaseOptions(
-      baseUrl: ApiEndpoints.baseUrl,
+      baseUrl: normalizedBaseUrl,
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 20),
       sendTimeout: const Duration(seconds: 15),
       headers: const {'Accept': 'application/json'},
     );
-    _dio.interceptors.addAll([AuthInterceptor(storage), LoggerInterceptor()]);
+    _dio.interceptors.add(AuthInterceptor(storage));
+    if (enableLogging) _dio.interceptors.add(LoggerInterceptor());
   }
 
   @override

@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required in every build type once the app talks to the REST API.
+         The debug/profile manifests declare it only for the Flutter tool. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
-        android:label="Shikshak"
+        android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

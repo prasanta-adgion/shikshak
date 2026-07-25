@@ -26,10 +26,14 @@ dependencies:
   # OTP text field
   pinput: ^6.0.2
 
+  equatable: ^2.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Pinned below 2.15.2, which requires Dart ^3.11.0 — this project is on 3.10.0.
+  build_runner: ^2.15.1
 
 flutter:
   uses-material-design: true

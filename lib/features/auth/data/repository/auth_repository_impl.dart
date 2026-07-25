@@ -5,61 +5,55 @@ import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/user_role.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/register_usecase.dart';
 import '../datasource/auth_remote_datasource.dart';
 import '../mapper/user_mapper.dart';
 import '../models/auth_response_model.dart';
 import '../models/login_request_model.dart';
 import '../models/register_request_model.dart';
 
-/// Concrete [AuthRepository]: orchestrates the remote data source and
-/// secure session persistence, and converts thrown [ApiException]s into
-/// [ApiResult] failures.
 class AuthRepositoryImpl implements AuthRepository {
-  const AuthRepositoryImpl({
-    required AuthRemoteDataSource remoteDataSource,
-    required SecureStorageService storage,
-  })  : _remote = remoteDataSource,
-        _storage = storage;
-
   final AuthRemoteDataSource _remote;
   final SecureStorageService _storage;
 
-  @override
-  Future<ApiResult<UserEntity>> login(LoginParams params) => _guard(() async {
-        final response = await _remote.login(
-          LoginRequestModel(
-            identifier: params.identifier.trim(),
-            password: params.password,
-            role: params.role.name,
-          ),
-        );
-        await _persistSession(response);
-        return response.user.toEntity();
-      });
+  const AuthRepositoryImpl({
+    required AuthRemoteDataSource remoteDataSource,
+    required SecureStorageService storage,
+  }) : _remote = remoteDataSource,
+       _storage = storage;
 
   @override
-  Future<ApiResult<UserEntity>> register(RegisterParams params) =>
-      _guard(() async {
-        final response = await _remote.register(
-          RegisterRequestModel(
-            fullName: params.fullName.trim(),
-            email: params.email.trim(),
-            mobileNumber: params.mobileNumber.trim(),
-            password: params.password,
-            role: params.role.name,
-            city: params.city.trim(),
-            qualification: params.qualification?.trim(),
-            experience: params.experience,
-            subjects: params.subjects.isEmpty ? null : params.subjects,
-            studentClass: params.studentClass,
-            preferredSubjects:
-                params.preferredSubjects.isEmpty ? null : params.preferredSubjects,
-          ),
-        );
-        await _persistSession(response);
-        return response.user.toEntity();
-      });
+  Future<ApiResult<UserEntity>> login(LoginParams params) => _guard(() async {
+    final response = await _remote.login(
+      LoginRequestModel(
+        identifier: params.identifier.trim(),
+        password: params.password,
+        role: params.role.name,
+      ),
+    );
+    await _persistSession(response);
+    return response.user.toEntity();
+  });
+
+  @override
+  Future<ApiResult<void>> register({
+    required String fullName,
+    required String email,
+    required String mobileNumber,
+    required String password,
+    required UserRole role,
+  }) => _guard(() async {
+    await _remote.register(
+      RegisterRequestModel(
+        fullName: fullName.trim(),
+        email: email.trim(),
+        mobileNumber: mobileNumber.trim(),
+        password: password,
+        role: role.name,
+      ),
+    );
+    // No _persistSession here on purpose: this endpoint returns no tokens.
+    // The session is established after the OTP is verified.
+  });
 
   @override
   Future<bool> hasValidSession() async {
@@ -75,12 +69,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() => _storage.clear();
 
   Future<void> _persistSession(AuthResponseModel response) => Future.wait([
-        _storage.saveToken(response.accessToken),
-        _storage.saveRefreshToken(response.refreshToken),
-        _storage.saveRole(response.user.role),
-      ]);
+    _storage.saveToken(response.accessToken),
+    _storage.saveRefreshToken(response.refreshToken),
+    _storage.saveRole(response.user.role),
+  ]);
 
-  /// Runs [action], normalising every failure into an [ApiResult.failure].
   Future<ApiResult<T>> _guard<T>(Future<T> Function() action) async {
     try {
       return ApiResult.success(await action());

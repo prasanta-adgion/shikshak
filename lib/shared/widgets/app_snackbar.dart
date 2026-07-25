@@ -27,9 +27,13 @@ abstract final class AppSnackbar {
           backgroundColor: backgroundColor,
           content: Text(
             message,
-            style: backgroundColor == null
-                ? null
-                : const TextStyle(color: Colors.white),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w400,
+            ),
+            // style: backgroundColor == null
+            //     ? null
+            //     : const TextStyle(color: Colors.white),
           ),
         ),
       );

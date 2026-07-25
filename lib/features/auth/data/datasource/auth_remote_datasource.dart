@@ -5,25 +5,18 @@ import '../../../../core/network/i_api_client.dart';
 import '../models/auth_response_model.dart';
 import '../models/login_request_model.dart';
 import '../models/register_request_model.dart';
+import '../models/register_response_model.dart';
 
 /// Contract for the auth API.
 abstract interface class AuthRemoteDataSource {
   Future<AuthResponseModel> login(LoginRequestModel request);
 
-  Future<AuthResponseModel> register(RegisterRequestModel request);
+  Future<RegisterResponseModel> register(RegisterRequestModel request);
 }
 
-/// Real implementation that talks to the Shikshak backend through
-/// [IApiClient].
-///
-/// The endpoints are placeholders — this class is fully wired and becomes
-/// live the moment [ApiEndpoints.baseUrl] points at a real server. Until
-/// then the app runs on [MockAuthRemoteDataSource] (see
-/// `mock_auth_remote_datasource.dart` and the provider wiring).
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  const AuthRemoteDataSourceImpl(this._client);
-
   final IApiClient _client;
+  const AuthRemoteDataSourceImpl(this._client);
 
   @override
   Future<AuthResponseModel> login(LoginRequestModel request) async {
@@ -38,14 +31,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthResponseModel> register(RegisterRequestModel request) async {
+  Future<RegisterResponseModel> register(RegisterRequestModel request) async {
     final json = await _client.post<Map<String, dynamic>>(
       ApiEndpoints.register,
       data: request.toJson(),
     );
     return _unwrap(
       json,
-      (data) => AuthResponseModel.fromJson(data as Map<String, dynamic>),
+      (data) => RegisterResponseModel.fromJson(data as Map<String, dynamic>),
     );
   }
 

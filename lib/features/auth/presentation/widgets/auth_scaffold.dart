@@ -1,4 +1,3 @@
-import 'package:Shikshak/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_spacing.dart';
@@ -41,7 +40,6 @@ class AuthScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.isTablet ? null : AppColors.lightBackground,
       body: ResponsiveBuilder(
         builder: (context, constraints) => context.isTabletDevice
             ? _buildTablet(context, constraints)

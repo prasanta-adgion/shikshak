@@ -28,6 +28,15 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<!-- Allows cleartext HTTP to local-network addresses only (e.g. the dev
+	     server at http://192.168.1.12:5001). This is Apple's sanctioned
+	     local-networking exception — it does NOT permit arbitrary insecure
+	     internet traffic, so App Store review is unaffected. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

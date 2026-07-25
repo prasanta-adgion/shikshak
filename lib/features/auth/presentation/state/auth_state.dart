@@ -1,36 +1,10 @@
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/user_role.dart';
 
-/// Session lifecycle.
-enum AuthStatus {
-  /// Splash is restoring a persisted session.
-  checking,
+enum AuthStatus { checking, authenticated, unauthenticated }
 
-  /// A valid session exists; [AuthState.user] is non-null.
-  authenticated,
-
-  /// No session — user is somewhere in the auth flow.
-  unauthenticated,
-}
-
-/// Immutable state for the whole authentication feature.
+/// Session state shared by login, splash, logout, and authenticated screens.
 class AuthState {
-  final AuthStatus status;
-
-  /// True while a login/register request is in flight.
-  final bool isSubmitting;
-
-  /// The authenticated user (null until [status] is authenticated).
-  final UserEntity? user;
-
-  /// Role picked on the role-selection screen; carried through the
-  /// login/registration flow.
-  final UserRole? selectedRole;
-
-  /// Last auth error, surfaced by the UI as a snackbar. Cleared on the
-  /// next submission.
-  final String? errorMessage;
-
   const AuthState({
     this.status = AuthStatus.checking,
     this.isSubmitting = false,
@@ -39,12 +13,16 @@ class AuthState {
     this.errorMessage,
   });
 
+  final AuthStatus status;
+  final bool isSubmitting;
+  final UserEntity? user;
+  final UserRole? selectedRole;
+  final String? errorMessage;
+
   bool get isAuthenticated => status == AuthStatus.authenticated;
 
   static const _unset = Object();
 
-  /// Nullable fields default to a sentinel so callers can either keep the
-  /// current value (omit the argument) or clear it (pass null explicitly).
   AuthState copyWith({
     AuthStatus? status,
     bool? isSubmitting,

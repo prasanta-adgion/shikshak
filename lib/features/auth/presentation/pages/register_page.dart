@@ -7,17 +7,18 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_paths.dart';
 import '../../../../core/constants/app_images_const.dart';
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/validators.dart';
+import '../../../../shared/widgets/app_hero_banner.dart';
 import '../../../../shared/widgets/app_loading_button.dart';
 import '../../../../shared/widgets/app_password_field.dart';
+import '../../../../shared/widgets/app_snackbar.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../domain/entities/user_role.dart';
 import '../../domain/usecases/register_usecase.dart';
 import '../providers/auth_providers.dart';
-import '../state/auth_state.dart';
-import '../widgets/auth_hero_banner.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/tablet_login_hero.dart';
 
@@ -49,61 +50,46 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     super.dispose();
   }
 
-  void _submit() {
-    context.go(RoutePaths.otpVerify, extra: []);
-    return;
-
+  Future<void> _submit() async {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    ref
-        .read(authNotifierProvider.notifier)
+    final email = _emailController.text.trim();
+    final succeeded = await ref
+        .read(registerNotifierProvider.notifier)
         .register(
           RegisterParams(
             fullName: _nameController.text,
-            email: _emailController.text,
+            email: email,
             mobileNumber: _mobileController.text,
             password: _passwordController.text,
             role: widget.role,
-            city: '',
           ),
         );
 
-    context.go(RoutePaths.otpVerify, extra: []);
+    if (succeeded && mounted) {
+      context.push(RoutePaths.signupOtp, extra: email);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    print('build');
     final theme = Theme.of(context);
-    final isSubmitting = ref.watch(
-      authNotifierProvider.select((s) => s.isSubmitting),
-    );
+    final registerState = ref.watch(registerNotifierProvider);
+    final isSubmitting = registerState.isLoading;
 
-    // Navigate to the dashboard once the account is created.
-    ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
-      final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
-      if (next == AuthStatus.authenticated && isCurrent) {
-        final role = ref.read(authNotifierProvider).user?.role ?? widget.role;
-        context.go(RoutePaths.dashboardFor(role));
-      }
-    });
-
-    ref.listen(authNotifierProvider.select((s) => s.errorMessage), (
-      previous,
-      next,
-    ) {
-      if (next != null && next != previous) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next),
-            backgroundColor: theme.colorScheme.error,
-          ),
-        );
+    ref.listen(registerNotifierProvider, (previous, next) {
+      if (next case AsyncError(:final error)) {
+        final message = error is ApiException
+            ? error.message
+            : 'An unexpected error occurred. Please try again.';
+        AppSnackbar.showError(context, message);
       }
     });
 
     return AuthScaffold(
-      banner: AuthHeroBanner(
+      banner: AppHeroBanner(
         image: AppImagesConst.loginScreenImage,
         headline: 'Join',
         headlineAccent: AppConstants.appName,

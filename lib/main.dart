@@ -1,19 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'bootstrap.dart';
+import 'core/flavor/app_flavor.dart';
 
-import 'app/app.dart';
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Edge-to-edge, transparent system bars for an immersive splash.
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.transparent,
-    ),
-  );
-
-  runApp(const ProviderScope(child: ShikshakApp()));
-}
+/// Default entrypoint, so a bare `flutter run` still works. It targets the
+/// development flavor — release builds should use an explicit entrypoint:
+///   flutter build apk -t lib/main_prod.dart --release
+void main() => bootstrap(AppFlavor.dev);

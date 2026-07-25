@@ -76,12 +76,13 @@ class TabletLoginHero extends StatelessWidget {
             ),
           ),
           AppSpacing.gapXxxl,
-          Row(
+          // Wrap, not Row: the hero pane is narrow in tablet portrait, so the
+          // chips must reflow onto a second line instead of overflowing.
+          Wrap(
+            spacing: AppSpacing.lg,
+            runSpacing: AppSpacing.md,
             children: [
-              for (final feature in _features) ...[
-                _FeatureChip(feature: feature),
-                if (feature != _features.last) AppSpacing.hGapLg,
-              ],
+              for (final feature in _features) _FeatureChip(feature: feature),
             ],
           ),
           // The baked-in illustration and wave occupy the lower half of the

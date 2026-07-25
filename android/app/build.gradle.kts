@@ -30,6 +30,34 @@ android {
         versionName = flutter.versionName
     }
 
+    // Product flavors matching the Dart entrypoints in lib/main_*.dart.
+    // These names are what `flutter run --flavor <name>` resolves against.
+    //
+    // dev and staging carry an applicationId suffix so all three can be
+    // installed side by side on one device; prod keeps the base id untouched.
+    // Pair each with its entrypoint, e.g.
+    //   flutter run --flavor dev -t lib/main_dev.dart
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "Shikshak Dev")
+        }
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            resValue("string", "app_name", "Shikshak Staging")
+        }
+        create("prod") {
+            dimension = "environment"
+            resValue("string", "app_name", "Shikshak")
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.

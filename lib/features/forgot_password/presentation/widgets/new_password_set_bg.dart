@@ -18,7 +18,7 @@ class NewPasswordSetBg extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           /// Background
-          Image.asset(AppImagesConst.passwordForgotBg, fit: BoxFit.fill),
+          Image.asset(AppImagesConst.passwordForgotBg, fit: BoxFit.cover),
 
           SafeArea(
             child: SingleChildScrollView(
@@ -44,11 +44,14 @@ class NewPasswordSetBg extends StatelessWidget {
                     Text(
                       'Your new password must be different from previously used passwords.',
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontSize: isTablet ? 20 : 12,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style:
+                          (isTablet
+                                  ? theme.textTheme.titleMedium
+                                  : theme.textTheme.bodySmall)
+                              ?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w400,
+                              ),
                     ),
 
                     isTablet ? AppSpacing.gapXxxl : AppSpacing.gapLg,

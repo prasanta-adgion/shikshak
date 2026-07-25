@@ -1,12 +1,13 @@
 import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
+import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/new_password_set.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/otp_verify_screen.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/auth/presentation/pages/signup_otp_screen.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/student/presentation/pages/student_dashboard_page.dart';
 import '../../features/teacher/presentation/pages/teacher_dashboard_page.dart';
@@ -47,18 +48,22 @@ abstract final class AppRouter {
           child: RegisterPage(role: _roleParam(state)),
         ),
       ),
+      //signup — OTP entry
       GoRoute(
-        path: RoutePaths.otpVerify,
-        name: RouteNames.otpVerify,
+        path: RoutePaths.signupOtp,
+        name: RouteNames.signupOtp,
+        redirect: (context, state) {
+          final email = state.extra;
+          return email is! String || email.trim().isEmpty
+              ? RoutePaths.login
+              : null;
+        },
         pageBuilder: (context, state) => fadeSlidePage(
           key: state.pageKey,
-          child: OtpVerifyScreen(
-            destination:
-                state.uri.queryParameters['destination'] ??
-                'your mobile number',
-          ),
+          child: SignupOtpScreen(email: state.extra! as String),
         ),
       ),
+
       GoRoute(
         path: RoutePaths.studentDashboard,
         name: RouteNames.studentDashboard,
@@ -83,6 +88,16 @@ abstract final class AppRouter {
         pageBuilder: (context, state) => fadeSlidePage(
           key: state.pageKey,
           child: const ForgotPasswordScreen(),
+        ),
+      ),
+
+      //forgot password — OTP entry
+      GoRoute(
+        path: RoutePaths.forgotPasswordOtp,
+        name: RouteNames.forgotPasswordOtp,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const ForgotPasswordOtpScreen(),
         ),
       ),
 
