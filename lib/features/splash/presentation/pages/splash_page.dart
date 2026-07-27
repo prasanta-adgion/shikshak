@@ -12,7 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../auth/domain/entities/user_role.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../auth/presentation/state/auth_state.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -102,7 +102,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
     // Start the session check once the first frame is up; the ref.listen in
     // build() navigates when the state resolves.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(authNotifierProvider.notifier).checkAuthStatus();
+      ref.read(authStateNotifierProvider.notifier).checkAuthStatus();
     });
   }
 
@@ -118,11 +118,14 @@ class _SplashPageState extends ConsumerState<SplashPage>
     final theme = Theme.of(context);
 
     // Navigate as soon as the session check completes.
-    ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
+    ref.listen(authStateNotifierProvider.select((s) => s.status), (
+      previous,
+      next,
+    ) {
       switch (next) {
         case AuthStatus.authenticated:
           final role =
-              ref.read(authNotifierProvider).selectedRole ?? UserRole.student;
+              ref.read(authStateNotifierProvider).role ?? UserRole.student;
           context.go(RoutePaths.dashboardFor(role));
         case AuthStatus.unauthenticated:
           context.go(RoutePaths.login);

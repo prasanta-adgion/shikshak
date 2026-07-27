@@ -8,7 +8,7 @@ import '../../../../shared/widgets/adaptive_navigation_scaffold.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
 import '../../../../shared/widgets/section_header.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../auth/presentation/widgets/logout_button.dart';
 import '../models/tutor_info.dart';
 import '../widgets/category_card.dart';
@@ -176,7 +176,7 @@ class _StudentHomeTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final user = ref.watch(authNotifierProvider.select((s) => s.user));
+    final user = ref.watch(authStateNotifierProvider.select((s) => s.user));
     final firstName = user?.firstName ?? 'Student';
 
     return CenteredConstrainedBox(

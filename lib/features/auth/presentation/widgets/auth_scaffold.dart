@@ -15,11 +15,9 @@ class AuthScaffold extends StatelessWidget {
     required this.subtitle,
     required this.form,
     this.footer,
-    this.roleSelector,
     this.banner,
     this.tabletBackgroundImage,
     this.tabletHero,
-    this.alignToTop = false,
   });
 
   final String title;
@@ -28,14 +26,10 @@ class AuthScaffold extends StatelessWidget {
 
   final Widget? footer;
 
-  final Widget? roleSelector;
-
   final Widget? banner;
 
   final String? tabletBackgroundImage;
   final Widget? tabletHero;
-
-  final bool alignToTop;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +46,7 @@ class AuthScaffold extends StatelessWidget {
     return SafeArea(
       child: Align(
         key: const Key('auth-phone-layout'),
-        alignment: alignToTop ? Alignment.topCenter : Alignment.center,
+        alignment: Alignment.center,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: CenteredConstrainedBox(
@@ -130,7 +124,7 @@ class AuthScaffold extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: constraints.maxHeight),
           child: Align(
-            alignment: alignToTop ? Alignment.topCenter : Alignment.center,
+            alignment: Alignment.center,
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 maxWidth: Breakpoints.tabletFormMaxWidth,
@@ -172,10 +166,6 @@ class _FormContent extends StatelessWidget {
                   alignment: CrossAxisAlignment.center,
                 ),
                 AppSpacing.gapXl,
-                if (child.roleSelector != null) ...[
-                  child.roleSelector!,
-                  AppSpacing.gapXl,
-                ],
                 child.form,
               ],
             ),

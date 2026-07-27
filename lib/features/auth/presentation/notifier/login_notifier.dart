@@ -1,25 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/entities/user_entity.dart';
 import '../../domain/params/auth_params.dart';
 import '../providers_di/auth_providers.dart';
 
-/// Owns only the loading, success, and failure state of registration.
-class RegisterNotifier extends Notifier<AsyncValue<void>> {
+class LoginNotifier extends Notifier<AsyncValue<void>> {
   @override
   AsyncValue<void> build() => const AsyncData(null);
 
-  Future<bool> register(RegisterParams params) async {
+  /// Returns the signed-in user, or `null` when login failed.
+  Future<UserEntity?> login(LoginParams params) async {
     state = const AsyncLoading();
-    final result = await ref.read(registerUseCaseProvider).call(params);
+    final result = await ref.read(loginUseCaseProvider).call(params);
 
     return result.fold(
-      onSuccess: (_) {
+      onSuccess: (user) {
         state = const AsyncData(null);
-        return true;
+        ref.read(authStateNotifierProvider.notifier).setSession(user);
+        return user;
       },
       onFailure: (exception) {
         state = AsyncError(exception, StackTrace.current);
-        return false;
+        return null;
       },
     );
   }
