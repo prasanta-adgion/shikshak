@@ -36,7 +36,7 @@ class LogoutButton extends ConsumerWidget {
           ),
         );
         if (confirmed ?? false) {
-          await ref.read(authNotifierProvider.notifier).logout();
+          await ref.read(authStateNotifierProvider.notifier).logout();
           if (context.mounted) {
             context.go(RoutePaths.login);
           }

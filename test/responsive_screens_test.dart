@@ -54,7 +54,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          authNotifierProvider.overrideWith(_SeededAuthNotifier.new),
+          authStateNotifierProvider.overrideWith(_SeededAuthNotifier.new),
         ],
         child: MaterialApp(theme: AppTheme.light, home: screen),
       ),
@@ -94,7 +94,7 @@ void main() {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              authNotifierProvider.overrideWith(_SeededAuthNotifier.new),
+              authStateNotifierProvider.overrideWith(_SeededAuthNotifier.new),
             ],
             child: MaterialApp(theme: AppTheme.dark, home: build()),
           ),

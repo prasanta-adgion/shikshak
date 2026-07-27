@@ -146,7 +146,7 @@ class _TeacherHomeTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final user = ref.watch(authNotifierProvider.select((s) => s.user));
+    final user = ref.watch(authStateNotifierProvider.select((s) => s.user));
     final firstName = user?.firstName ?? 'Teacher';
 
     return CenteredConstrainedBox(

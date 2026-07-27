@@ -8,6 +8,7 @@ import '../../domain/usecases/auth_usecases.dart';
 import '../notifier/auth_notifier.dart';
 import '../notifier/login_notifier.dart';
 import '../notifier/register_notifier.dart';
+import '../notifier/signup_otp_notifier.dart';
 import '../state/auth_state.dart';
 
 /// Composition root for the auth feature. Everything depends on
@@ -32,6 +33,14 @@ final registerUseCaseProvider = Provider<RegisterUseCase>(
   (ref) => RegisterUseCase(ref.watch(authRepositoryImplementProvider)),
 );
 
+final verifySignupOtpUseCaseProvider = Provider<VerifySignupOtpUseCase>(
+  (ref) => VerifySignupOtpUseCase(ref.watch(authRepositoryImplementProvider)),
+);
+
+final resendSignupOtpUseCaseProvider = Provider<ResendSignupOtpUseCase>(
+  (ref) => ResendSignupOtpUseCase(ref.watch(authRepositoryImplementProvider)),
+);
+
 final logoutUseCaseProvider = Provider<LogoutUseCase>(
   (ref) => LogoutUseCase(ref.watch(authRepositoryImplementProvider)),
 );
@@ -40,12 +49,18 @@ final checkAuthStatusUseCaseProvider = Provider<CheckAuthStatusUseCase>(
   (ref) => CheckAuthStatusUseCase(ref.watch(authRepositoryImplementProvider)),
 );
 
-final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(
+final authStateNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(
   AuthNotifier.new,
 );
 
-final loginNotifierProvider =
-    NotifierProvider<LoginNotifier, AsyncValue<void>>(LoginNotifier.new);
+final loginNotifierProvider = NotifierProvider<LoginNotifier, AsyncValue<void>>(
+  LoginNotifier.new,
+);
 
 final registerNotifierProvider =
     NotifierProvider<RegisterNotifier, AsyncValue<void>>(RegisterNotifier.new);
+
+final signupOtpNotifierProvider =
+    NotifierProvider<SignupOtpNotifier, AsyncValue<void>>(
+      SignupOtpNotifier.new,
+    );

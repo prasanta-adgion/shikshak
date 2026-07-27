@@ -4,8 +4,6 @@ import '../../domain/entities/user_entity.dart';
 import '../../domain/params/auth_params.dart';
 import '../providers_di/auth_providers.dart';
 
-/// Owns only the loading, success, and failure state of the login form.
-/// The resulting session is handed to [AuthNotifier], which owns it.
 class LoginNotifier extends Notifier<AsyncValue<void>> {
   @override
   AsyncValue<void> build() => const AsyncData(null);
@@ -18,7 +16,7 @@ class LoginNotifier extends Notifier<AsyncValue<void>> {
     return result.fold(
       onSuccess: (user) {
         state = const AsyncData(null);
-        ref.read(authNotifierProvider.notifier).setSession(user);
+        ref.read(authStateNotifierProvider.notifier).setSession(user);
         return user;
       },
       onFailure: (exception) {

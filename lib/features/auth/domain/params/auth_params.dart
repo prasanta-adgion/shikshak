@@ -24,3 +24,19 @@ class RegisterParams {
     required this.role,
   });
 }
+
+class ResendOtpParams {
+  /// Email address or mobile number the original code was sent to.
+  final String identifier;
+
+  const ResendOtpParams({required this.identifier});
+}
+
+class VerifySignupOtpParams {
+  final String email;
+
+  /// The 6-digit code sent to [email].
+  final String otp;
+
+  const VerifySignupOtpParams({required this.email, required this.otp});
+}

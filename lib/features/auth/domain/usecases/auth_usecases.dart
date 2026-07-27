@@ -22,6 +22,24 @@ class RegisterUseCase {
       _repository.register(params);
 }
 
+class VerifySignupOtpUseCase {
+  const VerifySignupOtpUseCase(this._repository);
+
+  final AuthRepository _repository;
+
+  Future<ApiResult<UserEntity>> call(VerifySignupOtpParams params) =>
+      _repository.verifySignupOtp(params);
+}
+
+class ResendSignupOtpUseCase {
+  const ResendSignupOtpUseCase(this._repository);
+
+  final AuthRepository _repository;
+
+  Future<ApiResult<void>> call(ResendOtpParams params) =>
+      _repository.resendSignupOtp(params);
+}
+
 class LogoutUseCase {
   const LogoutUseCase(this._repository);
 

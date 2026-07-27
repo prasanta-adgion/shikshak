@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:Shikshak/shared/widgets/app_snackbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_header.dart';
 import '../../../../shared/widgets/app_hero_banner.dart';
@@ -23,12 +24,17 @@ class OtpVerifyScreen extends StatefulWidget {
   final VoidCallback? onResend;
   final bool isLoading;
 
+  /// How long *Resend* stays locked after a code goes out. The first window
+  /// starts on entry, since the flow that pushed this screen just sent one.
+  final Duration resendCooldown;
+
   const OtpVerifyScreen({
     super.key,
     this.destination = 'your mobile number',
     this.onVerified,
     this.onResend,
     this.isLoading = false,
+    this.resendCooldown = const Duration(seconds: 60),
   });
 
   @override
@@ -40,11 +46,41 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   final _pinController = TextEditingController();
   final _pinFocusNode = FocusNode();
 
+  Timer? _resendTimer;
+
+  /// Seconds left on the resend lock; `0` means *Resend* is tappable. A
+  /// notifier rather than plain state, so a tick rebuilds the resend button
+  /// alone instead of the whole screen.
+  final _resendSecondsLeft = ValueNotifier<int>(0);
+
+  bool get _canResend => _resendSecondsLeft.value == 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startResendCooldown();
+  }
+
   @override
   void dispose() {
+    _resendTimer?.cancel();
+    _resendSecondsLeft.dispose();
     _pinController.dispose();
     _pinFocusNode.dispose();
     super.dispose();
+  }
+
+  /// Restarts the lock, ticking once a second and cancelling itself on the
+  /// last tick.
+  void _startResendCooldown() {
+    _resendTimer?.cancel();
+    _resendSecondsLeft.value = widget.resendCooldown.inSeconds;
+    if (_canResend) return;
+
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _resendSecondsLeft.value -= 1;
+      if (_canResend) timer.cancel();
+    });
   }
 
   void _verifyOtp() {
@@ -60,8 +96,14 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   }
 
   void _resendOtp() {
+    if (!_canResend) return;
+
     _pinController.clear();
     _pinFocusNode.requestFocus();
+    // Locks on the tap, not on the reply: the point is to stop the endpoint
+    // being hammered, and the caller reports the outcome itself.
+    _startResendCooldown();
+
     if (widget.onResend != null) {
       widget.onResend!();
       return;
@@ -294,12 +336,21 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                 ),
               ),
               AppSpacing.hGapSm,
-              AppButton(
-                label: 'Resend',
-                expanded: false,
-                color: Colors.transparent,
-                labelColor: theme.colorScheme.primary,
-                onPressed: widget.isLoading ? null : _resendOtp,
+
+              ValueListenableBuilder<int>(
+                valueListenable: _resendSecondsLeft,
+                builder: (context, secondsLeft, _) {
+                  final canResend = secondsLeft == 0;
+                  return TextButton(
+                    onPressed: widget.isLoading || !canResend
+                        ? null
+                        : _resendOtp,
+                    child: Text(
+                      canResend ? 'Resend' : 'Resend in ${secondsLeft}s',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -309,8 +360,6 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   }
 }
 
-/// Stacked hero for portrait tablets: the OTP illustration and reassuring
-/// security copy, centered above the floating form card.
 class _OtpPortraitHero extends StatelessWidget {
   const _OtpPortraitHero();
 
