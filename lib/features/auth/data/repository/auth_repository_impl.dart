@@ -3,12 +3,11 @@ import '../../../../core/network/api_result.dart';
 import '../../../../core/storage/secure_storage_service.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/entities/user_role.dart';
+import '../../domain/params/auth_params.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../../domain/usecases/login_usecase.dart';
 import '../datasource/auth_remote_datasource.dart';
-import '../mapper/user_mapper.dart';
-import '../models/auth_response_model.dart';
 import '../models/login_request_model.dart';
+import '../models/login_response_model.dart';
 import '../models/register_request_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -27,7 +26,6 @@ class AuthRepositoryImpl implements AuthRepository {
       LoginRequestModel(
         identifier: params.identifier.trim(),
         password: params.password,
-        role: params.role.name,
       ),
     );
     await _persistSession(response);
@@ -35,41 +33,30 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<ApiResult<void>> register({
-    required String fullName,
-    required String email,
-    required String mobileNumber,
-    required String password,
-    required UserRole role,
-  }) => _guard(() async {
+  Future<ApiResult<void>> register(RegisterParams params) => _guard(() async {
     await _remote.register(
       RegisterRequestModel(
-        fullName: fullName.trim(),
-        email: email.trim(),
-        mobileNumber: mobileNumber.trim(),
-        password: password,
-        role: role.name,
+        fullName: params.fullName.trim(),
+        email: params.email.trim(),
+        mobileNumber: params.mobileNumber.trim(),
+        password: params.password,
+        role: params.role.name,
       ),
     );
-    // No _persistSession here on purpose: this endpoint returns no tokens.
-    // The session is established after the OTP is verified.
   });
 
   @override
-  Future<bool> hasValidSession() async {
+  Future<UserRole?> sessionRole() async {
     final token = await _storage.getToken();
-    return token != null && token.isNotEmpty;
+    if (token == null || token.isEmpty) return null;
+    return UserRole.tryParse(await _storage.getRole());
   }
-
-  @override
-  Future<UserRole?> getPersistedRole() async =>
-      UserRole.tryParse(await _storage.getRole());
 
   @override
   Future<void> logout() => _storage.clear();
 
-  Future<void> _persistSession(AuthResponseModel response) => Future.wait([
-    _storage.saveToken(response.accessToken),
+  Future<void> _persistSession(LoginResponseModel response) => Future.wait([
+    _storage.saveToken(response.token),
     _storage.saveRefreshToken(response.refreshToken),
     _storage.saveRole(response.user.role),
   ]);

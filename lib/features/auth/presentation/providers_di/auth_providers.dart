@@ -4,11 +4,9 @@ import '../../../../core/providers/core_providers.dart';
 import '../../data/datasource/auth_remote_datasource.dart';
 import '../../data/repository/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../../domain/usecases/check_auth_status_usecase.dart';
-import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/logout_usecase.dart';
-import '../../domain/usecases/register_usecase.dart';
+import '../../domain/usecases/auth_usecases.dart';
 import '../notifier/auth_notifier.dart';
+import '../notifier/login_notifier.dart';
 import '../notifier/register_notifier.dart';
 import '../state/auth_state.dart';
 
@@ -19,7 +17,7 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   return AuthRemoteDataSourceImpl(ref.watch(apiClientProvider));
 });
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
+final authRepositoryImplementProvider = Provider<AuthRepository>((ref) {
   return AuthRepositoryImpl(
     remoteDataSource: ref.watch(authRemoteDataSourceProvider),
     storage: ref.watch(secureStorageServiceProvider),
@@ -27,24 +25,27 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 });
 
 final loginUseCaseProvider = Provider<LoginUseCase>(
-  (ref) => LoginUseCase(ref.watch(authRepositoryProvider)),
+  (ref) => LoginUseCase(ref.watch(authRepositoryImplementProvider)),
 );
 
 final registerUseCaseProvider = Provider<RegisterUseCase>(
-  (ref) => RegisterUseCase(ref.watch(authRepositoryProvider)),
+  (ref) => RegisterUseCase(ref.watch(authRepositoryImplementProvider)),
 );
 
 final logoutUseCaseProvider = Provider<LogoutUseCase>(
-  (ref) => LogoutUseCase(ref.watch(authRepositoryProvider)),
+  (ref) => LogoutUseCase(ref.watch(authRepositoryImplementProvider)),
 );
 
 final checkAuthStatusUseCaseProvider = Provider<CheckAuthStatusUseCase>(
-  (ref) => CheckAuthStatusUseCase(ref.watch(authRepositoryProvider)),
+  (ref) => CheckAuthStatusUseCase(ref.watch(authRepositoryImplementProvider)),
 );
 
 final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(
   AuthNotifier.new,
 );
+
+final loginNotifierProvider =
+    NotifierProvider<LoginNotifier, AsyncValue<void>>(LoginNotifier.new);
 
 final registerNotifierProvider =
     NotifierProvider<RegisterNotifier, AsyncValue<void>>(RegisterNotifier.new);

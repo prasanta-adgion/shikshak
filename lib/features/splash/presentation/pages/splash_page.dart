@@ -12,7 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../auth/domain/entities/user_role.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../auth/presentation/state/auth_state.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -121,8 +121,7 @@ class _SplashPageState extends ConsumerState<SplashPage>
     ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
       switch (next) {
         case AuthStatus.authenticated:
-          final role =
-              ref.read(authNotifierProvider).selectedRole ?? UserRole.student;
+          final role = ref.read(authNotifierProvider).role ?? UserRole.student;
           context.go(RoutePaths.dashboardFor(role));
         case AuthStatus.unauthenticated:
           context.go(RoutePaths.login);

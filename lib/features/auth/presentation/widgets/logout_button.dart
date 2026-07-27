@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router/route_paths.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../shared/widgets/app_button.dart';
-import '../providers/auth_providers.dart';
+import '../providers_di/auth_providers.dart';
 
 /// App-bar logout action with a confirmation dialog.
 /// Shared by both dashboards. Clears the session, then returns to the

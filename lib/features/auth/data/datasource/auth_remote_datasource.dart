@@ -2,14 +2,14 @@ import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/network/api_response.dart';
 import '../../../../core/network/i_api_client.dart';
-import '../models/auth_response_model.dart';
 import '../models/login_request_model.dart';
+import '../models/login_response_model.dart';
 import '../models/register_request_model.dart';
 import '../models/register_response_model.dart';
 
 /// Contract for the auth API.
 abstract interface class AuthRemoteDataSource {
-  Future<AuthResponseModel> login(LoginRequestModel request);
+  Future<LoginResponseModel> login(LoginRequestModel request);
 
   Future<RegisterResponseModel> register(RegisterRequestModel request);
 }
@@ -19,14 +19,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   const AuthRemoteDataSourceImpl(this._client);
 
   @override
-  Future<AuthResponseModel> login(LoginRequestModel request) async {
+  Future<LoginResponseModel> login(LoginRequestModel request) async {
     final json = await _client.post<Map<String, dynamic>>(
       ApiEndpoints.login,
       data: request.toJson(),
     );
     return _unwrap(
       json,
-      (data) => AuthResponseModel.fromJson(data as Map<String, dynamic>),
+      (data) => LoginResponseModel.fromJson(data as Map<String, dynamic>),
     );
   }
 
@@ -42,8 +42,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
   }
 
-  /// Decodes the standard `{success, message, data}` envelope and fails
-  /// loudly when the payload is malformed.
   T _unwrap<T>(Map<String, dynamic> json, T Function(Object? data) decode) {
     final response = ApiResponse<T>.fromJson(json, decode);
     final data = response.data;
@@ -53,6 +51,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         type: ApiExceptionType.server,
       );
     }
+
     return data;
   }
 }

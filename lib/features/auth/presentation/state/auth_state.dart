@@ -3,55 +3,39 @@ import '../../domain/entities/user_role.dart';
 
 enum AuthStatus { checking, authenticated, unauthenticated }
 
-/// Session state shared by login, splash, logout, and authenticated screens.
+/// The authenticated session, shared by splash, logout, and the dashboards.
+/// Form state (submitting/error) belongs to the login and register notifiers.
 class AuthState {
   const AuthState({
     this.status = AuthStatus.checking,
-    this.isSubmitting = false,
     this.user,
-    this.selectedRole,
-    this.errorMessage,
+    this.role,
   });
 
   final AuthStatus status;
-  final bool isSubmitting;
+
+  /// Only available after a login in this session.
   final UserEntity? user;
-  final UserRole? selectedRole;
-  final String? errorMessage;
 
-  bool get isAuthenticated => status == AuthStatus.authenticated;
+  /// Role of the active session: from the login response, or restored from
+  /// storage on startup when [user] has not been fetched.
+  final UserRole? role;
 
-  static const _unset = Object();
-
-  AuthState copyWith({
-    AuthStatus? status,
-    bool? isSubmitting,
-    Object? user = _unset,
-    Object? selectedRole = _unset,
-    Object? errorMessage = _unset,
-  }) => AuthState(
-    status: status ?? this.status,
-    isSubmitting: isSubmitting ?? this.isSubmitting,
-    user: identical(user, _unset) ? this.user : user as UserEntity?,
-    selectedRole: identical(selectedRole, _unset)
-        ? this.selectedRole
-        : selectedRole as UserRole?,
-    errorMessage: identical(errorMessage, _unset)
-        ? this.errorMessage
-        : errorMessage as String?,
-  );
+  AuthState copyWith({AuthStatus? status, UserEntity? user, UserRole? role}) =>
+      AuthState(
+        status: status ?? this.status,
+        user: user ?? this.user,
+        role: role ?? this.role,
+      );
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is AuthState &&
           other.status == status &&
-          other.isSubmitting == isSubmitting &&
           other.user == user &&
-          other.selectedRole == selectedRole &&
-          other.errorMessage == errorMessage;
+          other.role == role;
 
   @override
-  int get hashCode =>
-      Object.hash(status, isSubmitting, user, selectedRole, errorMessage);
+  int get hashCode => Object.hash(status, user, role);
 }

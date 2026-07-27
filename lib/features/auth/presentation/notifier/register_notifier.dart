@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../domain/usecases/register_usecase.dart';
-import '../providers/auth_providers.dart';
+import '../../domain/params/auth_params.dart';
+import '../providers_di/auth_providers.dart';
 
 /// Owns only the loading, success, and failure state of registration.
 class RegisterNotifier extends Notifier<AsyncValue<void>> {

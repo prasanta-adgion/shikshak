@@ -1,23 +1,19 @@
 import 'user_role.dart';
 
-/// Domain representation of an authenticated user.
-///
-/// Deliberately framework-free (no json, no Flutter imports) — mapping from
-/// transport models happens in the data layer.
 class UserEntity {
   const UserEntity({
     required this.id,
     required this.fullName,
     required this.email,
-    required this.mobileNumber,
     required this.role,
+    this.avatarUrl,
   });
 
   final String id;
   final String fullName;
   final String email;
-  final String mobileNumber;
   final UserRole role;
+  final String? avatarUrl;
 
   /// First name, for friendly greetings.
   String get firstName {

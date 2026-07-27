@@ -1,6 +1,5 @@
 import 'package:Shikshak/core/constants/app_constants.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,8 +16,9 @@ import '../../../../shared/widgets/app_password_field.dart';
 import '../../../../shared/widgets/app_snackbar.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../domain/entities/user_role.dart';
-import '../../domain/usecases/register_usecase.dart';
-import '../providers/auth_providers.dart';
+import '../../domain/params/auth_params.dart';
+import '../providers_di/auth_providers.dart';
+import '../widgets/auth_footer_prompt.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/tablet_login_hero.dart';
 
@@ -74,17 +74,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
-    final theme = Theme.of(context);
-    final registerState = ref.watch(registerNotifierProvider);
-    final isSubmitting = registerState.isLoading;
+    final isSubmitting = ref.watch(
+      registerNotifierProvider.select((state) => state.isLoading),
+    );
 
+    // The repository funnels every failure through ApiException, so the
+    // message is always presentable.
     ref.listen(registerNotifierProvider, (previous, next) {
-      if (next case AsyncError(:final error)) {
-        final message = error is ApiException
-            ? error.message
-            : 'An unexpected error occurred. Please try again.';
-        AppSnackbar.showError(context, message);
+      if (next case AsyncError(error: final ApiException error)) {
+        AppSnackbar.showError(context, error.message);
       }
     });
 
@@ -173,25 +171,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           ],
         ),
       ),
-      footer: Wrap(
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text(
-            'Already have an account?',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          TextButton(
-            onPressed: isSubmitting
-                ? null
-                : () {
-                    context.pop(context);
-                  },
-            child: const Text('Login'),
-          ),
-        ],
+      footer: AuthFooterPrompt(
+        question: 'Already have an account?',
+        actionLabel: 'Login',
+        onPressed: isSubmitting ? null : context.pop,
       ),
     );
   }

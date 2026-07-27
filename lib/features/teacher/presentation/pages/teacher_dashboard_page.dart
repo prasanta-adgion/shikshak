@@ -11,7 +11,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
 import '../../../../shared/widgets/section_header.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../auth/presentation/widgets/logout_button.dart';
 import '../widgets/availability_card.dart';
 import '../widgets/class_request_tile.dart';

@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 class LoggerInterceptor extends Interceptor {
-  static const _name = 'Shikshak.network';
+  static const _name = 'network';
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {

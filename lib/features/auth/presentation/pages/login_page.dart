@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router/route_paths.dart';
 import '../../../../core/constants/app_images_const.dart';
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/validators.dart';
@@ -15,15 +16,15 @@ import '../../../../shared/widgets/app_loading_button.dart';
 import '../../../../shared/widgets/app_password_field.dart';
 import '../../../../shared/widgets/app_snackbar.dart';
 import '../../../../shared/widgets/app_text_field.dart';
-import '../../domain/entities/user_role.dart';
-import '../providers/auth_providers.dart';
-import '../state/auth_state.dart';
+import '../../domain/params/auth_params.dart';
+import '../providers_di/auth_providers.dart';
+import '../widgets/auth_footer_prompt.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/role_check_dailog.dart';
 import '../widgets/tablet_login_hero.dart';
 
-/// Login screen. The student/teacher toggle at the top lets the same form
-/// serve both roles without a separate role-selection screen.
+/// Login screen. One form serves both roles; the register flow asks for the
+/// role in a dialog.
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -35,8 +36,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
-  final bool _rememberMe = true;
-  final UserRole _role = UserRole.student;
 
   @override
   void dispose() {
@@ -45,22 +44,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.dispose();
   }
 
-  void _submit() {
+  /// The server decides the role, so the dashboard comes from the response
+  /// rather than anything chosen on this screen.
+  Future<void> _submit() async {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    ref
-        .read(authNotifierProvider.notifier)
+    final user = await ref
+        .read(loginNotifierProvider.notifier)
         .login(
-          identifier: _identifierController.text,
-          password: _passwordController.text,
-          role: _role,
-          rememberMe: _rememberMe,
+          LoginParams(
+            identifier: _identifierController.text,
+            password: _passwordController.text,
+          ),
         );
+
+    if (user != null && mounted) {
+      context.go(RoutePaths.dashboardFor(user.role));
+    }
   }
 
   Future<void> _openRegister(BuildContext context) async {
-    final role = await showRoleCheckDialog(context, initialRole: _role);
+    final role = await showRoleCheckDialog(context);
     if (role == null || !context.mounted) return;
     context.push(RoutePaths.registerFor(role));
   }
@@ -69,27 +74,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isSubmitting = ref.watch(
-      authNotifierProvider.select((s) => s.isSubmitting),
+      loginNotifierProvider.select((state) => state.isLoading),
     );
 
-    // Navigate to the dashboard on successful login. The isCurrent check
-    // keeps this page from also reacting when the register page (pushed on
-    // top of it) completes the auth flow.
-    ref.listen(authNotifierProvider.select((s) => s.status), (previous, next) {
-      final isCurrent = ModalRoute.of(context)?.isCurrent ?? true;
-      if (next == AuthStatus.authenticated && isCurrent) {
-        final role = ref.read(authNotifierProvider).user?.role ?? _role;
-        context.go(RoutePaths.dashboardFor(role));
-      }
-    });
-
-    // Surface auth errors as a snackbar exactly once per failure.
-    ref.listen(authNotifierProvider.select((s) => s.errorMessage), (
-      previous,
-      next,
-    ) {
-      if (next != null && next != previous) {
-        AppSnackbar.showError(context, next);
+    // The repository funnels every failure through ApiException, so the
+    // message is always presentable.
+    ref.listen(loginNotifierProvider, (previous, next) {
+      if (next case AsyncError(error: final ApiException error)) {
+        AppSnackbar.showError(context, error.message);
       }
     });
 
@@ -104,8 +96,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       tabletBackgroundImage: AppImagesConst.loginBgOfTablet,
       tabletHero: const TabletLoginHero(),
       title: 'Hello Again! 👋',
-      subtitle:
-          'Login to continue your ${_role == UserRole.teacher ? 'teaching' : 'learning'} journey',
+      subtitle: 'Login to continue your journey',
       form: Form(
         key: _formKey,
         child: AutofillGroup(
@@ -178,21 +169,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
       ),
-      footer: Wrap(
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text(
-            'New to ${AppConstants.appName}?',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          TextButton(
-            onPressed: isSubmitting ? null : () => _openRegister(context),
-            child: const Text('Register'),
-          ),
-        ],
+      footer: AuthFooterPrompt(
+        question: 'New to ${AppConstants.appName}?',
+        actionLabel: 'Register',
+        onPressed: isSubmitting ? null : () => _openRegister(context),
       ),
     );
   }

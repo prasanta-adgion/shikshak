@@ -1,22 +1,15 @@
 import '../../../../core/network/api_result.dart';
 import '../entities/user_entity.dart';
 import '../entities/user_role.dart';
-import '../usecases/login_usecase.dart';
+import '../params/auth_params.dart';
 
 abstract interface class AuthRepository {
   Future<ApiResult<UserEntity>> login(LoginParams params);
 
-  Future<ApiResult<void>> register({
-    required String fullName,
-    required String email,
-    required String mobileNumber,
-    required String password,
-    required UserRole role,
-  });
+  Future<ApiResult<void>> register(RegisterParams params);
 
-  Future<bool> hasValidSession();
-
-  Future<UserRole?> getPersistedRole();
+  /// Role of the stored session, or `null` when there is no valid session.
+  Future<UserRole?> sessionRole();
 
   Future<void> logout();
 }
