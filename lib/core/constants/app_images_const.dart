@@ -13,6 +13,7 @@ class AppImagesConst {
 
   //teacher images
   static const teacherIcon = '${teacherRoot}teacher-icon.png';
+  static const accountCreateForm = '${teacherRoot}account-create-form.png';
 
   //shared images
   static const loginScreenImage = '${sharedRoot}login-image.png';

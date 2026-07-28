@@ -3,15 +3,10 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme/app_spacing.dart';
 
-/// Standard labelled text field.
-///
-/// Renders an external label above the input (cleaner than floating labels
-/// for dense forms) and inherits decoration from the theme's
-/// `InputDecorationTheme`.
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
-    required this.label,
+    this.label,
     this.controller,
     this.hint,
     this.validator,
@@ -23,13 +18,14 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.enabled = true,
     this.maxLines = 1,
+    this.maxLength,
     this.textCapitalization = TextCapitalization.none,
     this.inputFormatters,
     this.autofillHints,
     this.onFieldSubmitted,
   });
 
-  final String label;
+  final String? label;
   final TextEditingController? controller;
   final String? hint;
   final FormFieldValidator<String>? validator;
@@ -44,6 +40,10 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final bool enabled;
   final int maxLines;
+
+  /// Caps the entry and renders the `0/500` counter beneath the box.
+  final int? maxLength;
+
   final TextCapitalization textCapitalization;
   final List<TextInputFormatter>? inputFormatters;
   final Iterable<String>? autofillHints;
@@ -53,37 +53,45 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final field = TextFormField(
+      controller: controller,
+      validator: validator,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      obscureText: obscureText,
+      enabled: enabled,
+      maxLines: maxLines,
+      maxLength: maxLength,
+      textCapitalization: textCapitalization,
+      inputFormatters: inputFormatters,
+      autofillHints: autofillHints,
+      onFieldSubmitted: onFieldSubmitted,
+      style: theme.textTheme.bodyLarge,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+
+      decoration: InputDecoration(
+        hintText: hint,
+        prefixIcon: _buildPrefix(),
+        suffixIcon: suffixIcon,
+        counterStyle: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+
+    if (label == null) return field;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          label!,
           style: theme.textTheme.labelMedium?.copyWith(
             color: theme.colorScheme.onSurface,
           ),
         ),
         AppSpacing.gapSm,
-        TextFormField(
-          controller: controller,
-          validator: validator,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          obscureText: obscureText,
-          enabled: enabled,
-          maxLines: maxLines,
-          textCapitalization: textCapitalization,
-          inputFormatters: inputFormatters,
-          autofillHints: autofillHints,
-          onFieldSubmitted: onFieldSubmitted,
-          style: theme.textTheme.bodyLarge,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-
-          decoration: InputDecoration(
-            hintText: hint,
-            prefixIcon: _buildPrefix(),
-            suffixIcon: suffixIcon,
-          ),
-        ),
+        field,
       ],
     );
   }

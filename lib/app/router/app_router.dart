@@ -4,6 +4,7 @@ import 'package:Shikshak/features/forgot_password/presentation/screens/new_passw
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/account_create/shared/presentation/pages/create_teacher_account_page.dart';
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -64,6 +65,16 @@ abstract final class AppRouter {
         ),
       ),
 
+      //signup — teacher profile wizard
+      GoRoute(
+        path: RoutePaths.createTeacherAccount,
+        name: RouteNames.createTeacherAccount,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const CreateTeacherAccountPage(),
+        ),
+      ),
+
       GoRoute(
         path: RoutePaths.studentDashboard,
         name: RouteNames.studentDashboard,
@@ -107,6 +118,18 @@ abstract final class AppRouter {
         name: RouteNames.newPasswordSet,
         pageBuilder: (context, state) =>
             fadeSlidePage(key: state.pageKey, child: const NewPasswordSet()),
+      ),
+
+      //all teacher screens ------------------------------------------------------------------
+
+      //account create screen
+      GoRoute(
+        path: RoutePaths.createAccountScreenPath,
+        name: RouteNames.createAccountScreen,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const CreateTeacherAccountPage(),
+        ),
       ),
     ],
   );
