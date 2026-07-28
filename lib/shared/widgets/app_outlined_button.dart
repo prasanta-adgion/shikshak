@@ -31,7 +31,12 @@ class AppOutlinedButton extends StatelessWidget {
             children: [
               Icon(icon, size: 20),
               AppSpacing.hGapSm,
-              Text(label),
+              // Flexible so a long label ellipsizes instead of overflowing on
+              // narrow phones or at large text scales — same guard as
+              // [AppLoadingButton].
+              Flexible(
+                child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
             ],
           );
 

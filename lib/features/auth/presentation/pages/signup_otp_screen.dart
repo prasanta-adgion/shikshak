@@ -6,11 +6,14 @@ import '../../../../app/router/route_paths.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../shared/widgets/app_snackbar.dart';
 import '../../../otp_verification/presentation/pages/otp_verify_screen.dart';
+import '../../domain/entities/user_role.dart';
 import '../../domain/params/auth_params.dart';
 import '../providers_di/auth_providers.dart';
 
-/// Signup OTP entry. Verification completes registration and opens a
-/// session, so a success lands straight on the role's dashboard.
+/// Signup OTP entry. Verification completes registration and opens a session.
+///
+/// Students land on their dashboard; teachers first walk the profile wizard,
+/// which is what their account is judged on.
 class SignupOtpScreen extends ConsumerWidget {
   const SignupOtpScreen({super.key, required this.email});
 
@@ -21,9 +24,13 @@ class SignupOtpScreen extends ConsumerWidget {
         .read(signupOtpNotifierProvider.notifier)
         .verify(VerifySignupOtpParams(email: email, otp: otp));
 
-    if (user != null && context.mounted) {
-      context.go(RoutePaths.dashboardFor(user.role));
-    }
+    if (user == null || !context.mounted) return;
+
+    context.go(
+      user.role == UserRole.teacher
+          ? RoutePaths.createTeacherAccount
+          : RoutePaths.dashboardFor(user.role),
+    );
   }
 
   Future<void> _resend(BuildContext context, WidgetRef ref) async {

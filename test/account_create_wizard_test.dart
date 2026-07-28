@@ -1,0 +1,342 @@
+import 'package:Shikshak/core/constants/app_images_const.dart';
+import 'package:Shikshak/core/theme/app_theme.dart';
+import 'package:Shikshak/features/account_create/shared/domain/entities/profile_step.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/notifier/account_create_notifier.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/pages/create_teacher_account_page.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/providers/account_create_providers.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/state/account_create_state.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/widgets/step_timeline.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_step_header.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_step_layout.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_action_bar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:timelines_plus/timelines_plus.dart';
+
+/// Windows the wizard must render cleanly in — mirrors the set used by
+/// `responsive_screens_test.dart`.
+const _windows = <String, Size>{
+  'phone portrait': Size(390, 844),
+  'phone landscape': Size(844, 390),
+  'small phone': Size(320, 640),
+  'tablet portrait': Size(800, 1280),
+  'tablet landscape': Size(1280, 800),
+};
+
+/// Opens the wizard already parked on [step], so every step can be rendered
+/// without walking (and validating) the ones before it.
+class _NotifierAtStep extends AccountCreateNotifier {
+  _NotifierAtStep(this.step);
+
+  final ProfileStep step;
+
+  @override
+  AccountCreateState build() => AccountCreateState(step: step);
+}
+
+void main() {
+  Future<void> setWindow(WidgetTester tester, Size size) async {
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.physicalSize = size;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+  }
+
+  Future<void> pumpWizard(
+    WidgetTester tester,
+    ProfileStep step, {
+    ThemeData? theme,
+  }) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          accountCreateNotifierProvider.overrideWith(
+            () => _NotifierAtStep(step),
+          ),
+        ],
+        child: MaterialApp(
+          theme: theme ?? AppTheme.light,
+          home: const CreateTeacherAccountPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+  }
+
+  group('renders without overflow', () {
+    for (final step in ProfileStep.values) {
+      for (final MapEntry(key: windowName, value: size) in _windows.entries) {
+        testWidgets('${step.name} on $windowName', (tester) async {
+          await setWindow(tester, size);
+          await pumpWizard(tester, step);
+
+          // A RenderFlex overflow (or any layout assertion) surfaces here.
+          expect(tester.takeException(), isNull);
+        });
+      }
+    }
+  });
+
+  group('dark theme', () {
+    for (final step in ProfileStep.values) {
+      testWidgets('${step.name} renders in dark mode', (tester) async {
+        await setWindow(tester, const Size(390, 844));
+        await pumpWizard(tester, step, theme: AppTheme.dark);
+
+        expect(tester.takeException(), isNull);
+      });
+    }
+  });
+
+  group('step chrome', () {
+    testWidgets('timeline labels every step and heads the current one', (
+      tester,
+    ) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.experience);
+
+      for (final step in ProfileStep.values) {
+        expect(find.text(step.shortLabel), findsOneWidget);
+      }
+      expect(find.text('Teaching Experience'), findsOneWidget);
+    });
+
+    testWidgets('renders no app bar', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.basicInfo);
+
+      expect(find.byType(AppBar), findsNothing);
+    });
+
+    // One pump per test: pumping twice reuses the overridden notifier, so the
+    // second step would never actually mount.
+    testWidgets('first step hides the Back button', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.basicInfo);
+
+      expect(find.widgetWithText(OutlinedButton, 'Back'), findsNothing);
+    });
+
+    testWidgets('later steps show the Back button', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.aboutYou);
+
+      expect(find.widgetWithText(OutlinedButton, 'Back'), findsOneWidget);
+    });
+
+    testWidgets('the last step finishes rather than continuing', (
+      tester,
+    ) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.documents);
+
+      expect(find.widgetWithText(FilledButton, 'Finish'), findsOneWidget);
+      expect(find.widgetWithText(FilledButton, 'Continue'), findsNothing);
+    });
+  });
+
+  group('step header', () {
+    for (final step in ProfileStep.values) {
+      testWidgets('${step.name} pairs its own copy with the shared art', (
+        tester,
+      ) async {
+        await setWindow(tester, const Size(390, 844));
+        await pumpWizard(tester, step);
+
+        // Scoped to the header: a step's title can legitimately repeat as a
+        // timeline label ("About You") or a field name ("Upload Document").
+        final inHeader = find.descendant(
+          of: find.byType(WizardStepHeader),
+          matching: find.text(step.title),
+        );
+        expect(inHeader, findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(WizardStepHeader),
+            matching: find.text(step.subtitle),
+          ),
+          findsOneWidget,
+        );
+
+        final image = tester.widget<Image>(
+          find.descendant(
+            of: find.byType(WizardStepHeader),
+            matching: find.byType(Image),
+          ),
+        );
+        // cacheWidth wraps the AssetImage in a ResizeImage.
+        final resized = image.image as ResizeImage;
+        expect(
+          (resized.imageProvider as AssetImage).assetName,
+          AppImagesConst.accountCreateForm,
+        );
+      });
+    }
+  });
+
+  group('profile identity', () {
+    testWidgets('shows the account details left of the avatar', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.basicInfo);
+
+      expect(find.text('Priya Sharma'), findsOneWidget);
+      expect(find.text('priya.sharma@gmail.com'), findsOneWidget);
+      expect(find.text('+91 98765 43210'), findsOneWidget);
+
+      // The camera badge stands in for the avatar's position.
+      final nameX = tester.getCenter(find.text('Priya Sharma')).dx;
+      final avatarX = tester
+          .getCenter(find.byIcon(Icons.photo_camera_rounded))
+          .dx;
+      expect(avatarX, greaterThan(nameX));
+    });
+  });
+
+  group('step container', () {
+    testWidgets('holds the header and every field in one surface', (
+      tester,
+    ) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.basicInfo);
+
+      final container = find.byType(WizardStepLayout);
+      expect(container, findsOneWidget);
+
+      // Header and fields are all inside that single panel — not separate
+      // cards stacked down the page.
+      expect(
+        find.descendant(of: container, matching: find.byType(WizardStepHeader)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: container,
+          matching: find.text('Select your gender'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: container, matching: find.text('Postal Code')),
+        findsOneWidget,
+      );
+    });
+  });
+
+  group('timeline', () {
+    testWidgets('centres the step number inside its dot', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.experience);
+
+      // Step 3 is current, so its dot carries the number.
+      final number = find.text('3');
+      final dot = find.ancestor(of: number, matching: find.byType(DotIndicator));
+
+      expect(dot, findsOneWidget);
+
+      // DotIndicator hands its child the circle's tight constraints and no
+      // alignment. Stretched to 26x26 the glyph paints at the top edge, and
+      // the box centre still matches the dot's — so size is what proves a
+      // Center is doing the work.
+      final numberSize = tester.getSize(number);
+      final dotSize = tester.getSize(dot);
+      expect(numberSize.height, lessThan(dotSize.height));
+      expect(numberSize.width, lessThan(dotSize.width));
+      expect(
+        tester.getCenter(number),
+        offsetMoreOrLessEquals(tester.getCenter(dot), epsilon: 0.5),
+      );
+    });
+
+    testWidgets('stays pinned while the form scrolls', (tester) async {
+      await setWindow(tester, const Size(390, 700));
+      await pumpWizard(tester, ProfileStep.basicInfo);
+
+      final before = tester.getTopLeft(find.byType(StepTimeline));
+      await tester.drag(
+        find.byType(SingleChildScrollView).first,
+        const Offset(0, -260),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.getTopLeft(find.byType(StepTimeline)), equals(before));
+    });
+  });
+
+  group('action bar', () {
+    bool isVisible(WidgetTester tester) =>
+        tester.widget<WizardActionBar>(find.byType(WizardActionBar)).isVisible;
+
+    testWidgets('hides on scroll down and returns on scroll up', (
+      tester,
+    ) async {
+      await setWindow(tester, const Size(390, 700));
+      await pumpWizard(tester, ProfileStep.basicInfo);
+
+      expect(isVisible(tester), isTrue);
+
+      final scrollable = find.byType(SingleChildScrollView).first;
+      await tester.drag(scrollable, const Offset(0, -260));
+      await tester.pumpAndSettle();
+      expect(isVisible(tester), isFalse);
+
+      await tester.drag(scrollable, const Offset(0, 160));
+      await tester.pumpAndSettle();
+      expect(isVisible(tester), isTrue);
+    });
+  });
+
+  group('date entry', () {
+    testWidgets('opens the shared app date picker', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.basicInfo);
+
+      await tester.tap(find.text('Select your date of birth'));
+      await tester.pumpAndSettle();
+
+      // Proves DateTimeUtils.showAppDatePicker builds: its blurred, scaled
+      // frame and themed overrides all run before the dialog appears.
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('about you', () {
+    testWidgets('tapping a subject marks it selected', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.aboutYou);
+
+      expect(find.text('You can select multiple subjects'), findsOneWidget);
+
+      // The grid sits below the three prose cards, so it has to be scrolled
+      // into reach before it can be tapped.
+      await tester.ensureVisible(find.text('Mathematics'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Mathematics'));
+      await tester.pump();
+
+      expect(find.text('1 selected'), findsOneWidget);
+    });
+
+    testWidgets('prose fields carry a character counter', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.aboutYou);
+
+      // Short Bio, Teaching Approach and What Makes You Unique.
+      expect(find.text('0/500'), findsNWidgets(3));
+    });
+  });
+
+  group('experience', () {
+    testWidgets('carries subjects over instead of re-asking', (tester) async {
+      await setWindow(tester, const Size(390, 844));
+      await pumpWizard(tester, ProfileStep.experience);
+
+      // The recap is present, and no subject picker is offered here.
+      expect(find.text('From your profile'), findsOneWidget);
+      expect(find.text('Subjects'), findsOneWidget);
+      expect(find.text('Subjects Taught'), findsNothing);
+    });
+  });
+}

@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Primary CTA with a built-in loading state.
-///
-/// While [isLoading] is true the button is disabled and shows a spinner,
-/// cross-faded with the label via [AnimatedSwitcher].
 class AppLoadingButton extends StatelessWidget {
   const AppLoadingButton({
     super.key,
@@ -12,6 +8,7 @@ class AppLoadingButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.trailingIcon,
+    this.color,
   });
 
   final String label;
@@ -19,15 +16,17 @@ class AppLoadingButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData? icon;
   final IconData? trailingIcon;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
         onPressed: isLoading ? null : onPressed,
+        style: color != null
+            ? FilledButton.styleFrom(backgroundColor: color)
+            : null,
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 220),
           transitionBuilder: (child, animation) =>
@@ -39,7 +38,9 @@ class AppLoadingButton extends StatelessWidget {
                   width: 22,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.4,
-                    color: colorScheme.primary,
+                    color: color != null
+                        ? Theme.of(context).colorScheme.onPrimary
+                        : Theme.of(context).colorScheme.primary,
                   ),
                 )
               : Row(
@@ -50,8 +51,7 @@ class AppLoadingButton extends StatelessWidget {
                       Icon(icon, size: 20),
                       const SizedBox(width: 8),
                     ],
-                    // Flexible so a long label ellipsizes instead of
-                    // overflowing on narrow phones or at large text scales.
+
                     Flexible(
                       child: Text(
                         label,

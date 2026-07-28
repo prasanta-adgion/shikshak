@@ -162,8 +162,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
               GoogleLoginButton(
                 isSubmitting: isSubmitting,
-                onPressed: () =>
-                    AppSnackbar.show(context, 'Google sign-in is coming soon'),
+                onPressed: () {
+                  context.go(RoutePaths.createAccountScreenPath);
+                },
               ),
             ],
           ),
