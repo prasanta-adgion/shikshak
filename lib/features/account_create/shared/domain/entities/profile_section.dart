@@ -1,21 +1,18 @@
 import 'profile_step.dart';
 import 'teacher_profile_draft.dart';
 
-/// One saveable section of the teacher profile.
-///
-/// The five endpoints differ only in path and body, so this is all a slice has
-/// to supply — the transport, the create-vs-update decision and the error
-/// handling are shared. Adding a sixth section means writing one of these and
-/// registering it; nothing else in the wizard changes.
 abstract interface class ProfileSection {
-  /// The wizard step this section is saved from.
   ProfileStep get step;
 
-  /// An `ApiEndpoints` constant. POST creates, PATCH updates the same path.
   String get path;
 
-  /// The exact request body for this section, read off [draft].
   Map<String, dynamic> body(TeacherProfileDraft draft);
+}
+
+abstract interface class RepeatableSection {
+  bool isEntryEmpty(TeacherProfileDraft draft);
+
+  TeacherProfileDraft commitEntry(TeacherProfileDraft draft);
 }
 
 /// Companion contract for the sections that carry a file.

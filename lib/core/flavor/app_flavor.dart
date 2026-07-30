@@ -17,10 +17,10 @@ enum AppFlavor {
   String get baseUrl {
     switch (this) {
       case AppFlavor.dev:
-        // return 'http://192.168.1.14:5001';
-        return 'http://192.168.1.12:5010/';
+        return 'http://192.168.1.14:5001';
+      // return 'http://192.168.1.12:5010/';
       case AppFlavor.staging:
-        return '';
+        return 'https://backend.shiksak.in/';
       case AppFlavor.prod:
         return '';
     }

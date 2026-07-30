@@ -16,12 +16,6 @@ import '../controller/wizard_step_controller.dart';
 import '../notifier/account_create_notifier.dart';
 import '../state/account_create_state.dart';
 
-/// Composition root for the teacher profile wizard. Everything depends on
-/// abstractions; only this file knows the concrete classes.
-
-/// Which section belongs to which step. Adding a sixth section is one entry
-/// here plus its mapper — the notifier, the page and the transport are
-/// untouched.
 final profileSectionsProvider = Provider<Map<ProfileStep, ProfileSection>>(
   (ref) => const {
     ProfileStep.basicInfo: BasicInfoSection(),

@@ -8,6 +8,8 @@ import '../../../../../shared/widgets/app_text_field.dart';
 import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
+import '../../../shared/presentation/widgets/saved_entry_card.dart';
+import '../../../shared/presentation/widgets/wizard_add_another_button.dart';
 import '../../../shared/presentation/widgets/wizard_checkbox_tile.dart';
 import '../../../shared/presentation/widgets/wizard_date_field.dart';
 import '../../../shared/presentation/widgets/wizard_field.dart';
@@ -72,8 +74,16 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
     super.dispose();
   }
 
-  @override
-  void submitStep() {
+  /// True when nothing has been typed for the next position — the teacher has
+  /// filed what they wanted and left the form blank.
+  bool get _isFormEmpty =>
+      _jobTitleController.text.trim().isEmpty &&
+      _institutionController.text.trim().isEmpty &&
+      _detailsController.text.trim().isEmpty &&
+      _startDate.value == null;
+
+  /// Validates the form and stages it on the draft, ready to be posted.
+  bool _stageEntry() {
     FocusScope.of(context).unfocus();
     _showErrors.value = true;
 
@@ -81,22 +91,64 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
     if (!formValid ||
         _totalExperience.value == null ||
         _startDate.value == null) {
+      return false;
+    }
+
+    final current = ref.read(accountCreateNotifierProvider).draft.experience;
+    ref
+        .read(accountCreateNotifierProvider.notifier)
+        .setExperience(
+          current.copyWith(
+            totalTeachingExperience: _totalExperience.value,
+            currentJobTitle: _jobTitleController.text.trim(),
+            currentInstitution: _institutionController.text.trim(),
+            experienceDetails: _detailsController.text.trim(),
+            isCurrent: _isCurrent.value,
+            startDate: _startDate.value,
+          ),
+        );
+    return true;
+  }
+
+  void _clearForm() {
+    _formKey.currentState?.reset();
+    _jobTitleController.clear();
+    _institutionController.clear();
+    _detailsController.clear();
+    _startDate.value = null;
+    _isCurrent.value = true;
+    _showErrors.value = false;
+    // Total experience stays: it describes the teacher, not the position.
+  }
+
+  /// Posts this position and keeps the teacher here with an empty form.
+  Future<void> _addAnother() async {
+    if (!_stageEntry()) return;
+
+    final saved = await ref
+        .read(accountCreateNotifierProvider.notifier)
+        .submitEntry();
+    if (saved && mounted) _clearForm();
+  }
+
+  @override
+  void submitStep() {
+    final notifier = ref.read(accountCreateNotifierProvider.notifier);
+    final hasSaved = ref
+        .read(accountCreateNotifierProvider)
+        .draft
+        .savedExperiences
+        .isNotEmpty;
+
+    // A blank form after at least one position was filed is not an error —
+    // there is simply nothing left to send, so move on.
+    if (_isFormEmpty && hasSaved) {
+      FocusScope.of(context).unfocus();
+      notifier.submitCurrentStep();
       return;
     }
 
-    final notifier = ref.read(accountCreateNotifierProvider.notifier);
-    final current = ref.read(accountCreateNotifierProvider).draft.experience;
-
-    notifier.setExperience(
-      current.copyWith(
-        totalTeachingExperience: _totalExperience.value,
-        currentJobTitle: _jobTitleController.text.trim(),
-        currentInstitution: _institutionController.text.trim(),
-        experienceDetails: _detailsController.text.trim(),
-        isCurrent: _isCurrent.value,
-        startDate: _startDate.value,
-      ),
-    );
+    if (!_stageEntry()) return;
     // teachingSubjects and classesTaught come off the draft, not this screen.
     notifier.submitCurrentStep();
   }
@@ -109,6 +161,8 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
         step: ProfileStep.experience,
         children: [
           const _CarriedOverCard(),
+
+          const _SavedPositions(),
 
           WizardField(
             icon: AppIcons.experience,
@@ -190,8 +244,40 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
               onChanged: (value) => _isCurrent.value = value,
             ),
           ),
+
+          WizardAddAnotherButton(
+            label: 'Add Another Experience',
+            onPressed: _addAnother,
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// Positions already posted, listed above the form.
+class _SavedPositions extends ConsumerWidget {
+  const _SavedPositions();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final saved = ref.watch(
+      accountCreateNotifierProvider.select(
+        (state) => state.draft.savedExperiences,
+      ),
+    );
+
+    return SavedEntryList(
+      title: 'Experience added',
+      cards: [
+        for (final experience in saved)
+          SavedEntryCard(
+            icon: AppIcons.experience,
+            title: experience.currentJobTitle,
+            subtitle: experience.currentInstitution,
+            trailingNote: experience.isCurrent ? 'Current' : null,
+          ),
+      ],
     );
   }
 }

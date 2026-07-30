@@ -8,6 +8,10 @@ import 'package:Shikshak/features/account_create/about_you/data/about_you_sectio
 import 'package:Shikshak/features/account_create/about_you/domain/entities/about_you.dart';
 import 'package:Shikshak/features/account_create/basic_info/data/basic_info_section.dart';
 import 'package:Shikshak/features/account_create/basic_info/domain/entities/basic_info.dart';
+import 'package:Shikshak/features/account_create/education/data/education_section.dart';
+import 'package:Shikshak/features/account_create/education/domain/entities/education.dart';
+import 'package:Shikshak/features/account_create/experience/data/experience_section.dart';
+import 'package:Shikshak/features/account_create/experience/domain/entities/experience_info.dart';
 import 'package:Shikshak/features/account_create/shared/domain/entities/profile_step.dart';
 import 'package:Shikshak/features/account_create/shared/domain/entities/teacher_profile_draft.dart';
 import 'package:Shikshak/features/account_create/shared/domain/repositories/profile_section_repository.dart';
@@ -58,6 +62,8 @@ void main() {
     sections: const {
       ProfileStep.aboutYou: AboutYouSection(),
       ProfileStep.basicInfo: BasicInfoSection(),
+      ProfileStep.experience: ExperienceSection(),
+      ProfileStep.education: EducationSection(),
     },
     repository: repository,
     uploader: uploader,
@@ -184,6 +190,112 @@ void main() {
         (result as ApiFailure<SectionSaveOutcome>).exception.message,
         'Server error. Try again later.',
       );
+    });
+  });
+
+  group('repeatable sections', () {
+    ExperienceInfo position(String jobTitle) => ExperienceInfo(
+      totalTeachingExperience: '5-7 years',
+      currentJobTitle: jobTitle,
+      currentInstitution: 'Delhi Public School',
+      experienceDetails: 'Taught senior classes.',
+      startDate: DateTime(2019, 4),
+    );
+
+    test('files each experience with its own POST', () async {
+      final useCase = buildUseCase();
+
+      final first = await useCase.call(
+        step: ProfileStep.experience,
+        draft: TeacherProfileDraft(experience: position('Mathematics Teacher')),
+        lastSavedBody: null,
+      );
+      final afterFirst = (first as ApiSuccess<SectionSaveOutcome>).data;
+
+      expect(repository.calls.single.isUpdate, isFalse);
+      expect(afterFirst.draft.savedExperiences, hasLength(1));
+      // The form is cleared for the next position...
+      expect(afterFirst.draft.experience.currentJobTitle, isEmpty);
+      // ...but the profile-level answer rides along.
+      expect(
+        afterFirst.draft.experience.totalTeachingExperience,
+        '5-7 years',
+      );
+
+      // A second entry creates another row — never a PATCH of the first.
+      final second = await useCase.call(
+        step: ProfileStep.experience,
+        draft: afterFirst.draft.copyWith(
+          experience: position('Head of Department'),
+        ),
+        lastSavedBody: afterFirst.savedBody,
+      );
+
+      expect(repository.calls, hasLength(2));
+      expect(repository.calls.last.isUpdate, isFalse);
+      expect(
+        (second as ApiSuccess<SectionSaveOutcome>).data.draft.savedExperiences,
+        hasLength(2),
+      );
+    });
+
+    test('sends nothing when the form is left blank', () async {
+      final result = await buildUseCase().call(
+        step: ProfileStep.experience,
+        draft: TeacherProfileDraft(
+          savedExperiences: [position('Mathematics Teacher')],
+          // Only the profile-level answer remains after filing an entry.
+          experience: const ExperienceInfo(
+            totalTeachingExperience: '5-7 years',
+          ),
+        ),
+        lastSavedBody: 'whatever was sent last time',
+      );
+
+      expect(repository.calls, isEmpty);
+      expect((result as ApiSuccess<SectionSaveOutcome>).data.wasSkipped, isTrue);
+    });
+
+    test('files each qualification with its own POST', () async {
+      final useCase = buildUseCase();
+
+      final first = await useCase.call(
+        step: ProfileStep.education,
+        draft: const TeacherProfileDraft(
+          education: Education(
+            degree: 'Bachelor of Science',
+            specialization: 'Mathematics',
+            universityCollege: 'University of Delhi',
+            yearOfPassing: 2014,
+            marksOrGrade: 'A',
+          ),
+        ),
+        lastSavedBody: null,
+      );
+      final afterFirst = (first as ApiSuccess<SectionSaveOutcome>).data;
+
+      expect(repository.calls.single.isUpdate, isFalse);
+      expect(repository.calls.single.path, ApiEndpoints.education);
+      expect(afterFirst.draft.savedEducations, hasLength(1));
+      expect(afterFirst.draft.education.degree, isNull);
+
+      await useCase.call(
+        step: ProfileStep.education,
+        draft: afterFirst.draft.copyWith(
+          education: const Education(
+            degree: 'Master of Science',
+            specialization: 'Mathematics',
+            universityCollege: 'University of Delhi',
+            yearOfPassing: 2016,
+            marksOrGrade: 'A+',
+          ),
+        ),
+        lastSavedBody: afterFirst.savedBody,
+      );
+
+      expect(repository.calls, hasLength(2));
+      expect(repository.calls.last.isUpdate, isFalse);
+      expect(repository.calls.last.body['degree'], 'Master of Science');
     });
   });
 

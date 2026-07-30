@@ -3,6 +3,7 @@ import '../../../../core/utils/date_time_picker_func.dart';
 import '../../shared/domain/entities/profile_section.dart';
 import '../../shared/domain/entities/profile_step.dart';
 import '../../shared/domain/entities/teacher_profile_draft.dart';
+import '../domain/entities/experience_info.dart';
 
 /// Maps [ExperienceInfo] onto the experience payload:
 ///
@@ -15,7 +16,7 @@ import '../../shared/domain/entities/teacher_profile_draft.dart';
 /// `teachingSubjects` and `classesTaught` come off the draft rather than the
 /// experience entity: About You captured them, and the teacher is only asked
 /// once.
-class ExperienceSection implements ProfileSection {
+class ExperienceSection implements ProfileSection, RepeatableSection {
   const ExperienceSection();
 
   @override
@@ -41,4 +42,24 @@ class ExperienceSection implements ProfileSection {
           : DateTimeUtils.isoDate(experience.startDate!),
     };
   }
+
+  /// Judged on the per-position fields only: total experience is a profile
+  /// level answer that rides along with every entry.
+  @override
+  bool isEntryEmpty(TeacherProfileDraft draft) {
+    final experience = draft.experience;
+    return experience.currentJobTitle.isEmpty &&
+        experience.currentInstitution.isEmpty &&
+        experience.experienceDetails.isEmpty &&
+        experience.startDate == null;
+  }
+
+  @override
+  TeacherProfileDraft commitEntry(TeacherProfileDraft draft) => draft.copyWith(
+    savedExperiences: [...draft.savedExperiences, draft.experience],
+    // Total experience carries over — it describes the teacher, not the post.
+    experience: ExperienceInfo(
+      totalTeachingExperience: draft.experience.totalTeachingExperience,
+    ),
+  );
 }

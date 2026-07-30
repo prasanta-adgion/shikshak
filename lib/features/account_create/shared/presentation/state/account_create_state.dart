@@ -2,9 +2,18 @@ import '../../../../../core/network/api_exception.dart';
 import '../../domain/entities/profile_step.dart';
 import '../../domain/entities/teacher_profile_draft.dart';
 
-/// Wizard state: which step is showing, what has been entered, and what has
-/// already reached the server.
 class AccountCreateState {
+  final ProfileStep step;
+  final TeacherProfileDraft draft;
+
+  final Map<ProfileStep, String> savedBodies;
+
+  final bool isSubmitting;
+
+  final bool isComplete;
+
+  final ApiException? error;
+
   const AccountCreateState({
     this.step = ProfileStep.basicInfo,
     this.draft = const TeacherProfileDraft(),
@@ -13,23 +22,6 @@ class AccountCreateState {
     this.isComplete = false,
     this.error,
   });
-
-  final ProfileStep step;
-  final TeacherProfileDraft draft;
-
-  /// Encoded body last accepted for each step. Its presence means "created",
-  /// so the next save PATCHes; an identical body means there is nothing to
-  /// send at all.
-  final Map<ProfileStep, String> savedBodies;
-
-  /// True while the current step's section is being saved.
-  final bool isSubmitting;
-
-  /// Set once the final section has been accepted.
-  final bool isComplete;
-
-  /// Last failure, for the page to surface. Cleared when a save starts.
-  final ApiException? error;
 
   AccountCreateState copyWith({
     ProfileStep? step,

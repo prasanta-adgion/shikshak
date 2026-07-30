@@ -2,6 +2,7 @@ import '../../../../core/constants/api_endpoints.dart';
 import '../../shared/domain/entities/profile_section.dart';
 import '../../shared/domain/entities/profile_step.dart';
 import '../../shared/domain/entities/teacher_profile_draft.dart';
+import '../domain/entities/education.dart';
 
 /// Maps [Education] onto the education payload:
 ///
@@ -9,7 +10,8 @@ import '../../shared/domain/entities/teacher_profile_draft.dart';
 /// { "degree", "specialization", "universityCollege", "yearOfPassing",
 ///   "marksOrGrade", "certificateUrl", "isHighestQualification" }
 /// ```
-class EducationSection implements ProfileSection, UploadingSection {
+class EducationSection
+    implements ProfileSection, RepeatableSection, UploadingSection {
   const EducationSection();
 
   /// Names the payload field the picked certificate fills.
@@ -35,6 +37,22 @@ class EducationSection implements ProfileSection, UploadingSection {
       'isHighestQualification': education.isHighestQualification,
     };
   }
+
+  @override
+  bool isEntryEmpty(TeacherProfileDraft draft) {
+    final education = draft.education;
+    return education.degree == null &&
+        education.specialization.isEmpty &&
+        education.universityCollege.isEmpty &&
+        education.yearOfPassing == null &&
+        education.marksOrGrade.isEmpty;
+  }
+
+  @override
+  TeacherProfileDraft commitEntry(TeacherProfileDraft draft) => draft.copyWith(
+    savedEducations: [...draft.savedEducations, draft.education],
+    education: const Education(),
+  );
 
   @override
   List<PendingUpload> pendingUploads(TeacherProfileDraft draft) {

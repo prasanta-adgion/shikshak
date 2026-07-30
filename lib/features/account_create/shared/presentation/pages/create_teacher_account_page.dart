@@ -96,7 +96,6 @@ class _CreateTeacherAccountPageState
 
   @override
   Widget build(BuildContext context) {
-    print('build');
     final step = ref.watch(
       accountCreateNotifierProvider.select((state) => state.step),
     );

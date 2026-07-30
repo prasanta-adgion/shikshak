@@ -10,39 +10,25 @@ import '../repositories/profile_section_repository.dart';
 
 /// What a save did, and the draft it leaves behind.
 class SectionSaveOutcome {
+  final TeacherProfileDraft draft;
+
+  final String savedBody;
+
+  final bool wasSkipped;
   const SectionSaveOutcome({
     required this.draft,
     required this.savedBody,
     required this.wasSkipped,
   });
-
-  /// The draft after any upload wrote its URL back in.
-  final TeacherProfileDraft draft;
-
-  /// Encoded body now on the server, to compare against on the next attempt.
-  final String savedBody;
-
-  /// True when nothing had changed and no request was made.
-  final bool wasSkipped;
 }
 
-/// Saves the section belonging to a step, deciding between create, update and
-/// doing nothing at all.
-///
-/// Each section is judged on its own history:
 ///
 /// | state                            | action        |
 /// |----------------------------------|---------------|
 /// | never saved                      | `POST path`   |
 /// | saved, and the body has changed  | `PATCH path`  |
 /// | saved, and the body is identical | no request    |
-///
-/// So a section creates itself the first time its step is completed, and
-/// updates on every later pass.
-///
-/// Change detection compares the encoded body rather than the entity, so it
-/// reacts to exactly the fields that go over the wire and needs no equality
-/// plumbing on the domain objects.
+
 class SaveProfileSectionUseCase {
   const SaveProfileSectionUseCase({
     required Map<ProfileStep, ProfileSection> sections,
@@ -91,6 +77,17 @@ class SaveProfileSectionUseCase {
     final body = RequestBody.nullsAsEmptyStrings(section.body(currentDraft));
     final encoded = jsonEncode(body);
 
+    if (section is RepeatableSection) {
+      return _saveEntry(
+        section as RepeatableSection,
+        path: section.path,
+        draft: currentDraft,
+        body: body,
+        encoded: encoded,
+        lastSavedBody: lastSavedBody,
+      );
+    }
+
     if (encoded == lastSavedBody) {
       return ApiResult.success(
         SectionSaveOutcome(
@@ -111,6 +108,42 @@ class SaveProfileSectionUseCase {
     return result.map(
       (_) => SectionSaveOutcome(
         draft: currentDraft,
+        savedBody: encoded,
+        wasSkipped: false,
+      ),
+    );
+  }
+
+  /// Repeatable sections always create: every entry is a new row, so there is
+  /// no body to compare against and never a PATCH. A blank form means the
+  /// teacher has filed everything they wanted, so nothing is sent.
+  Future<ApiResult<SectionSaveOutcome>> _saveEntry(
+    RepeatableSection section, {
+    required String path,
+    required TeacherProfileDraft draft,
+    required Map<String, dynamic> body,
+    required String encoded,
+    required String? lastSavedBody,
+  }) async {
+    if (section.isEntryEmpty(draft)) {
+      return ApiResult.success(
+        SectionSaveOutcome(
+          draft: draft,
+          savedBody: lastSavedBody ?? '',
+          wasSkipped: true,
+        ),
+      );
+    }
+
+    final result = await _repository.submit(
+      path: path,
+      body: body,
+      isUpdate: false,
+    );
+
+    return result.map(
+      (_) => SectionSaveOutcome(
+        draft: section.commitEntry(draft),
         savedBody: encoded,
         wasSkipped: false,
       ),

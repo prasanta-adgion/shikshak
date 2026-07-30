@@ -9,6 +9,8 @@ import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
 import '../../../shared/presentation/widgets/file_upload_tile.dart';
+import '../../../shared/presentation/widgets/saved_entry_card.dart';
+import '../../../shared/presentation/widgets/wizard_add_another_button.dart';
 import '../../../shared/presentation/widgets/wizard_checkbox_tile.dart';
 import '../../../shared/presentation/widgets/wizard_field.dart';
 import '../../../shared/presentation/widgets/wizard_select_field.dart';
@@ -100,29 +102,79 @@ class _EducationStepState extends ConsumerState<EducationStep>
     );
   }
 
-  @override
-  void submitStep() {
+  /// True when nothing has been typed for the next qualification.
+  bool get _isFormEmpty =>
+      _degree.value == null &&
+      _yearOfPassing.value == null &&
+      _specializationController.text.trim().isEmpty &&
+      _universityController.text.trim().isEmpty &&
+      _marksController.text.trim().isEmpty;
+
+  /// Validates the form and stages it on the draft, ready to be posted.
+  bool _stageEntry() {
     FocusScope.of(context).unfocus();
     _showErrors.value = true;
 
     final formValid = _formKey.currentState?.validate() ?? false;
     if (!formValid || _degree.value == null || _yearOfPassing.value == null) {
+      return false;
+    }
+
+    final current = ref.read(accountCreateNotifierProvider).draft.education;
+    ref
+        .read(accountCreateNotifierProvider.notifier)
+        .setEducation(
+          current.copyWith(
+            degree: _degree.value,
+            specialization: _specializationController.text.trim(),
+            universityCollege: _universityController.text.trim(),
+            yearOfPassing: _yearOfPassing.value,
+            marksOrGrade: _marksController.text.trim(),
+            isHighestQualification: _isHighest.value,
+          ),
+        );
+    return true;
+  }
+
+  void _clearForm() {
+    _formKey.currentState?.reset();
+    _specializationController.clear();
+    _universityController.clear();
+    _marksController.clear();
+    _degree.value = null;
+    _yearOfPassing.value = null;
+    _isHighest.value = false;
+    _showErrors.value = false;
+  }
+
+  /// Posts this qualification and keeps the teacher here with an empty form.
+  Future<void> _addAnother() async {
+    if (!_stageEntry()) return;
+
+    final saved = await ref
+        .read(accountCreateNotifierProvider.notifier)
+        .submitEntry();
+    if (saved && mounted) _clearForm();
+  }
+
+  @override
+  void submitStep() {
+    final notifier = ref.read(accountCreateNotifierProvider.notifier);
+    final hasSaved = ref
+        .read(accountCreateNotifierProvider)
+        .draft
+        .savedEducations
+        .isNotEmpty;
+
+    // A blank form after at least one qualification was filed is not an
+    // error — there is nothing left to send, so move on.
+    if (_isFormEmpty && hasSaved) {
+      FocusScope.of(context).unfocus();
+      notifier.submitCurrentStep();
       return;
     }
 
-    final notifier = ref.read(accountCreateNotifierProvider.notifier);
-    final current = ref.read(accountCreateNotifierProvider).draft.education;
-
-    notifier.setEducation(
-      current.copyWith(
-        degree: _degree.value,
-        specialization: _specializationController.text.trim(),
-        universityCollege: _universityController.text.trim(),
-        yearOfPassing: _yearOfPassing.value,
-        marksOrGrade: _marksController.text.trim(),
-        isHighestQualification: _isHighest.value,
-      ),
-    );
+    if (!_stageEntry()) return;
     notifier.submitCurrentStep();
   }
 
@@ -133,6 +185,8 @@ class _EducationStepState extends ConsumerState<EducationStep>
       child: WizardStepLayout(
         step: ProfileStep.education,
         children: [
+          const _SavedQualifications(),
+
           WizardField(
             icon: AppIcons.qualification,
             label: 'Degree',
@@ -237,8 +291,46 @@ class _EducationStepState extends ConsumerState<EducationStep>
               onChanged: (value) => _isHighest.value = value,
             ),
           ),
+
+          WizardAddAnotherButton(
+            label: 'Add Another Education',
+            onPressed: _addAnother,
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// Qualifications already posted, listed above the form.
+class _SavedQualifications extends ConsumerWidget {
+  const _SavedQualifications();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final saved = ref.watch(
+      accountCreateNotifierProvider.select(
+        (state) => state.draft.savedEducations,
+      ),
+    );
+
+    return SavedEntryList(
+      title: 'Education added',
+      cards: [
+        for (final education in saved)
+          SavedEntryCard(
+            icon: AppIcons.qualification,
+            title: [
+              education.degree ?? '',
+              if (education.specialization.isNotEmpty) education.specialization,
+            ].where((part) => part.isNotEmpty).join(' · '),
+            subtitle: [
+              education.universityCollege,
+              if (education.yearOfPassing != null) '${education.yearOfPassing}',
+            ].where((part) => part.isNotEmpty).join(' · '),
+            trailingNote: education.isHighestQualification ? 'Highest' : null,
+          ),
+      ],
     );
   }
 }

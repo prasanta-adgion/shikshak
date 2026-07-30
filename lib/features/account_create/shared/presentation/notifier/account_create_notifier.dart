@@ -47,14 +47,12 @@ class AccountCreateNotifier extends Notifier<AccountCreateState> {
 
   // ── Saving ─────────────────────────────────────────────────────────────
 
-  /// Sends the current step's section, then advances — or marks the wizard
-  /// complete when it was the last one.
-  ///
-  /// A step whose data has not changed since its last save advances without a
-  /// request. Failures leave the teacher exactly where they are, with [error]
-  /// set for the page to surface.
-  Future<void> submitCurrentStep() async {
-    if (state.isSubmitting) return;
+  Future<bool> submitCurrentStep() => _save(advance: true);
+
+  Future<bool> submitEntry() => _save(advance: false);
+
+  Future<bool> _save({required bool advance}) async {
+    if (state.isSubmitting) return false;
 
     final step = state.step;
     state = state.copyWith(isSubmitting: true, clearError: true);
@@ -67,18 +65,21 @@ class AccountCreateNotifier extends Notifier<AccountCreateState> {
           lastSavedBody: state.savedBodies[step],
         );
 
-    result.fold(
+    return result.fold(
       onSuccess: (outcome) {
         state = state.copyWith(
           isSubmitting: false,
           draft: outcome.draft,
           savedBodies: {...state.savedBodies, step: outcome.savedBody},
-          isComplete: step.isLast ? true : null,
+          isComplete: advance && step.isLast ? true : null,
         );
-        if (!step.isLast) next();
+        if (advance && !step.isLast) next();
+        return true;
       },
-      onFailure: (exception) =>
-          state = state.copyWith(isSubmitting: false, error: exception),
+      onFailure: (exception) {
+        state = state.copyWith(isSubmitting: false, error: exception);
+        return false;
+      },
     );
   }
 }

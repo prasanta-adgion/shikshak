@@ -3,12 +3,6 @@ import '../../shared/domain/entities/profile_section.dart';
 import '../../shared/domain/entities/profile_step.dart';
 import '../../shared/domain/entities/teacher_profile_draft.dart';
 
-/// Maps [AboutYou] onto the about-you payload:
-///
-/// ```json
-/// { "shortBio", "teachingApproach", "whatMakesYouUnique",
-///   "subjectsTaught": [], "classesTaught": [], "languagesKnown": [] }
-/// ```
 class AboutYouSection implements ProfileSection {
   const AboutYouSection();
 
