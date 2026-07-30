@@ -40,8 +40,13 @@ class BasicInfo {
     String? state,
     String? country,
     String? postalCode,
+    bool clearProfilePhotoUrl = false,
   }) => BasicInfo(
-    profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,
+    // A freshly picked photo has to drop the old URL, or the upload is
+    // skipped and the previous image is sent again.
+    profilePhotoUrl: clearProfilePhotoUrl
+        ? null
+        : profilePhotoUrl ?? this.profilePhotoUrl,
     localPhotoPath: localPhotoPath ?? this.localPhotoPath,
     gender: gender ?? this.gender,
     dateOfBirth: dateOfBirth ?? this.dateOfBirth,

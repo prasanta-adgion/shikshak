@@ -16,6 +16,7 @@ class ProfileSectionRepositoryImpl implements ProfileSectionRepository {
     required Map<String, dynamic> body,
     required bool isUpdate,
   }) async {
+    print(path);
     try {
       await _remote.submit(path: path, body: body, isUpdate: isUpdate);
       return const ApiResult.success(null);

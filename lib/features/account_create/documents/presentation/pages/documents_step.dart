@@ -5,15 +5,17 @@ import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
-import '../../../shared/presentation/widgets/file_upload_tile.dart';
-import '../../../shared/presentation/widgets/wizard_field.dart';
-import '../../../shared/presentation/widgets/wizard_info_note.dart';
-import '../../../shared/presentation/widgets/wizard_select_field.dart';
+import '../../../shared/presentation/widgets/wizard_add_another_button.dart';
 import '../../../shared/presentation/widgets/wizard_step_layout.dart';
-import '../../domain/entities/teacher_document.dart';
+import '../controller/document_form_controller.dart';
+import '../providers/document_providers.dart';
+import '../widgets/document_display_screen.dart';
+import '../widgets/document_form_fields.dart';
 
-/// Step 5 — the document payload. `fileName`, `mimeType` and `fileSizeBytes`
-/// are all derived from the picked file; only `documentType` is chosen.
+/// Step 5 — the document payload: one POST per file.
+///
+/// The documents already filed are read back from the server after every
+/// save, so the list above the form is the server's, not the draft's.
 class DocumentsStep extends ConsumerStatefulWidget {
   const DocumentsStep({super.key});
 
@@ -23,134 +25,106 @@ class DocumentsStep extends ConsumerStatefulWidget {
 
 class _DocumentsStepState extends ConsumerState<DocumentsStep>
     with WizardStepRegistration {
-  final _showErrors = ValueNotifier<bool>(false);
+  late final DocumentFormController _form;
+
+  @override
+  void initState() {
+    super.initState();
+    _form = DocumentFormController(
+      initial: ref.read(accountCreateNotifierProvider).draft.document,
+    );
+
+    // Deferred: reading the list mutates provider state, which cannot happen
+    // while the step is still being built into the tree.
+    Future.microtask(_loadSaved);
+  }
 
   @override
   void dispose() {
-    _showErrors.dispose();
+    _form.dispose();
     super.dispose();
   }
 
-  void _pickFile() {
-    // TODO(picker): replace with file_picker — it reports name, MIME type and
-    // size, which is exactly what the payload needs. fileUrl comes from the
-    // upload response.
-    final notifier = ref.read(accountCreateNotifierProvider.notifier);
-    final current = ref.read(accountCreateNotifierProvider).draft.document;
-
-    notifier.setDocument(
-      current.copyWith(
-        fileName: 'resume.pdf',
-        mimeType: 'application/pdf',
-        fileSizeBytes: 123456,
-      ),
-    );
-    AppSnackbar.show(
-      context,
-      'File picking is not connected yet — attached a placeholder.',
-    );
+  void _loadSaved() {
+    if (!mounted) return;
+    ref.read(documentListNotifierProvider.notifier).load();
   }
 
-  void _removeFile() {
-    final notifier = ref.read(accountCreateNotifierProvider.notifier);
-    final current = ref.read(accountCreateNotifierProvider).draft.document;
-    notifier.setDocument(current.withoutFile());
+  /// Validates the form and stages it on the draft, ready to be posted.
+  bool _stageEntry() {
+    FocusScope.of(context).unfocus();
+    if (!_form.validate()) {
+      // The type has its own inline error; a missing file has nowhere to show
+      // one, so it is called out instead.
+      if (_form.documentType.value != null && !_form.hasFile) {
+        AppSnackbar.showError(context, 'Attach a file for this document.');
+      }
+      return false;
+    }
+
+    // The whole entity, file included: the section uploads whatever local
+    // path it finds here before the body is built.
+    ref
+        .read(accountCreateNotifierProvider.notifier)
+        .setDocument(_form.toDocument());
+    return true;
+  }
+
+  /// Posts this document, reads the list back, and keeps the teacher here with
+  /// an empty form.
+  Future<void> _addAnother() async {
+    if (!_stageEntry()) return;
+
+    final saved = await ref
+        .read(accountCreateNotifierProvider.notifier)
+        .submitEntry();
+    if (!saved || !mounted) return;
+
+    _form.reset();
+    _loadSaved();
   }
 
   @override
   void submitStep() {
-    _showErrors.value = true;
+    final notifier = ref.read(accountCreateNotifierProvider.notifier);
+    final hasSaved = ref.read(documentListNotifierProvider).items.isNotEmpty;
 
-    final document = ref.read(accountCreateNotifierProvider).draft.document;
-    if (document.documentType == null) return;
-
-    if (!document.hasFile) {
-      AppSnackbar.showError(context, 'Attach a document to finish.');
+    // A blank form after at least one document was filed is not an error —
+    // there is nothing left to send, so finish.
+    if (_form.isEmpty && hasSaved) {
+      FocusScope.of(context).unfocus();
+      notifier.submitCurrentStep();
       return;
     }
 
-    // Last section: on success the wizard reports complete and the page
-    // leaves for the dashboard.
-    ref.read(accountCreateNotifierProvider.notifier).submitCurrentStep();
+    if (!_stageEntry()) return;
+    notifier.submitCurrentStep();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Loading and updating the saved list fail independently of the wizard's
+    // own save, which the page reports.
+    ref.listen(documentListNotifierProvider.select((state) => state.error), (
+      previous,
+      next,
+    ) {
+      if (next == null || next == previous) return;
+      AppSnackbar.showError(context, next.message);
+    });
+
     return WizardStepLayout(
       step: ProfileStep.documents,
       children: [
-        WizardField(
-          icon: Icons.category_outlined,
-          label: 'Document Type',
-          child: Consumer(
-            builder: (context, ref, _) {
-              final type = ref.watch(
-                accountCreateNotifierProvider.select(
-                  (state) => state.draft.document.documentType,
-                ),
-              );
+        const SavedDocumentList(),
 
-              return ValueListenableBuilder<bool>(
-                valueListenable: _showErrors,
-                builder: (context, showErrors, _) =>
-                    WizardSelectField<DocumentType>(
-                      hint: 'Select document type',
-                      sheetTitle: 'Document type',
-                      value: type,
-                      options: DocumentType.values,
-                      labelOf: _documentTypeLabel,
-                      errorText: showErrors && type == null
-                          ? 'Document type is required'
-                          : null,
-                      onSelected: (selected) => ref
-                          .read(accountCreateNotifierProvider.notifier)
-                          .setDocument(
-                            ref
-                                .read(accountCreateNotifierProvider)
-                                .draft
-                                .document
-                                .copyWith(documentType: selected),
-                          ),
-                    ),
-              );
-            },
-          ),
-        ),
+        DocumentFormFields(controller: _form),
 
-        WizardField(
-          icon: Icons.upload_file_outlined,
-          label: 'Upload Document',
-          helpText: 'PDF, JPG or PNG up to 5 MB.',
-          child: Consumer(
-            builder: (context, ref, _) {
-              final document = ref.watch(
-                accountCreateNotifierProvider.select(
-                  (state) => state.draft.document,
-                ),
-              );
-
-              return FileUploadTile(
-                title: document.documentType?.label ?? 'Document',
-                hint: 'Upload your document',
-                fileName: document.fileName,
-                detail: document.hasFile
-                    ? '${document.mimeType} · ${document.readableSize}'
-                    : null,
-                onUpload: _pickFile,
-                onRemove: _removeFile,
-              );
-            },
-          ),
-        ),
-
-        const WizardInfoNote(
-          icon: Icons.info_outline_rounded,
-          message: 'Clear scans get approved faster.',
+        WizardAddAnotherButton(
+          label: 'Add Another Document',
+          onPressed: _addAnother,
         ),
       ],
     );
   }
 }
-
-// Top-level so the closure passed into the field is stable across rebuilds.
-String _documentTypeLabel(DocumentType type) => type.label;

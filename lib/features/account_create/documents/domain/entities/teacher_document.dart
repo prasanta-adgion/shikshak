@@ -52,6 +52,19 @@ class TeacherDocument {
   TeacherDocument withoutFile() => TeacherDocument(documentType: documentType);
 }
 
+extension DocumentTypeX on DocumentType {
+  /// Reads the type back off a server row; `null` when it is absent or a
+  /// value this build does not know.
+  static DocumentType? tryParse(String? wireValue) {
+    if (wireValue == null) return null;
+
+    for (final type in DocumentType.values) {
+      if (type.wireValue == wireValue) return type;
+    }
+    return null;
+  }
+}
+
 /// Values the `documentType` field accepts.
 enum DocumentType {
   resume('Resume', 'resume'),

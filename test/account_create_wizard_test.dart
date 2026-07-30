@@ -1,5 +1,7 @@
 import 'package:Shikshak/core/constants/app_images_const.dart';
 import 'package:Shikshak/core/theme/app_theme.dart';
+import 'package:Shikshak/features/account_create/documents/presentation/notifier/document_list_notifier.dart';
+import 'package:Shikshak/features/account_create/documents/presentation/providers/document_providers.dart';
 import 'package:Shikshak/features/account_create/education/presentation/notifier/education_list_notifier.dart';
 import 'package:Shikshak/features/account_create/education/presentation/providers/education_providers.dart';
 import 'package:Shikshak/features/account_create/experience/presentation/notifier/experience_list_notifier.dart';
@@ -56,6 +58,11 @@ class _OfflineEducationList extends EducationListNotifier {
   Future<void> load() async {}
 }
 
+class _OfflineDocumentList extends DocumentListNotifier {
+  @override
+  Future<void> load() async {}
+}
+
 /// The account as it stands after signup — what step 1 shows beside the
 /// avatar.
 class _SeededAuthNotifier extends AuthNotifier {
@@ -96,6 +103,7 @@ void main() {
             _OfflineExperienceList.new,
           ),
           educationListNotifierProvider.overrideWith(_OfflineEducationList.new),
+          documentListNotifierProvider.overrideWith(_OfflineDocumentList.new),
         ],
         child: MaterialApp(
           theme: theme ?? AppTheme.light,

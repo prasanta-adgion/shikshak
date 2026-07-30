@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../flavor/app_flavor.dart';
+import '../media/media_picker.dart';
 import '../network/dio_client.dart';
 import '../network/file_uploader.dart';
 import '../network/i_api_client.dart';
@@ -20,6 +21,9 @@ final secureStorageServiceProvider = Provider<SecureStorageService>((ref) {
     ),
   );
 });
+
+/// Photo and document picking, shared by every screen that attaches a file.
+final mediaPickerProvider = Provider<MediaPicker>((ref) => MediaPickerImpl());
 
 final fileUploaderProvider = Provider<FileUploader>((ref) {
   return FileUploaderImpl(ref.watch(apiClientProvider));

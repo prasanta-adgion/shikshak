@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/providers/core_providers.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/utils/validators.dart';
-import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../shared/widgets/app_text_field.dart';
 import '../../../shared/presentation/widgets/file_upload_tile.dart';
 import '../../../shared/presentation/widgets/wizard_checkbox_tile.dart';
@@ -133,19 +134,20 @@ class EducationFormFields extends StatelessWidget {
   }
 }
 
-class _CertificateField extends StatelessWidget {
+class _CertificateField extends ConsumerWidget {
   const _CertificateField({required this.controller});
 
   final EducationFormController controller;
 
-  void _pick(BuildContext context) {
-    // TODO(picker): replace with file_picker. The form holds the file name
-    // until an upload turns it into certificateUrl.
-    controller.certificateFileName.value = 'certificate.pdf';
-    AppSnackbar.show(
-      context,
-      'File picking is not connected yet — attached a placeholder.',
-    );
+  Future<void> _pick(WidgetRef ref) async {
+    final picked = await ref.read(mediaPickerProvider).pickDocument();
+    if (picked == null) return;
+
+    controller.certificateFileName.value = picked.name;
+    controller.certificateLocalPath.value = picked.path;
+    // Replacing the file drops the stored URL, so the new one uploads
+    // instead of the old one being sent again.
+    controller.certificateUrl.value = null;
   }
 
   void _remove() {
@@ -155,7 +157,7 @@ class _CertificateField extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListenableBuilder(
       listenable: Listenable.merge([
         controller.certificateFileName,
@@ -170,7 +172,7 @@ class _CertificateField extends StatelessWidget {
         fileName:
             controller.certificateFileName.value ??
             _nameFromUrl(controller.certificateUrl.value),
-        onUpload: () => _pick(context),
+        onUpload: () => _pick(ref),
         onRemove: _remove,
       ),
     );
