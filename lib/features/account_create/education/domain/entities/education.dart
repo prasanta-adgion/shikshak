@@ -7,6 +7,7 @@ class Education {
     this.marksOrGrade = '',
     this.certificateUrl,
     this.certificateFileName,
+    this.certificateLocalPath,
     this.isHighestQualification = true,
   });
 
@@ -24,6 +25,10 @@ class Education {
   /// Name of the file chosen on device, shown until that upload happens.
   final String? certificateFileName;
 
+  /// Path on the device, set by the picker. Distinct from
+  /// [certificateFileName]: only a real path can be uploaded.
+  final String? certificateLocalPath;
+
   final bool isHighestQualification;
 
   Education copyWith({
@@ -34,6 +39,7 @@ class Education {
     String? marksOrGrade,
     String? certificateUrl,
     String? certificateFileName,
+    String? certificateLocalPath,
     bool? isHighestQualification,
   }) => Education(
     degree: degree ?? this.degree,
@@ -43,6 +49,7 @@ class Education {
     marksOrGrade: marksOrGrade ?? this.marksOrGrade,
     certificateUrl: certificateUrl ?? this.certificateUrl,
     certificateFileName: certificateFileName ?? this.certificateFileName,
+    certificateLocalPath: certificateLocalPath ?? this.certificateLocalPath,
     isHighestQualification:
         isHighestQualification ?? this.isHighestQualification,
   );

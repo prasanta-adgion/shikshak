@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:network_logger/network_logger.dart';
 
 import '../storage/secure_storage_service.dart';
 import 'api_exception.dart';
@@ -33,7 +34,13 @@ class DioClient implements IApiClient {
       headers: const {'Accept': 'application/json'},
     );
     _dio.interceptors.add(AuthInterceptor(storage));
-    if (enableLogging) _dio.interceptors.add(LoggerInterceptor());
+    if (enableLogging) {
+      // Two audiences: the console for a terminal, and the in-app inspector
+      // (the draggable button) for a device with no console attached.
+      _dio.interceptors
+        ..add(LoggerInterceptor())
+        ..add(DioNetworkLogger());
+    }
   }
 
   @override
@@ -72,6 +79,21 @@ class DioClient implements IApiClient {
     Map<String, dynamic>? headers,
   }) => _request(
     () => _dio.put<T>(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: Options(headers: headers),
+    ),
+  );
+
+  @override
+  Future<T> patch<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => _request(
+    () => _dio.patch<T>(
       path,
       data: data,
       queryParameters: queryParameters,

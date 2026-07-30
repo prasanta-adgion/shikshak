@@ -97,8 +97,7 @@ class _AboutYouStepState extends ConsumerState<AboutYouStep>
         languagesKnown: _languages.value,
       ),
     );
-    // TODO(api): POST the about-you payload here, then advance on success.
-    notifier.next();
+    notifier.submitCurrentStep();
   }
 
   @override
@@ -139,7 +138,8 @@ class _AboutYouStepState extends ConsumerState<AboutYouStep>
           WizardField(
             icon: Icons.star_outline_rounded,
             label: 'What Makes You Unique',
-            helpText: 'What a student gets from you that they would not '
+            helpText:
+                'What a student gets from you that they would not '
                 'get elsewhere.',
             child: AppTextField(
               controller: _uniqueController,
@@ -157,10 +157,8 @@ class _AboutYouStepState extends ConsumerState<AboutYouStep>
             label: 'Subjects Taught',
             child: ValueListenableBuilder<List<String>>(
               valueListenable: _subjects,
-              builder: (context, selected, _) => _SubjectGrid(
-                selected: selected,
-                onToggle: _toggleSubject,
-              ),
+              builder: (context, selected, _) =>
+                  _SubjectGrid(selected: selected, onToggle: _toggleSubject),
             ),
           ),
 

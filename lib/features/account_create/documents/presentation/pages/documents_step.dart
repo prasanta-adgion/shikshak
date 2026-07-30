@@ -69,9 +69,9 @@ class _DocumentsStepState extends ConsumerState<DocumentsStep>
       return;
     }
 
-    // TODO(api): POST the document payload here, then leave the wizard for the
-    // teacher dashboard once it succeeds.
-    AppSnackbar.show(context, 'Profile submission is not connected yet.');
+    // Last section: on success the wizard reports complete and the page
+    // leaves for the dashboard.
+    ref.read(accountCreateNotifierProvider.notifier).submitCurrentStep();
   }
 
   @override

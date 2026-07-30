@@ -17,9 +17,10 @@ enum AppFlavor {
   String get baseUrl {
     switch (this) {
       case AppFlavor.dev:
-        return 'http://192.168.1.12:5001';
+        return 'http://192.168.1.14:5001';
+      // return 'http://192.168.1.12:5010/';
       case AppFlavor.staging:
-        return '';
+        return 'https://backend.shiksak.in/';
       case AppFlavor.prod:
         return '';
     }
@@ -27,6 +28,10 @@ enum AppFlavor {
 
   /// False until the host for this environment exists.
   bool get hasBaseUrl => baseUrl.isNotEmpty;
+
+  /// Whether requests are recorded — console logs and the in-app inspector
+  /// alike. Never in production.
+  bool get enableNetworkLogging => this != AppFlavor.prod;
 }
 
 class AppFlavorConfig {
@@ -40,7 +45,7 @@ class AppFlavorConfig {
 
   static String get baseUrl => _flavor.baseUrl;
 
-  static bool get enableNetworkLogging => !isProd;
+  static bool get enableNetworkLogging => _flavor.enableNetworkLogging;
 
   static void set(AppFlavor flavor) {
     _flavor = flavor;

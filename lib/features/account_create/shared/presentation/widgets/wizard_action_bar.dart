@@ -15,7 +15,7 @@ class WizardActionBar extends StatelessWidget {
     required this.maxWidth,
     required this.isVisible,
     required this.onBack,
-    required this.onPrimary,
+    required this.continueButtonOnpressed,
     this.isSubmitting = false,
   });
 
@@ -24,7 +24,7 @@ class WizardActionBar extends StatelessWidget {
   final bool isVisible;
   final bool isSubmitting;
   final VoidCallback onBack;
-  final VoidCallback onPrimary;
+  final VoidCallback continueButtonOnpressed;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,7 @@ class WizardActionBar extends StatelessWidget {
                       child: AppLoadingButton(
                         label: step.primaryLabel,
                         isLoading: isSubmitting,
-                        onPressed: onPrimary,
+                        onPressed: continueButtonOnpressed,
                         color: theme.colorScheme.tertiary,
                         trailingIcon: CupertinoIcons.arrow_right,
                       ),

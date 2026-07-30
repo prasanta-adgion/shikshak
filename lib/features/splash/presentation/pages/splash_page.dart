@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/network_inspector.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
@@ -102,6 +103,10 @@ class _SplashPageState extends ConsumerState<SplashPage>
     // Start the session check once the first frame is up; the ref.listen in
     // build() navigates when the state resolves.
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // First screen under the navigator, so this is where the debug network
+      // inspector can find the overlay to live in. No-op in production.
+      NetworkInspector.attach(context);
+
       ref.read(authStateNotifierProvider.notifier).checkAuthStatus();
     });
   }
@@ -171,13 +176,13 @@ class _SplashPageState extends ConsumerState<SplashPage>
                           position: _textSlide,
                           child: Column(
                             children: [
-                              Text(
-                                AppConstants.appName.toUpperCase(),
-                                style: theme.textTheme.headlineLarge?.copyWith(
-                                  color: theme.colorScheme.primary,
-                                  fontFamily: 'Audiowide',
-                                ),
-                              ),
+                              // Text(
+                              //   AppConstants.appName.toUpperCase(),
+                              //   style: theme.textTheme.headlineLarge?.copyWith(
+                              //     color: theme.colorScheme.primary,
+                              //     fontFamily: 'Audiowide',
+                              //   ),
+                              // ),
                               RichText(
                                 textAlign: TextAlign.center,
                                 text: TextSpan(

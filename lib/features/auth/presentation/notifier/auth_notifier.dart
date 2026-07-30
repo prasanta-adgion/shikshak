@@ -22,11 +22,22 @@ class AuthNotifier extends Notifier<AuthState> {
         : state.copyWith(status: AuthStatus.authenticated, role: role);
   }
 
-  /// Called by [LoginNotifier] once the credentials are accepted.
+  /// Holds the number typed on the register form until a session exists to
+  /// attach it to — no auth response carries a phone.
+  void rememberSignupMobile(String mobileNumber) =>
+      state = state.copyWith(signupMobileNumber: mobileNumber.trim());
+
+  /// Called by [LoginNotifier] and [SignupOtpNotifier] once credentials are
+  /// accepted.
   void setSession(UserEntity user) => state = AuthState(
     status: AuthStatus.authenticated,
-    user: user,
+    // Merged rather than overwritten: signup knows the phone, the response
+    // does not.
+    user: user.copyWith(
+      mobileNumber: user.mobileNumber ?? state.signupMobileNumber,
+    ),
     role: user.role,
+    signupMobileNumber: state.signupMobileNumber,
   );
 
   Future<void> logout() async {

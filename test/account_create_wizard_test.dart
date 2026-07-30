@@ -9,6 +9,11 @@ import 'package:Shikshak/features/account_create/shared/presentation/widgets/ste
 import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_step_header.dart';
 import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_step_layout.dart';
 import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_action_bar.dart';
+import 'package:Shikshak/features/auth/domain/entities/user_entity.dart';
+import 'package:Shikshak/features/auth/domain/entities/user_role.dart';
+import 'package:Shikshak/features/auth/presentation/notifier/auth_notifier.dart';
+import 'package:Shikshak/features/auth/presentation/providers_di/auth_providers.dart';
+import 'package:Shikshak/features/auth/presentation/state/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,6 +40,22 @@ class _NotifierAtStep extends AccountCreateNotifier {
   AccountCreateState build() => AccountCreateState(step: step);
 }
 
+/// The account as it stands after signup — what step 1 shows beside the
+/// avatar.
+class _SeededAuthNotifier extends AuthNotifier {
+  static const UserEntity user = UserEntity(
+    id: '1',
+    fullName: 'Priya Sharma',
+    email: 'priya.sharma@gmail.com',
+    mobileNumber: '9876543210',
+    role: UserRole.teacher,
+  );
+
+  @override
+  AuthState build() =>
+      const AuthState(status: AuthStatus.authenticated, user: user);
+}
+
 void main() {
   Future<void> setWindow(WidgetTester tester, Size size) async {
     tester.view.devicePixelRatio = 1.0;
@@ -54,6 +75,7 @@ void main() {
           accountCreateNotifierProvider.overrideWith(
             () => _NotifierAtStep(step),
           ),
+          authStateNotifierProvider.overrideWith(_SeededAuthNotifier.new),
         ],
         child: MaterialApp(
           theme: theme ?? AppTheme.light,
@@ -180,9 +202,10 @@ void main() {
       await setWindow(tester, const Size(390, 844));
       await pumpWizard(tester, ProfileStep.basicInfo);
 
-      expect(find.text('Priya Sharma'), findsOneWidget);
-      expect(find.text('priya.sharma@gmail.com'), findsOneWidget);
-      expect(find.text('+91 98765 43210'), findsOneWidget);
+      // Comes from the signed-in account, not from constants in the step.
+      expect(find.text(_SeededAuthNotifier.user.fullName), findsOneWidget);
+      expect(find.text(_SeededAuthNotifier.user.email), findsOneWidget);
+      expect(find.text(_SeededAuthNotifier.user.mobileNumber!), findsOneWidget);
 
       // The camera badge stands in for the avatar's position.
       final nameX = tester.getCenter(find.text('Priya Sharma')).dx;

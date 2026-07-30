@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../../app/router/route_paths.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/utils/responsive.dart';
 import '../../../../../shared/widgets/app_button.dart';
+import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../shared/widgets/gradient_background.dart';
 import '../../../about_you/presentation/pages/about_you_step.dart';
 import '../../../basic_info/presentation/pages/basic_info_step.dart';
@@ -104,6 +108,24 @@ class _CreateTeacherAccountPageState
       _actionsVisible.value = true;
       if (_scrollController.hasClients) _scrollController.jumpTo(0);
     });
+
+    // Save failures surface here rather than in all five steps.
+    ref.listen(accountCreateNotifierProvider.select((state) => state.error), (
+      previous,
+      next,
+    ) {
+      if (next == null || next == previous) return;
+      AppSnackbar.showError(context, next.message);
+    });
+
+    // The final section landed — the profile is live.
+    ref.listen(
+      accountCreateNotifierProvider.select((state) => state.isComplete),
+      (previous, next) {
+        if (!next || previous == next) return;
+        context.go(RoutePaths.teacherDashboard);
+      },
+    );
 
     final maxWidth = context.isTabletDevice
         ? Breakpoints.tabletFormMaxWidth
@@ -247,7 +269,7 @@ class _ActionBar extends ConsumerWidget {
       isVisible: isVisible,
       isSubmitting: isSubmitting,
       onBack: onBack,
-      onPrimary: ref.read(wizardStepControllerProvider).submit,
+      continueButtonOnpressed: ref.read(wizardStepControllerProvider).submit,
     );
   }
 }

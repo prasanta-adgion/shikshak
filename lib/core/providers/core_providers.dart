@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../flavor/app_flavor.dart';
 import '../network/dio_client.dart';
+import '../network/file_uploader.dart';
 import '../network/i_api_client.dart';
 import '../storage/secure_storage_service.dart';
 
@@ -20,12 +21,16 @@ final secureStorageServiceProvider = Provider<SecureStorageService>((ref) {
   );
 });
 
+final fileUploaderProvider = Provider<FileUploader>((ref) {
+  return FileUploaderImpl(ref.watch(apiClientProvider));
+});
+
 final apiClientProvider = Provider<IApiClient>((ref) {
   final flavor = ref.watch(appFlavorProvider);
 
   return DioClient(
     baseUrl: flavor.baseUrl,
     storage: ref.watch(secureStorageServiceProvider),
-    enableLogging: flavor != AppFlavor.prod,
+    enableLogging: flavor.enableNetworkLogging,
   );
 });

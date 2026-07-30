@@ -5,13 +5,13 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/profile_step.dart';
 
 class StepTimeline extends StatelessWidget {
-  const StepTimeline({super.key, required this.current, this.onStepTapped});
-
   final ProfileStep current;
   final ValueChanged<ProfileStep>? onStepTapped;
 
   static const double _railHeight = 68;
   static const double _dotSize = 26;
+
+  const StepTimeline({super.key, required this.current, this.onStepTapped});
 
   @override
   Widget build(BuildContext context) {

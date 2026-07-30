@@ -43,16 +43,22 @@ class ProfilePhotoPicker extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.titleMedium,
-              ),
-              AppSpacing.gapSm,
-              _DetailLine(icon: AppIcons.email, value: email),
-              AppSpacing.gapXs,
-              _DetailLine(icon: AppIcons.phone, value: phoneNumber),
+              // Each line is dropped when empty rather than rendering a blank
+              // row — the account may not carry every detail.
+              if (name.isNotEmpty) ...[
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium,
+                ),
+                AppSpacing.gapSm,
+              ],
+              if (email.isNotEmpty) _DetailLine(icon: AppIcons.email, value: email),
+              if (phoneNumber.isNotEmpty) ...[
+                AppSpacing.gapXs,
+                _DetailLine(icon: AppIcons.phone, value: phoneNumber),
+              ],
             ],
           ),
         ),
