@@ -28,8 +28,17 @@ dependencies:
 
   equatable: ^2.1.0
 
-  #Steps
+  # Steps
   timelines_plus: ^2.0.0
+
+  # check API request & response
+  network_logger: ^1.0.4
+
+  # camera/gallery selection
+  image_picker: ^1.2.3
+
+  # documents, certificates, notes, and any file uploads
+  file_picker: ^11.0.2
 
 dev_dependencies:
   flutter_test:

@@ -15,6 +15,10 @@ class RegisterNotifier extends Notifier<AsyncValue<void>> {
     return result.fold(
       onSuccess: (_) {
         state = const AsyncData(null);
+        // Kept for the profile wizard: no auth response returns the phone.
+        ref
+            .read(authStateNotifierProvider.notifier)
+            .rememberSignupMobile(params.mobileNumber);
         return true;
       },
       onFailure: (exception) {

@@ -9,14 +9,29 @@ class AuthState {
 
   final UserRole? role;
 
-  const AuthState({this.status = AuthStatus.checking, this.user, this.role});
+  /// Mobile number typed on the register form. The signup and login responses
+  /// do not carry a phone, so it is remembered here and merged into [user]
+  /// when the session opens.
+  final String? signupMobileNumber;
 
-  AuthState copyWith({AuthStatus? status, UserEntity? user, UserRole? role}) =>
-      AuthState(
-        status: status ?? this.status,
-        user: user ?? this.user,
-        role: role ?? this.role,
-      );
+  const AuthState({
+    this.status = AuthStatus.checking,
+    this.user,
+    this.role,
+    this.signupMobileNumber,
+  });
+
+  AuthState copyWith({
+    AuthStatus? status,
+    UserEntity? user,
+    UserRole? role,
+    String? signupMobileNumber,
+  }) => AuthState(
+    status: status ?? this.status,
+    user: user ?? this.user,
+    role: role ?? this.role,
+    signupMobileNumber: signupMobileNumber ?? this.signupMobileNumber,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -24,8 +39,9 @@ class AuthState {
       other is AuthState &&
           other.status == status &&
           other.user == user &&
-          other.role == role;
+          other.role == role &&
+          other.signupMobileNumber == signupMobileNumber;
 
   @override
-  int get hashCode => Object.hash(status, user, role);
+  int get hashCode => Object.hash(status, user, role, signupMobileNumber);
 }

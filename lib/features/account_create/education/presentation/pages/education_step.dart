@@ -123,8 +123,7 @@ class _EducationStepState extends ConsumerState<EducationStep>
         isHighestQualification: _isHighest.value,
       ),
     );
-    // TODO(api): POST the education payload here, then advance on success.
-    notifier.next();
+    notifier.submitCurrentStep();
   }
 
   @override

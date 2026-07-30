@@ -6,13 +6,9 @@ import '../../../documents/domain/entities/teacher_document.dart';
 import '../../../education/domain/entities/education.dart';
 import '../../../experience/domain/entities/experience_info.dart';
 import '../../domain/entities/profile_step.dart';
+import '../providers/account_create_providers.dart';
 import '../state/account_create_state.dart';
 
-/// Owns the wizard: which step is showing, and the draft being filled in.
-///
-/// One setter per section, mirroring the one-endpoint-per-section split. Steps
-/// hand back a whole section rather than field-by-field edits, so the object
-/// posted later is exactly the object the screen built.
 class AccountCreateNotifier extends Notifier<AccountCreateState> {
   @override
   AccountCreateState build() => const AccountCreateState();
@@ -49,6 +45,40 @@ class AccountCreateNotifier extends Notifier<AccountCreateState> {
   void setDocument(TeacherDocument document) =>
       state = state.copyWith(draft: state.draft.copyWith(document: document));
 
-  void setSubmitting({required bool submitting}) =>
-      state = state.copyWith(isSubmitting: submitting);
+  // ── Saving ─────────────────────────────────────────────────────────────
+
+  /// Sends the current step's section, then advances — or marks the wizard
+  /// complete when it was the last one.
+  ///
+  /// A step whose data has not changed since its last save advances without a
+  /// request. Failures leave the teacher exactly where they are, with [error]
+  /// set for the page to surface.
+  Future<void> submitCurrentStep() async {
+    if (state.isSubmitting) return;
+
+    final step = state.step;
+    state = state.copyWith(isSubmitting: true, clearError: true);
+
+    final result = await ref
+        .read(saveProfileSectionUseCaseProvider)
+        .call(
+          step: step,
+          draft: state.draft,
+          lastSavedBody: state.savedBodies[step],
+        );
+
+    result.fold(
+      onSuccess: (outcome) {
+        state = state.copyWith(
+          isSubmitting: false,
+          draft: outcome.draft,
+          savedBodies: {...state.savedBodies, step: outcome.savedBody},
+          isComplete: step.isLast ? true : null,
+        );
+        if (!step.isLast) next();
+      },
+      onFailure: (exception) =>
+          state = state.copyWith(isSubmitting: false, error: exception),
+    );
+  }
 }

@@ -2,13 +2,21 @@ class TeacherDocument {
   const TeacherDocument({
     this.documentType,
     this.fileName,
+    this.localFilePath,
     this.fileUrl,
     this.mimeType,
     this.fileSizeBytes,
   });
 
   final DocumentType? documentType;
+
+  /// Display name of the attached file — what the payload carries.
   final String? fileName;
+
+  /// Path on the device, set by the picker. Distinct from [fileName]: only a
+  /// real path can be uploaded, and it never reaches the payload.
+  final String? localFilePath;
+
   final String? fileUrl;
   final String? mimeType;
   final int? fileSizeBytes;
@@ -27,12 +35,14 @@ class TeacherDocument {
   TeacherDocument copyWith({
     DocumentType? documentType,
     String? fileName,
+    String? localFilePath,
     String? fileUrl,
     String? mimeType,
     int? fileSizeBytes,
   }) => TeacherDocument(
     documentType: documentType ?? this.documentType,
     fileName: fileName ?? this.fileName,
+    localFilePath: localFilePath ?? this.localFilePath,
     fileUrl: fileUrl ?? this.fileUrl,
     mimeType: mimeType ?? this.mimeType,
     fileSizeBytes: fileSizeBytes ?? this.fileSizeBytes,

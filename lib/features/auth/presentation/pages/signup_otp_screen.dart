@@ -28,7 +28,7 @@ class SignupOtpScreen extends ConsumerWidget {
 
     context.go(
       user.role == UserRole.teacher
-          ? RoutePaths.createTeacherAccount
+          ? RoutePaths.createAccountScreenPath
           : RoutePaths.dashboardFor(user.role),
     );
   }

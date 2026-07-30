@@ -10,4 +10,14 @@ abstract final class ApiEndpoints {
   static const String verifyPasswordResetOtp =
       'api/v1/auth/password/verify-otp';
   static const String resetPassword = 'api/v1/auth/password/reset';
+
+  // Files — multipart upload returning the URL the profile payloads carry.
+  static const String upload = '/api/v1/user/profile/avatar';
+
+  // Teacher account create / update / get
+  static const String basicInfo = '/api/v1/user/teacher/profile/basic-info';
+  static const String aboutYou = '/api/v1/user/teacher/profile/about-you';
+  static const String education = '/api/v1/user/teacher/profile/education';
+  static const String experience = '/api/v1/user/teacher/profile/experience';
+  static const String documents = '/api/v1/user/teacher/profile/documents';
 }

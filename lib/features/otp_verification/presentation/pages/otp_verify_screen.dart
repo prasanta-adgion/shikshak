@@ -341,13 +341,30 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                 valueListenable: _resendSecondsLeft,
                 builder: (context, secondsLeft, _) {
                   final canResend = secondsLeft == 0;
+
                   return TextButton(
                     onPressed: widget.isLoading || !canResend
                         ? null
                         : _resendOtp,
+                    style: TextButton.styleFrom(
+                      foregroundColor: canResend
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.outline,
+                      disabledForegroundColor: Theme.of(
+                        context,
+                      ).colorScheme.outline,
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                     child: Text(
                       canResend ? 'Resend' : 'Resend in ${secondsLeft}s',
-                      style: theme.textTheme.titleMedium,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: canResend
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.outline,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   );
                 },

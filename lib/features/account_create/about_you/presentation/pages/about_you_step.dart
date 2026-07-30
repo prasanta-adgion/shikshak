@@ -97,8 +97,7 @@ class _AboutYouStepState extends ConsumerState<AboutYouStep>
         languagesKnown: _languages.value,
       ),
     );
-    // TODO(api): POST the about-you payload here, then advance on success.
-    notifier.next();
+    notifier.submitCurrentStep();
   }
 
   @override

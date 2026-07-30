@@ -97,9 +97,8 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
         startDate: _startDate.value,
       ),
     );
-    // TODO(api): POST the experience payload here — teachingSubjects and
-    // classesTaught come off the draft, not off this screen.
-    notifier.next();
+    // teachingSubjects and classesTaught come off the draft, not this screen.
+    notifier.submitCurrentStep();
   }
 
   @override

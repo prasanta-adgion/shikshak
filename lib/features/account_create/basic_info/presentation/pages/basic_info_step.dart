@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/utils/validators.dart';
 import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../shared/widgets/app_text_field.dart';
+import '../../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
@@ -108,8 +109,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
         postalCode: _postalCodeController.text.trim(),
       ),
     );
-    // TODO(api): POST the basic-info payload here, then advance on success.
-    notifier.next();
+    notifier.submitCurrentStep();
   }
 
   String? _validatePostalCode(String? value) {
@@ -126,23 +126,31 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
       child: WizardStepLayout(
         step: ProfileStep.basicInfo,
         children: [
-          ValueListenableBuilder<String?>(
-            valueListenable: _photoPath,
-            builder: (context, path, _) => ProfilePhotoPicker(
-              photoPath: path,
-              // TODO(api): placeholders until the profile endpoint returns the
-              // verified account. Signup captured all three, so these come
-              // from `AuthState.user` (name, email) and the register payload.
-              name: _placeholderName,
-              email: _placeholderEmail,
-              phoneNumber: _placeholderPhone,
-              // TODO(picker): needs image_picker. The entity already holds a
-              // localPhotoPath, uploaded later into profilePhotoUrl.
-              onTap: () => AppSnackbar.show(
-                context,
-                'Photo upload is not connected yet.',
-              ),
-            ),
+          // The verified account, as typed on the register form: name and
+          // email come back with the session, the phone is carried over from
+          // signup.
+          Consumer(
+            builder: (context, ref, _) {
+              final user = ref.watch(
+                authStateNotifierProvider.select((state) => state.user),
+              );
+
+              return ValueListenableBuilder<String?>(
+                valueListenable: _photoPath,
+                builder: (context, path, _) => ProfilePhotoPicker(
+                  photoPath: path,
+                  name: user?.fullName ?? '',
+                  email: user?.email ?? '',
+                  phoneNumber: user?.mobileNumber ?? '',
+                  // TODO(picker): needs image_picker. The entity already holds
+                  // a localPhotoPath, uploaded later into profilePhotoUrl.
+                  onTap: () => AppSnackbar.show(
+                    context,
+                    'Photo upload is not connected yet.',
+                  ),
+                ),
+              );
+            },
           ),
 
           WizardField(
@@ -261,11 +269,6 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
     );
   }
 }
-
-// Static stand-ins for the verified account details shown beside the avatar.
-const String _placeholderName = 'Priya Sharma';
-const String _placeholderEmail = 'priya.sharma@gmail.com';
-const String _placeholderPhone = '+91 98765 43210';
 
 // Top-level so the closures passed into fields are stable across rebuilds.
 String _genderLabel(Gender gender) => gender.label;
