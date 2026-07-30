@@ -5,17 +5,6 @@ import '../../shared/domain/entities/profile_step.dart';
 import '../../shared/domain/entities/teacher_profile_draft.dart';
 import '../domain/entities/experience_info.dart';
 
-/// Maps [ExperienceInfo] onto the experience payload:
-///
-/// ```json
-/// { "teachingSubjects": [], "classesTaught": [], "totalTeachingExperience",
-///   "currentJobTitle", "currentInstitution", "experienceDetails",
-///   "isCurrent", "startDate" }
-/// ```
-///
-/// `teachingSubjects` and `classesTaught` come off the draft rather than the
-/// experience entity: About You captured them, and the teacher is only asked
-/// once.
 class ExperienceSection implements ProfileSection, RepeatableSection {
   const ExperienceSection();
 

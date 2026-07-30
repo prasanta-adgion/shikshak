@@ -1,27 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../core/theme/app_icons.dart';
-import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/utils/validators.dart';
-import '../../../../../shared/widgets/app_text_field.dart';
+import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
-import '../../../shared/presentation/widgets/saved_entry_card.dart';
 import '../../../shared/presentation/widgets/wizard_add_another_button.dart';
-import '../../../shared/presentation/widgets/wizard_checkbox_tile.dart';
-import '../../../shared/presentation/widgets/wizard_date_field.dart';
-import '../../../shared/presentation/widgets/wizard_field.dart';
-import '../../../shared/presentation/widgets/wizard_select_field.dart';
 import '../../../shared/presentation/widgets/wizard_step_layout.dart';
-import '../../domain/entities/experience_info.dart';
+import '../controller/experience_form_controller.dart';
+import '../providers/experience_providers.dart';
+import '../widgets/experience_display_screen.dart';
+import '../widgets/experience_form_fields.dart';
 
-/// Step 3 — the experience payload.
-///
-/// `teachingSubjects` and `classesTaught` are shown read-only: About You
-/// already captured them, and asking twice for the same answer is a good way
-/// to collect two different ones.
 class ExperienceStep extends ConsumerStatefulWidget {
   const ExperienceStep({super.key});
 
@@ -31,118 +21,64 @@ class ExperienceStep extends ConsumerStatefulWidget {
 
 class _ExperienceStepState extends ConsumerState<ExperienceStep>
     with WizardStepRegistration {
-  final _formKey = GlobalKey<FormState>();
-
-  late final TextEditingController _jobTitleController;
-  late final TextEditingController _institutionController;
-  late final TextEditingController _detailsController;
-
-  final _totalExperience = ValueNotifier<String?>(null);
-  final _startDate = ValueNotifier<DateTime?>(null);
-  final _isCurrent = ValueNotifier<bool>(true);
-  final _showErrors = ValueNotifier<bool>(false);
-
-  static const int _detailsLimit = 500;
+  late final ExperienceFormController _form;
 
   @override
   void initState() {
     super.initState();
-    final experience = ref.read(accountCreateNotifierProvider).draft.experience;
-    _jobTitleController = TextEditingController(
-      text: experience.currentJobTitle,
+    _form = ExperienceFormController(
+      initial: ref.read(accountCreateNotifierProvider).draft.experience,
     );
-    _institutionController = TextEditingController(
-      text: experience.currentInstitution,
-    );
-    _detailsController = TextEditingController(
-      text: experience.experienceDetails,
-    );
-    _totalExperience.value = experience.totalTeachingExperience;
-    _startDate.value = experience.startDate;
-    _isCurrent.value = experience.isCurrent;
+
+    // Deferred: reading the list mutates provider state, which cannot happen
+    // while the step is still being built into the tree.
+    Future.microtask(_loadSaved);
   }
 
   @override
   void dispose() {
-    _jobTitleController.dispose();
-    _institutionController.dispose();
-    _detailsController.dispose();
-    _totalExperience.dispose();
-    _startDate.dispose();
-    _isCurrent.dispose();
-    _showErrors.dispose();
+    _form.dispose();
     super.dispose();
   }
 
-  /// True when nothing has been typed for the next position — the teacher has
-  /// filed what they wanted and left the form blank.
-  bool get _isFormEmpty =>
-      _jobTitleController.text.trim().isEmpty &&
-      _institutionController.text.trim().isEmpty &&
-      _detailsController.text.trim().isEmpty &&
-      _startDate.value == null;
+  void _loadSaved() {
+    if (!mounted) return;
+    ref.read(experienceListNotifierProvider.notifier).load();
+  }
 
   /// Validates the form and stages it on the draft, ready to be posted.
   bool _stageEntry() {
     FocusScope.of(context).unfocus();
-    _showErrors.value = true;
+    if (!_form.validate()) return false;
 
-    final formValid = _formKey.currentState?.validate() ?? false;
-    if (!formValid ||
-        _totalExperience.value == null ||
-        _startDate.value == null) {
-      return false;
-    }
-
-    final current = ref.read(accountCreateNotifierProvider).draft.experience;
     ref
         .read(accountCreateNotifierProvider.notifier)
-        .setExperience(
-          current.copyWith(
-            totalTeachingExperience: _totalExperience.value,
-            currentJobTitle: _jobTitleController.text.trim(),
-            currentInstitution: _institutionController.text.trim(),
-            experienceDetails: _detailsController.text.trim(),
-            isCurrent: _isCurrent.value,
-            startDate: _startDate.value,
-          ),
-        );
+        .setExperience(_form.toExperienceInfo());
     return true;
   }
 
-  void _clearForm() {
-    _formKey.currentState?.reset();
-    _jobTitleController.clear();
-    _institutionController.clear();
-    _detailsController.clear();
-    _startDate.value = null;
-    _isCurrent.value = true;
-    _showErrors.value = false;
-    // Total experience stays: it describes the teacher, not the position.
-  }
-
-  /// Posts this position and keeps the teacher here with an empty form.
+  /// Posts this position, reads the list back, and keeps the teacher here with
+  /// an empty form.
   Future<void> _addAnother() async {
     if (!_stageEntry()) return;
 
     final saved = await ref
         .read(accountCreateNotifierProvider.notifier)
         .submitEntry();
-    if (saved && mounted) _clearForm();
+    if (!saved || !mounted) return;
+
+    _form.reset();
+    _loadSaved();
   }
 
   @override
   void submitStep() {
     final notifier = ref.read(accountCreateNotifierProvider.notifier);
-    final hasSaved = ref
-        .read(accountCreateNotifierProvider)
-        .draft
-        .savedExperiences
-        .isNotEmpty;
+    final hasSaved = ref.read(experienceListNotifierProvider).items.isNotEmpty;
 
     // A blank form after at least one position was filed is not an error —
     // there is simply nothing left to send, so move on.
-    if (_isFormEmpty && hasSaved) {
+    if (_form.isEmpty && hasSaved) {
       FocusScope.of(context).unfocus();
       notifier.submitCurrentStep();
       return;
@@ -155,232 +91,28 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: WizardStepLayout(
-        step: ProfileStep.experience,
-        children: [
-          const _CarriedOverCard(),
+    // Loading and updating the saved list fail independently of the wizard's
+    // own save, which the page reports.
+    ref.listen(experienceListNotifierProvider.select((state) => state.error), (
+      previous,
+      next,
+    ) {
+      if (next == null || next == previous) return;
+      AppSnackbar.showError(context, next.message);
+    });
 
-          const _SavedPositions(),
-
-          WizardField(
-            icon: AppIcons.experience,
-            label: 'Total Teaching Experience',
-            child: ListenableBuilder(
-              listenable: Listenable.merge([_totalExperience, _showErrors]),
-              builder: (context, _) => WizardSelectField<String>(
-                hint: 'Select experience',
-                sheetTitle: 'Total teaching experience',
-                value: _totalExperience.value,
-                options: ExperienceRanges.all,
-                labelOf: _identity,
-                errorText: _showErrors.value && _totalExperience.value == null
-                    ? 'Total experience is required'
-                    : null,
-                onSelected: (range) => _totalExperience.value = range,
-              ),
-            ),
-          ),
-
-          WizardField(
-            icon: Icons.work_outline_rounded,
-            label: 'Current Job Title',
-            child: AppTextField(
-              controller: _jobTitleController,
-              hint: 'e.g. Mathematics Teacher',
-              validator: _jobTitleValidator,
-              textCapitalization: TextCapitalization.words,
-            ),
-          ),
-
-          WizardField(
-            icon: Icons.apartment_rounded,
-            label: 'Current Institution',
-            child: AppTextField(
-              controller: _institutionController,
-              hint: 'e.g. Delhi Public School',
-              validator: _institutionValidator,
-              textCapitalization: TextCapitalization.words,
-            ),
-          ),
-
-          WizardField(
-            icon: Icons.notes_rounded,
-            label: 'Experience Details',
-            helpText: 'What you have taught, and to whom.',
-            child: AppTextField(
-              controller: _detailsController,
-              hint: 'Briefly describe your teaching experience',
-              maxLines: 4,
-              maxLength: _detailsLimit,
-              validator: _detailsValidator,
-              textCapitalization: TextCapitalization.sentences,
-              textInputAction: TextInputAction.done,
-            ),
-          ),
-
-          WizardField(
-            icon: Icons.event_outlined,
-            label: 'Start Date',
-            child: ListenableBuilder(
-              listenable: Listenable.merge([_startDate, _showErrors]),
-              builder: (context, _) => WizardDateField(
-                hint: 'Select start date',
-                value: _startDate.value,
-                errorText: _showErrors.value && _startDate.value == null
-                    ? 'Start date is required'
-                    : null,
-                onSelected: (date) => _startDate.value = date,
-              ),
-            ),
-          ),
-
-          ValueListenableBuilder<bool>(
-            valueListenable: _isCurrent,
-            builder: (context, isCurrent, _) => WizardCheckboxTile(
-              label: 'I currently work here',
-              value: isCurrent,
-              onChanged: (value) => _isCurrent.value = value,
-            ),
-          ),
-
-          WizardAddAnotherButton(
-            label: 'Add Another Experience',
-            onPressed: _addAnother,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Positions already posted, listed above the form.
-class _SavedPositions extends ConsumerWidget {
-  const _SavedPositions();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final saved = ref.watch(
-      accountCreateNotifierProvider.select(
-        (state) => state.draft.savedExperiences,
-      ),
-    );
-
-    return SavedEntryList(
-      title: 'Experience added',
-      cards: [
-        for (final experience in saved)
-          SavedEntryCard(
-            icon: AppIcons.experience,
-            title: experience.currentJobTitle,
-            subtitle: experience.currentInstitution,
-            trailingNote: experience.isCurrent ? 'Current' : null,
-          ),
-      ],
-    );
-  }
-}
-
-/// Read-only recap of what About You captured, with a way back to change it.
-class _CarriedOverCard extends ConsumerWidget {
-  const _CarriedOverCard();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Watches only the two lists it renders, so typing elsewhere in the
-    // wizard never rebuilds this card.
-    final subjects = ref.watch(
-      accountCreateNotifierProvider.select(
-        (state) => state.draft.teachingSubjects,
-      ),
-    );
-    final classes = ref.watch(
-      accountCreateNotifierProvider.select(
-        (state) => state.draft.classesTaught,
-      ),
-    );
-
-    return WizardField(
-      icon: Icons.checklist_rounded,
-      label: 'From your profile',
-      helpText: 'Sent with this step. Edit it back in About You.',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SummaryLine(label: 'Subjects', values: subjects),
-          AppSpacing.gapXs,
-          _SummaryLine(label: 'Classes', values: classes),
-          AppSpacing.gapSm,
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () => ref
-                  .read(accountCreateNotifierProvider.notifier)
-                  .goTo(ProfileStep.aboutYou),
-              icon: const Icon(Icons.edit_outlined, size: 16),
-              label: const Text('Edit in About You'),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                visualDensity: VisualDensity.compact,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SummaryLine extends StatelessWidget {
-  const _SummaryLine({required this.label, required this.values});
-
-  final String label;
-  final List<String> values;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isEmpty = values.isEmpty;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return WizardStepLayout(
+      step: ProfileStep.experience,
       children: [
-        SizedBox(
-          width: 68,
-          child: Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        AppSpacing.hGapSm,
-        Expanded(
-          child: Text(
-            isEmpty ? 'None selected yet' : values.join(', '),
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontStyle: isEmpty ? FontStyle.italic : null,
-              color: isEmpty
-                  ? theme.colorScheme.onSurfaceVariant
-                  : theme.colorScheme.onSurface,
-            ),
-          ),
+        const SavedExperienceList(),
+
+        ExperienceFormFields(controller: _form),
+
+        WizardAddAnotherButton(
+          label: 'Add Another Experience',
+          onPressed: _addAnother,
         ),
       ],
     );
   }
 }
-
-// Top-level so the closures passed into fields are stable across rebuilds.
-String _identity(String value) => value;
-
-String? _jobTitleValidator(String? value) =>
-    Validators.required(value, field: 'Job title');
-
-String? _institutionValidator(String? value) =>
-    Validators.required(value, field: 'Institution');
-
-String? _detailsValidator(String? value) =>
-    Validators.required(value, field: 'Experience details');

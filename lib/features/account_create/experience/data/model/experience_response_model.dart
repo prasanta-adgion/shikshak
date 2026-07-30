@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../domain/entities/experience_info.dart';
+
 class ExperienceResponseModel extends Equatable {
   final bool? success;
   final int? code;
@@ -110,6 +112,24 @@ class ExperienceItem extends Equatable {
       updatedAt: json['updatedAt'] as String?,
     );
   }
+
+  /// The row as the edit form takes it. Dates arrive as ISO strings and are
+  /// parsed here, so nothing above this layer has to think about the wire
+  /// format.
+  ExperienceInfo toExperienceInfo() => ExperienceInfo(
+    totalTeachingExperience: totalTeachingExperience,
+    currentJobTitle: currentJobTitle ?? '',
+    currentInstitution: currentInstitution ?? '',
+    experienceDetails: experienceDetails ?? '',
+    isCurrent: isCurrent ?? true,
+    startDate: startDateTime,
+  );
+
+  DateTime? get startDateTime =>
+      startDate == null ? null : DateTime.tryParse(startDate!)?.toLocal();
+
+  DateTime? get endDateTime =>
+      endDate == null ? null : DateTime.tryParse(endDate!)?.toLocal();
 
   Map<String, dynamic> toJson() {
     return {

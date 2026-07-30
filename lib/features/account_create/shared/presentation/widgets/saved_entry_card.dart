@@ -6,23 +6,33 @@ import '../../../../../core/theme/app_spacing.dart';
 
 /// One entry of a repeatable section that has already been saved.
 ///
-/// Read-only on purpose: it is a row on the server by the time it appears
-/// here, and the profile API has no delete.
+/// The row itself only reports: anything acting on the entry goes in
+/// [trailing], e.g. the button that opens an experience row for edit.
 class SavedEntryCard extends StatelessWidget {
   const SavedEntryCard({
     super.key,
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.meta,
     this.trailingNote,
+    this.trailing,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
 
-  /// Small right-aligned annotation, e.g. "Current".
+  /// Third line, smaller than [subtitle] — dates or a total, e.g.
+  /// "3-5 years · Jul 2026 – Present".
+  final String? meta;
+
+  /// Small right-aligned annotation, e.g. "Current". Ignored when [trailing]
+  /// is given.
   final String? trailingNote;
+
+  /// Right-aligned action, e.g. an edit button.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +77,24 @@ class SavedEntryCard extends StatelessWidget {
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
+                if (meta != null) ...[
+                  AppSpacing.gapXs,
+                  Text(
+                    meta!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
-          if (trailingNote != null) ...[
+          if (trailing != null) ...[
+            AppSpacing.hGapSm,
+            trailing!,
+          ] else if (trailingNote != null) ...[
             AppSpacing.hGapSm,
             Container(
               padding: const EdgeInsets.symmetric(

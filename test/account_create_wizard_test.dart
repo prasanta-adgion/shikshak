@@ -1,5 +1,9 @@
 import 'package:Shikshak/core/constants/app_images_const.dart';
 import 'package:Shikshak/core/theme/app_theme.dart';
+import 'package:Shikshak/features/account_create/education/presentation/notifier/education_list_notifier.dart';
+import 'package:Shikshak/features/account_create/education/presentation/providers/education_providers.dart';
+import 'package:Shikshak/features/account_create/experience/presentation/notifier/experience_list_notifier.dart';
+import 'package:Shikshak/features/account_create/experience/presentation/providers/experience_providers.dart';
 import 'package:Shikshak/features/account_create/shared/domain/entities/profile_step.dart';
 import 'package:Shikshak/features/account_create/shared/presentation/notifier/account_create_notifier.dart';
 import 'package:Shikshak/features/account_create/shared/presentation/pages/create_teacher_account_page.dart';
@@ -40,6 +44,18 @@ class _NotifierAtStep extends AccountCreateNotifier {
   AccountCreateState build() => AccountCreateState(step: step);
 }
 
+/// Keeps the wizard offline: steps 3 and 4 read their saved rows back from the
+/// API as soon as they mount, and these tests only care about what they render.
+class _OfflineExperienceList extends ExperienceListNotifier {
+  @override
+  Future<void> load() async {}
+}
+
+class _OfflineEducationList extends EducationListNotifier {
+  @override
+  Future<void> load() async {}
+}
+
 /// The account as it stands after signup — what step 1 shows beside the
 /// avatar.
 class _SeededAuthNotifier extends AuthNotifier {
@@ -76,6 +92,10 @@ void main() {
             () => _NotifierAtStep(step),
           ),
           authStateNotifierProvider.overrideWith(_SeededAuthNotifier.new),
+          experienceListNotifierProvider.overrideWith(
+            _OfflineExperienceList.new,
+          ),
+          educationListNotifierProvider.overrideWith(_OfflineEducationList.new),
         ],
         child: MaterialApp(
           theme: theme ?? AppTheme.light,
@@ -253,7 +273,10 @@ void main() {
 
       // Step 3 is current, so its dot carries the number.
       final number = find.text('3');
-      final dot = find.ancestor(of: number, matching: find.byType(DotIndicator));
+      final dot = find.ancestor(
+        of: number,
+        matching: find.byType(DotIndicator),
+      );
 
       expect(dot, findsOneWidget);
 
@@ -352,14 +375,18 @@ void main() {
   });
 
   group('experience', () {
-    testWidgets('carries subjects over instead of re-asking', (tester) async {
+    testWidgets('asks for the position, not the subjects again', (
+      tester,
+    ) async {
       await setWindow(tester, const Size(390, 844));
       await pumpWizard(tester, ProfileStep.experience);
 
-      // The recap is present, and no subject picker is offered here.
-      expect(find.text('From your profile'), findsOneWidget);
-      expect(find.text('Subjects'), findsOneWidget);
+      expect(find.text('Job Title'), findsOneWidget);
+      expect(find.text('Institution'), findsOneWidget);
+
+      // About You already captured these; they ride along with the payload.
       expect(find.text('Subjects Taught'), findsNothing);
+      expect(find.text('Classes Taught'), findsNothing);
     });
   });
 }
