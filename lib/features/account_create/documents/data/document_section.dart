@@ -2,6 +2,7 @@ import '../../../../core/constants/api_endpoints.dart';
 import '../../shared/domain/entities/profile_section.dart';
 import '../../shared/domain/entities/profile_step.dart';
 import '../../shared/domain/entities/teacher_profile_draft.dart';
+import '../domain/entities/teacher_document.dart';
 
 /// Maps [TeacherDocument] onto the document payload:
 ///
@@ -11,7 +12,8 @@ import '../../shared/domain/entities/teacher_profile_draft.dart';
 ///
 /// Everything but `fileUrl` is derived from the picked file; the URL comes
 /// from the shared upload endpoint.
-class DocumentSection implements ProfileSection, UploadingSection {
+class DocumentSection
+    implements ProfileSection, RepeatableSection, UploadingSection {
   const DocumentSection();
 
   /// Names the payload field the picked document fills.
@@ -35,6 +37,16 @@ class DocumentSection implements ProfileSection, UploadingSection {
       'fileSizeBytes': document.fileSizeBytes,
     };
   }
+
+  /// Nothing to send without a file — the type alone is not a document.
+  @override
+  bool isEntryEmpty(TeacherProfileDraft draft) => !draft.document.hasFile;
+
+  @override
+  TeacherProfileDraft commitEntry(TeacherProfileDraft draft) => draft.copyWith(
+    savedDocuments: [...draft.savedDocuments, draft.document],
+    document: const TeacherDocument(),
+  );
 
   @override
   List<PendingUpload> pendingUploads(TeacherProfileDraft draft) {

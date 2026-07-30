@@ -40,6 +40,9 @@ dependencies:
   # documents, certificates, notes, and any file uploads
   file_picker: ^11.0.2
 
+  # crop image
+  image_cropper: ^12.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

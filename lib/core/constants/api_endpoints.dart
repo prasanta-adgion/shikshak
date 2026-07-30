@@ -14,6 +14,9 @@ abstract final class ApiEndpoints {
   // Files — multipart upload returning the URL the profile payloads carry.
   static const String upload = '/api/v1/user/profile/avatar';
 
+  //upload all images or document
+  static const String uploadFile = '/api/v1/upload/image';
+
   // Teacher account create / update / get
   static const String basicInfo = '/api/v1/user/teacher/profile/basic-info';
   static const String aboutYou = '/api/v1/user/teacher/profile/about-you';

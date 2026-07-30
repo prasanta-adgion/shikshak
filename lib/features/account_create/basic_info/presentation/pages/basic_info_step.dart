@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_cropper/image_cropper.dart';
 
+import '../../../../../core/providers/core_providers.dart';
 import '../../../../../core/utils/validators.dart';
-import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../shared/widgets/app_text_field.dart';
+import '../../../../../shared/widgets/media_source_sheet.dart';
 import '../../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
@@ -112,6 +114,37 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
     notifier.submitCurrentStep();
   }
 
+  /// Camera or gallery, then the cropper — square, because the avatar is.
+  Future<void> _pickPhoto() async {
+    final source = await MediaSourceSheet.show(
+      context,
+      title: 'Profile photo',
+    );
+    if (source == null || !mounted) return;
+
+    final picked = await ref
+        .read(mediaPickerProvider)
+        .pickImage(
+          source: source,
+          crop: true,
+          aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        );
+    if (picked == null || !mounted) return;
+
+    _photoPath.value = picked.path;
+
+    final current = ref.read(accountCreateNotifierProvider).draft.basicInfo;
+    ref
+        .read(accountCreateNotifierProvider.notifier)
+        .setBasicInfo(
+          current.copyWith(
+            localPhotoPath: picked.path,
+            // A new photo has to upload, so the old URL cannot stay.
+            clearProfilePhotoUrl: true,
+          ),
+        );
+  }
+
   String? _validatePostalCode(String? value) {
     final trimmed = (value ?? '').trim();
     if (trimmed.isEmpty) return 'Postal code is required';
@@ -142,12 +175,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
                   name: user?.fullName ?? '',
                   email: user?.email ?? '',
                   phoneNumber: user?.mobileNumber ?? '',
-                  // TODO(picker): needs image_picker. The entity already holds
-                  // a localPhotoPath, uploaded later into profilePhotoUrl.
-                  onTap: () => AppSnackbar.show(
-                    context,
-                    'Photo upload is not connected yet.',
-                  ),
+                  onTap: _pickPhoto,
                 ),
               );
             },

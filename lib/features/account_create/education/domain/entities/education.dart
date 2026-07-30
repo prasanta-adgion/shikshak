@@ -41,13 +41,18 @@ class Education {
     String? certificateFileName,
     String? certificateLocalPath,
     bool? isHighestQualification,
+    bool clearCertificateUrl = false,
   }) => Education(
     degree: degree ?? this.degree,
     specialization: specialization ?? this.specialization,
     universityCollege: universityCollege ?? this.universityCollege,
     yearOfPassing: yearOfPassing ?? this.yearOfPassing,
     marksOrGrade: marksOrGrade ?? this.marksOrGrade,
-    certificateUrl: certificateUrl ?? this.certificateUrl,
+    // A freshly picked certificate has to drop the old URL, or the upload is
+    // skipped and the previous file is sent again.
+    certificateUrl: clearCertificateUrl
+        ? null
+        : certificateUrl ?? this.certificateUrl,
     certificateFileName: certificateFileName ?? this.certificateFileName,
     certificateLocalPath: certificateLocalPath ?? this.certificateLocalPath,
     isHighestQualification:

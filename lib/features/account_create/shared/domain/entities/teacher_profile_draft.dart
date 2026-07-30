@@ -15,6 +15,7 @@ class TeacherProfileDraft {
   final List<Education> savedEducations;
 
   final TeacherDocument document;
+  final List<TeacherDocument> savedDocuments;
 
   List<String> get teachingSubjects => aboutYou.subjectsTaught;
 
@@ -29,6 +30,7 @@ class TeacherProfileDraft {
     this.education = const Education(),
     this.savedEducations = const [],
     this.document = const TeacherDocument(),
+    this.savedDocuments = const [],
   });
 
   TeacherProfileDraft copyWith({
@@ -39,6 +41,7 @@ class TeacherProfileDraft {
     Education? education,
     List<Education>? savedEducations,
     TeacherDocument? document,
+    List<TeacherDocument>? savedDocuments,
   }) => TeacherProfileDraft(
     basicInfo: basicInfo ?? this.basicInfo,
     aboutYou: aboutYou ?? this.aboutYou,
@@ -47,5 +50,6 @@ class TeacherProfileDraft {
     education: education ?? this.education,
     savedEducations: savedEducations ?? this.savedEducations,
     document: document ?? this.document,
+    savedDocuments: savedDocuments ?? this.savedDocuments,
   );
 }
