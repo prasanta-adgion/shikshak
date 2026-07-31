@@ -6,11 +6,9 @@ import '../../domain/repositories/profile_image_repository.dart';
 import '../../domain/usecases/upload_profile_image_usecase.dart';
 
 final profileImageRepositoryProvider = Provider<ProfileImageRepository>(
-  (ref) => ProfileImageRepositoryImpl(ref.watch(apiClientProvider)),
+  (ref) => ProfileImageRepositoryImpl(ref.watch(fileUploaderProvider)),
 );
 
 final uploadProfileImageUseCaseProvider = Provider<UploadProfileImageUseCase>(
-  (ref) => UploadProfileImageUseCase(
-    ref.watch(profileImageRepositoryProvider),
-  ),
+  (ref) => UploadProfileImageUseCase(ref.watch(profileImageRepositoryProvider)),
 );

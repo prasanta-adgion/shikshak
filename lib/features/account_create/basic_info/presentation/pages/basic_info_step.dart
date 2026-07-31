@@ -124,10 +124,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
 
   /// Camera or gallery, then the cropper — square, because the avatar is.
   Future<void> _pickPhoto() async {
-    final source = await MediaSourceSheet.show(
-      context,
-      title: 'Profile photo',
-    );
+    final source = await MediaSourceSheet.show(context, title: 'Profile photo');
     if (source == null || !mounted) return;
 
     final picked = await ref
@@ -148,10 +145,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
     result.fold(
       onSuccess: (url) {
         _photoPath.value = picked.path;
-        final current = ref
-            .read(accountCreateNotifierProvider)
-            .draft
-            .basicInfo;
+        final current = ref.read(accountCreateNotifierProvider).draft.basicInfo;
         ref
             .read(accountCreateNotifierProvider.notifier)
             .setBasicInfo(
@@ -160,6 +154,10 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
                 profilePhotoUrl: url,
               ),
             );
+        AppSnackbar.showSuccess(
+          context,
+          'Profile photo uploaded successfully.',
+        );
       },
       onFailure: (exception) {
         AppSnackbar.showError(context, exception.message);
@@ -192,10 +190,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
               );
 
               return ListenableBuilder(
-                listenable: Listenable.merge([
-                  _photoPath,
-                  _isPhotoUploading,
-                ]),
+                listenable: Listenable.merge([_photoPath, _isPhotoUploading]),
                 builder: (context, _) => ProfilePhotoPicker(
                   photoPath: _photoPath.value,
                   isLoading: _isPhotoUploading.value,
@@ -316,7 +311,8 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
           ),
 
           const WizardInfoNote(
-            message: 'Your information is secure and will be used only to '
+            message:
+                'Your information is secure and will be used only to '
                 'enhance your teaching experience.',
           ),
         ],

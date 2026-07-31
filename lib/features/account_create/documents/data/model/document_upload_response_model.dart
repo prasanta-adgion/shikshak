@@ -29,21 +29,17 @@ class DocumentUploadResponseModel extends Equatable {
 }
 
 class DocumentUploadData extends Equatable {
-  const DocumentUploadData({
-    required this.key,
-    required this.signedUrl,
-    required this.expiresIn,
-  });
+  const DocumentUploadData({required this.signedUrl, this.key, this.expiresIn});
 
-  final String key;
+  final String? key;
   final String signedUrl;
-  final int expiresIn;
+  final int? expiresIn;
 
   factory DocumentUploadData.fromJson(Map<String, dynamic> json) {
     return DocumentUploadData(
-      key: json['key'] as String? ?? '',
+      key: json['key'] as String?,
       signedUrl: json['signedUrl'] as String? ?? '',
-      expiresIn: (json['expiresIn'] as num?)?.toInt() ?? 0,
+      expiresIn: (json['expiresIn'] as num?)?.toInt(),
     );
   }
 

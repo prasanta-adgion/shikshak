@@ -9,7 +9,10 @@ import '../notifier/document_list_notifier.dart';
 import '../state/document_list_state.dart';
 
 final documentRemoteDataSourceProvider = Provider<DocumentRemoteDataSource>(
-  (ref) => DocumentRemoteDataSourceImpl(ref.watch(apiClientProvider)),
+  (ref) => DocumentRemoteDataSourceImpl(
+    client: ref.watch(apiClientProvider),
+    fileUploader: ref.watch(fileUploaderProvider),
+  ),
 );
 
 final documentRepositoryProvider = Provider<DocumentRepository>((ref) {

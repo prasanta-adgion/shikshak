@@ -1,8 +1,10 @@
-import 'package:dio/dio.dart';
+import 'dart:io';
 
 import '../../../../../core/constants/api_endpoints.dart';
 import '../../../../../core/network/api_exception.dart';
 import '../../../../../core/network/api_response.dart';
+import '../../../../../core/network/api_result.dart';
+import '../../../../../core/network/file_uploader/i_file_uploader.dart';
 import '../../../../../core/network/i_api_client.dart';
 import '../model/document_request_model.dart';
 import '../model/document_response_model.dart';
@@ -21,34 +23,38 @@ abstract interface class DocumentRemoteDataSource {
 
 class DocumentRemoteDataSourceImpl implements DocumentRemoteDataSource {
   final IApiClient _client;
-  const DocumentRemoteDataSourceImpl(this._client);
+  final IFileUploader _fileUploader;
+
+  const DocumentRemoteDataSourceImpl({
+    required IApiClient client,
+    required IFileUploader fileUploader,
+  }) : _client = client,
+       _fileUploader = fileUploader;
 
   @override
   Future<DocumentUploadData> upload(String filePath) async {
-    final formData = FormData.fromMap({
-      'files': [
-        await MultipartFile.fromFile(
-          filePath,
-          filename: Uri.file(filePath).pathSegments.last,
-        ),
-      ],
-      'folder': 'teacher-documents',
-    });
-
-    final json = await _client.post<Map<String, dynamic>>(
+    final result = await _fileUploader.upload(
       ApiEndpoints.uploadFile,
-      data: formData,
+      fileField: 'image',
+      files: [File(filePath)],
+      fields: const {'folder': 'teacher-documents'},
     );
+
+    return switch (result) {
+      ApiSuccess(:final data) => _parseUploadResponse(data),
+      ApiFailure(:final exception) => throw exception,
+    };
+  }
+
+  DocumentUploadData _parseUploadResponse(Map<String, dynamic> json) {
     final response = DocumentUploadResponseModel.fromJson(json);
     final data = response.data;
-
     if (!response.success || data == null || data.signedUrl.isEmpty) {
       throw ApiException(
         message: response.message,
         type: ApiExceptionType.server,
       );
     }
-
     return data;
   }
 

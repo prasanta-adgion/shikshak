@@ -1,57 +1,63 @@
-import 'package:dio/dio.dart';
+import 'dart:io';
 
 import '../../../../../core/constants/api_endpoints.dart';
 import '../../../../../core/network/api_exception.dart';
 import '../../../../../core/network/api_response.dart';
 import '../../../../../core/network/api_result.dart';
-import '../../../../../core/network/i_api_client.dart';
+import '../../../../../core/network/file_uploader/i_file_uploader.dart';
 import '../../domain/repositories/profile_image_repository.dart';
 
 class ProfileImageRepositoryImpl implements ProfileImageRepository {
-  const ProfileImageRepositoryImpl(this._client);
+  const ProfileImageRepositoryImpl(this._fileUploader);
 
-  final IApiClient _client;
+  final IFileUploader _fileUploader;
 
   @override
   Future<ApiResult<String>> uploadProfileImage(String filePath) async {
-    try {
-      final formData = FormData.fromMap({
-        'image': await MultipartFile.fromFile(
-          filePath,
-          filename: Uri.file(filePath).pathSegments.last,
-        ),
-      });
-      final json = await _client.post<Map<String, dynamic>>(
-        ApiEndpoints.uploadAvatar,
-        data: formData,
-      );
-      final response = ApiResponse<String>.fromJson(json, _urlFromData);
-      final url = response.data;
+    final result = await _fileUploader.upload(
+      ApiEndpoints.uploadAvatar,
+      fileField: 'image',
+      files: [File(filePath)],
+    );
 
-      if (!response.success || url == null || url.isEmpty) {
-        return ApiResult.failure(
-          ApiException(
-            message: response.message,
-            type: ApiExceptionType.server,
-          ),
-        );
-      }
-
-      return ApiResult.success(url);
-    } on ApiException catch (exception) {
-      return ApiResult.failure(exception);
-    } catch (error) {
-      return ApiResult.failure(ApiException.unexpected(error));
+    switch (result) {
+      case ApiFailure(:final exception):
+        return ApiResult.failure(exception);
+      case ApiSuccess(:final data):
+        final response = ApiResponse<String>.fromJson(data, _urlFromData);
+        final url = response.data;
+        if (!response.success || url == null || url.isEmpty) {
+          return ApiResult.failure(
+            ApiException(
+              message: response.message,
+              type: ApiExceptionType.server,
+            ),
+          );
+        }
+        return ApiResult.success(url);
     }
   }
 
-  static String _urlFromData(Object? data) {
-    if (data is String) return data;
-    if (data is! Map<String, dynamic>) return '';
+  static String _urlFromData(Object? data) => _findUrl(data) ?? '';
 
-    return data['url'] as String? ??
-        data['profilePhotoUrl'] as String? ??
-        data['avatarUrl'] as String? ??
-        '';
+  static String? _findUrl(Object? value) {
+    if (value is String) {
+      final uri = Uri.tryParse(value);
+      return uri != null && uri.hasScheme && uri.host.isNotEmpty ? value : null;
+    }
+    if (value is List) {
+      for (final item in value) {
+        final url = _findUrl(item);
+        if (url != null) return url;
+      }
+      return null;
+    }
+    if (value is Map) {
+      for (final nested in value.values) {
+        final url = _findUrl(nested);
+        if (url != null) return url;
+      }
+    }
+    return null;
   }
 }

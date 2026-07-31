@@ -1,10 +1,12 @@
 import 'package:Shikshak/core/media/i_media_picker.dart';
+import 'package:Shikshak/core/network/file_uploader/i_file_uploader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../flavor/app_flavor.dart';
 import '../media/media_picker.dart';
 import '../network/dio_client.dart';
+import '../network/file_uploader/file_uploader_impl.dart';
 import '../network/i_api_client.dart';
 import '../storage/secure_storage_service.dart';
 
@@ -20,6 +22,10 @@ final secureStorageServiceProvider = Provider<SecureStorageService>((ref) {
 
 /// Photo and document picking, shared by every screen that attaches a file.
 final mediaPickerProvider = Provider<IMediaPicker>((ref) => MediaPickerImpl());
+
+final fileUploaderProvider = Provider<IFileUploader>(
+  (ref) => FileUploaderImpl(ref.watch(apiClientProvider)),
+);
 
 final apiClientProvider = Provider<IApiClient>((ref) {
   final flavor = ref.watch(appFlavorProvider);
