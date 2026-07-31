@@ -17,11 +17,13 @@ class ProfilePhotoPicker extends StatelessWidget {
     required this.email,
     required this.phoneNumber,
     this.photoPath,
+    this.isLoading = false,
     this.size = 76,
   });
 
   /// Local file path of the picked image; `null` shows the placeholder.
   final String? photoPath;
+  final bool isLoading;
   final VoidCallback onTap;
 
   final String name;
@@ -69,7 +71,11 @@ class ProfilePhotoPicker extends StatelessWidget {
             _buildAvatar(context, hasPhoto: hasPhoto),
             AppSpacing.gapSm,
             Text(
-              hasPhoto ? 'Change photo' : 'Add photo',
+              isLoading
+                  ? 'Uploading...'
+                  : hasPhoto
+                  ? 'Change photo'
+                  : 'Add photo',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.primary,
               ),
@@ -87,7 +93,7 @@ class ProfilePhotoPicker extends StatelessWidget {
       button: true,
       label: hasPhoto ? 'Change profile photo' : 'Add profile photo',
       child: GestureDetector(
-        onTap: onTap,
+        onTap: isLoading ? null : onTap,
         child: SizedBox(
           height: size,
           width: size,
@@ -112,6 +118,21 @@ class ProfilePhotoPicker extends StatelessWidget {
                       )
                     : _Placeholder(size: size),
               ),
+              if (isLoading)
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface.withValues(alpha: 0.72),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: SizedBox.square(
+                        dimension: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
                 right: 0,
                 bottom: AppSpacing.xs,

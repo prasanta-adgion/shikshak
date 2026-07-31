@@ -53,6 +53,10 @@ class _DocumentsStepState extends ConsumerState<DocumentsStep>
   /// Validates the form and stages it on the draft, ready to be posted.
   bool _stageEntry() {
     FocusScope.of(context).unfocus();
+    if (_form.isUploading.value) {
+      AppSnackbar.show(context, 'Please wait for the document upload.');
+      return false;
+    }
     if (!_form.validate()) {
       // The type has its own inline error; a missing file has nowhere to show
       // one, so it is called out instead.

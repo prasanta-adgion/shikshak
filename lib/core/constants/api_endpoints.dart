@@ -4,6 +4,7 @@ abstract final class ApiEndpoints {
   static const String register = 'api/v1/auth/signup/request-otp';
   static const String otpVerify = 'api/v1/auth/signup/verify-otp';
   static const String resendOtp = 'api/v1/auth/signup/resend-otp';
+  static const String refreshTokenGenerate = 'api/v1/auth/refresh-token';
 
   static const String requestPasswordResetOtp =
       'api/v1/auth/password/request-otp';
@@ -12,7 +13,7 @@ abstract final class ApiEndpoints {
   static const String resetPassword = 'api/v1/auth/password/reset';
 
   // Files — multipart upload returning the URL the profile payloads carry.
-  static const String upload = '/api/v1/user/profile/avatar';
+  static const String uploadAvatar = '/api/v1/user/profile/avatar';
 
   //upload all images or document
   static const String uploadFile = '/api/v1/upload/image';

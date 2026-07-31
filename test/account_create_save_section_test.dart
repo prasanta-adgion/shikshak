@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:Shikshak/core/constants/api_endpoints.dart';
 import 'package:Shikshak/core/network/api_exception.dart';
 import 'package:Shikshak/core/network/api_result.dart';
-import 'package:Shikshak/core/network/file_uploader.dart';
 import 'package:Shikshak/features/account_create/about_you/data/about_you_section.dart';
 import 'package:Shikshak/features/account_create/about_you/domain/entities/about_you.dart';
 import 'package:Shikshak/features/account_create/basic_info/data/basic_info_section.dart';
@@ -37,26 +36,8 @@ class _RecordingRepository implements ProfileSectionRepository {
   }
 }
 
-class _StubUploader implements FileUploader {
-  _StubUploader({this.failWith});
-
-  static const String url = 'https://cdn.example.com/photo.jpg';
-
-  final ApiException? failWith;
-  final List<String> uploaded = [];
-
-  @override
-  Future<ApiResult<String>> upload(String localPath) async {
-    uploaded.add(localPath);
-    final failure = failWith;
-    if (failure != null) return ApiResult.failure(failure);
-    return const ApiResult.success(url);
-  }
-}
-
 void main() {
   late _RecordingRepository repository;
-  late _StubUploader uploader;
 
   SaveProfileSectionUseCase buildUseCase() => SaveProfileSectionUseCase(
     sections: const {
@@ -66,7 +47,6 @@ void main() {
       ProfileStep.education: EducationSection(),
     },
     repository: repository,
-    uploader: uploader,
   );
 
   TeacherProfileDraft draftWithBio(String bio) =>
@@ -74,7 +54,6 @@ void main() {
 
   setUp(() {
     repository = _RecordingRepository();
-    uploader = _StubUploader();
   });
 
   group('save decision', () {
@@ -103,7 +82,8 @@ void main() {
         draft: draft,
         lastSavedBody: null,
       );
-      final savedBody = (first as ApiSuccess<SectionSaveOutcome>).data.savedBody;
+      final savedBody =
+          (first as ApiSuccess<SectionSaveOutcome>).data.savedBody;
 
       final second = await useCase.call(
         step: ProfileStep.aboutYou,
@@ -113,7 +93,10 @@ void main() {
 
       // Still just the first call.
       expect(repository.calls, hasLength(1));
-      expect((second as ApiSuccess<SectionSaveOutcome>).data.wasSkipped, isTrue);
+      expect(
+        (second as ApiSuccess<SectionSaveOutcome>).data.wasSkipped,
+        isTrue,
+      );
     });
 
     test('updates with PATCH when the body has changed', () async {
@@ -124,7 +107,8 @@ void main() {
         draft: draftWithBio('Maths teacher'),
         lastSavedBody: null,
       );
-      final savedBody = (first as ApiSuccess<SectionSaveOutcome>).data.savedBody;
+      final savedBody =
+          (first as ApiSuccess<SectionSaveOutcome>).data.savedBody;
 
       await useCase.call(
         step: ProfileStep.aboutYou,
@@ -217,10 +201,7 @@ void main() {
       // The form is cleared for the next position...
       expect(afterFirst.draft.experience.currentJobTitle, isEmpty);
       // ...but the profile-level answer rides along.
-      expect(
-        afterFirst.draft.experience.totalTeachingExperience,
-        '5-7 years',
-      );
+      expect(afterFirst.draft.experience.totalTeachingExperience, '5-7 years');
 
       // A second entry creates another row — never a PATCH of the first.
       final second = await useCase.call(
@@ -253,7 +234,10 @@ void main() {
       );
 
       expect(repository.calls, isEmpty);
-      expect((result as ApiSuccess<SectionSaveOutcome>).data.wasSkipped, isTrue);
+      expect(
+        (result as ApiSuccess<SectionSaveOutcome>).data.wasSkipped,
+        isTrue,
+      );
     });
 
     test('files each qualification with its own POST', () async {
@@ -327,62 +311,6 @@ void main() {
       final body = repository.calls.single.body;
       expect(body['city'], 'New Delhi');
       expect(body['postalCode'], '110016');
-    });
-  });
-
-  group('uploads', () {
-    test('uploads a picked photo and sends back its URL', () async {
-      final result = await buildUseCase().call(
-        step: ProfileStep.basicInfo,
-        draft: const TeacherProfileDraft(
-          basicInfo: BasicInfo(localPhotoPath: '/tmp/avatar.jpg'),
-        ),
-        lastSavedBody: null,
-      );
-
-      expect(uploader.uploaded, ['/tmp/avatar.jpg']);
-      expect(
-        repository.calls.single.body['profilePhotoUrl'],
-        'https://cdn.example.com/photo.jpg',
-      );
-      // The URL is written back so a later PATCH does not re-upload.
-      final outcome = (result as ApiSuccess<SectionSaveOutcome>).data;
-      expect(outcome.draft.basicInfo.profilePhotoUrl, isNotNull);
-    });
-
-    test('does not send the section when the upload fails', () async {
-      uploader = _StubUploader(
-        failWith: const ApiException(
-          message: 'No internet connection. Check your network and retry.',
-          type: ApiExceptionType.network,
-        ),
-      );
-
-      final result = await buildUseCase().call(
-        step: ProfileStep.basicInfo,
-        draft: const TeacherProfileDraft(
-          basicInfo: BasicInfo(localPhotoPath: '/tmp/avatar.jpg'),
-        ),
-        lastSavedBody: null,
-      );
-
-      expect(result, isA<ApiFailure<SectionSaveOutcome>>());
-      expect(repository.calls, isEmpty);
-    });
-
-    test('skips the upload once a URL already exists', () async {
-      await buildUseCase().call(
-        step: ProfileStep.basicInfo,
-        draft: const TeacherProfileDraft(
-          basicInfo: BasicInfo(
-            localPhotoPath: '/tmp/avatar.jpg',
-            profilePhotoUrl: 'https://cdn.example.com/existing.jpg',
-          ),
-        ),
-        lastSavedBody: null,
-      );
-
-      expect(uploader.uploaded, isEmpty);
     });
   });
 

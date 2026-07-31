@@ -5,9 +5,11 @@ import 'package:image_cropper/image_cropper.dart';
 
 import '../../../../../core/providers/core_providers.dart';
 import '../../../../../core/utils/validators.dart';
+import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../shared/widgets/app_text_field.dart';
 import '../../../../../shared/widgets/media_source_sheet.dart';
 import '../../../../auth/presentation/providers_di/auth_providers.dart';
+import '../../../about_you/presentation/providers/about_you_providers.dart';
 import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
@@ -43,6 +45,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
   final _gender = ValueNotifier<Gender?>(null);
   final _dateOfBirth = ValueNotifier<DateTime?>(null);
   final _photoPath = ValueNotifier<String?>(null);
+  final _isPhotoUploading = ValueNotifier<bool>(false);
 
   /// Flipped on the first submit, so the pickers only show their errors after
   /// a real attempt — matching how the text fields behave.
@@ -82,6 +85,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
     _gender.dispose();
     _dateOfBirth.dispose();
     _photoPath.dispose();
+    _isPhotoUploading.dispose();
     _showErrors.dispose();
     super.dispose();
   }
@@ -89,6 +93,10 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
   @override
   void submitStep() {
     FocusScope.of(context).unfocus();
+    if (_isPhotoUploading.value) {
+      AppSnackbar.show(context, 'Please wait for the profile photo upload.');
+      return;
+    }
     _showErrors.value = true;
 
     final formValid = _formKey.currentState?.validate() ?? false;
@@ -116,10 +124,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
 
   /// Camera or gallery, then the cropper — square, because the avatar is.
   Future<void> _pickPhoto() async {
-    final source = await MediaSourceSheet.show(
-      context,
-      title: 'Profile photo',
-    );
+    final source = await MediaSourceSheet.show(context, title: 'Profile photo');
     if (source == null || !mounted) return;
 
     final picked = await ref
@@ -131,18 +136,34 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
         );
     if (picked == null || !mounted) return;
 
-    _photoPath.value = picked.path;
+    _isPhotoUploading.value = true;
+    final result = await ref
+        .read(uploadProfileImageUseCaseProvider)
+        .call(picked.path);
+    if (!mounted) return;
 
-    final current = ref.read(accountCreateNotifierProvider).draft.basicInfo;
-    ref
-        .read(accountCreateNotifierProvider.notifier)
-        .setBasicInfo(
-          current.copyWith(
-            localPhotoPath: picked.path,
-            // A new photo has to upload, so the old URL cannot stay.
-            clearProfilePhotoUrl: true,
-          ),
+    result.fold(
+      onSuccess: (url) {
+        _photoPath.value = picked.path;
+        final current = ref.read(accountCreateNotifierProvider).draft.basicInfo;
+        ref
+            .read(accountCreateNotifierProvider.notifier)
+            .setBasicInfo(
+              current.copyWith(
+                localPhotoPath: picked.path,
+                profilePhotoUrl: url,
+              ),
+            );
+        AppSnackbar.showSuccess(
+          context,
+          'Profile photo uploaded successfully.',
         );
+      },
+      onFailure: (exception) {
+        AppSnackbar.showError(context, exception.message);
+      },
+    );
+    _isPhotoUploading.value = false;
   }
 
   String? _validatePostalCode(String? value) {
@@ -168,10 +189,11 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
                 authStateNotifierProvider.select((state) => state.user),
               );
 
-              return ValueListenableBuilder<String?>(
-                valueListenable: _photoPath,
-                builder: (context, path, _) => ProfilePhotoPicker(
-                  photoPath: path,
+              return ListenableBuilder(
+                listenable: Listenable.merge([_photoPath, _isPhotoUploading]),
+                builder: (context, _) => ProfilePhotoPicker(
+                  photoPath: _photoPath.value,
+                  isLoading: _isPhotoUploading.value,
                   name: user?.fullName ?? '',
                   email: user?.email ?? '',
                   phoneNumber: user?.mobileNumber ?? '',
@@ -289,7 +311,8 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
           ),
 
           const WizardInfoNote(
-            message: 'Your information is secure and will be used only to '
+            message:
+                'Your information is secure and will be used only to '
                 'enhance your teaching experience.',
           ),
         ],

@@ -10,7 +10,8 @@ class DocumentFormController {
       fileName = ValueNotifier<String?>(initial?.fileName),
       localFilePath = ValueNotifier<String?>(initial?.localFilePath),
       mimeType = ValueNotifier<String?>(initial?.mimeType),
-      fileSizeBytes = ValueNotifier<int?>(initial?.fileSizeBytes);
+      fileSizeBytes = ValueNotifier<int?>(initial?.fileSizeBytes),
+      isUploading = ValueNotifier<bool>(false);
 
   final formKey = GlobalKey<FormState>();
 
@@ -23,15 +24,14 @@ class DocumentFormController {
   final ValueNotifier<String?> localFilePath;
   final ValueNotifier<String?> mimeType;
   final ValueNotifier<int?> fileSizeBytes;
+  final ValueNotifier<bool> isUploading;
 
   /// The type select has no validator of its own, so its error stays hidden
   /// until the first submit.
   final showErrors = ValueNotifier<bool>(false);
 
   /// True once there is something to send — a stored URL or a picked file.
-  bool get hasFile =>
-      (fileName.value?.isNotEmpty ?? false) ||
-      (fileUrl.value?.isNotEmpty ?? false);
+  bool get hasFile => fileUrl.value?.isNotEmpty ?? false;
 
   /// True when nothing has been chosen — the teacher has filed what they
   /// wanted and left the form blank.
@@ -52,6 +52,10 @@ class DocumentFormController {
     mimeType.value = media.mimeType;
     fileSizeBytes.value = media.sizeBytes;
     fileUrl.value = null;
+  }
+
+  void setUploadedUrl(String url) {
+    fileUrl.value = url;
   }
 
   void removeFile() {
@@ -95,6 +99,7 @@ class DocumentFormController {
     localFilePath.dispose();
     mimeType.dispose();
     fileSizeBytes.dispose();
+    isUploading.dispose();
     showErrors.dispose();
   }
 }
