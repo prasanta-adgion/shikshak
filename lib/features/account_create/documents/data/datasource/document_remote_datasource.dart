@@ -1,12 +1,17 @@
+import 'package:dio/dio.dart';
+
 import '../../../../../core/constants/api_endpoints.dart';
 import '../../../../../core/network/api_exception.dart';
 import '../../../../../core/network/api_response.dart';
 import '../../../../../core/network/i_api_client.dart';
 import '../model/document_request_model.dart';
 import '../model/document_response_model.dart';
+import '../model/document_upload_response_model.dart';
 
 abstract interface class DocumentRemoteDataSource {
   Future<List<DocumentItem>> fetchAll();
+
+  Future<DocumentUploadData> upload(String filePath);
 
   Future<void> update({
     required String id,
@@ -17,6 +22,35 @@ abstract interface class DocumentRemoteDataSource {
 class DocumentRemoteDataSourceImpl implements DocumentRemoteDataSource {
   final IApiClient _client;
   const DocumentRemoteDataSourceImpl(this._client);
+
+  @override
+  Future<DocumentUploadData> upload(String filePath) async {
+    final formData = FormData.fromMap({
+      'files': [
+        await MultipartFile.fromFile(
+          filePath,
+          filename: Uri.file(filePath).pathSegments.last,
+        ),
+      ],
+      'folder': 'teacher-documents',
+    });
+
+    final json = await _client.post<Map<String, dynamic>>(
+      ApiEndpoints.uploadFile,
+      data: formData,
+    );
+    final response = DocumentUploadResponseModel.fromJson(json);
+    final data = response.data;
+
+    if (!response.success || data == null || data.signedUrl.isEmpty) {
+      throw ApiException(
+        message: response.message,
+        type: ApiExceptionType.server,
+      );
+    }
+
+    return data;
+  }
 
   @override
   Future<List<DocumentItem>> fetchAll() async {

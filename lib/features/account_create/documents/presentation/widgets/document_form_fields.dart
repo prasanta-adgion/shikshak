@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/providers/core_providers.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../shared/presentation/widgets/file_upload_tile.dart';
 import '../../../shared/presentation/widgets/wizard_field.dart';
 import '../../../shared/presentation/widgets/wizard_info_note.dart';
 import '../../../shared/presentation/widgets/wizard_select_field.dart';
 import '../../domain/entities/teacher_document.dart';
 import '../controller/document_form_controller.dart';
+import '../providers/document_providers.dart';
 
 /// The document form, shared by the step and the edit sheet.
 class DocumentFormFields extends StatelessWidget {
@@ -76,11 +78,29 @@ class _DocumentFileField extends ConsumerWidget {
 
   final DocumentFormController controller;
 
-  Future<void> _pick(WidgetRef ref) async {
+  Future<void> _pick(BuildContext context, WidgetRef ref) async {
     final picked = await ref.read(mediaPickerProvider).pickDocument();
     if (picked == null) return;
 
     controller.attach(picked);
+    controller.isUploading.value = true;
+
+    final result = await ref
+        .read(uploadDocumentUseCaseProvider)
+        .call(picked.path);
+    if (!context.mounted) return;
+
+    result.fold(
+      onSuccess: (upload) {
+        controller.setUploadedUrl(upload.signedUrl);
+        AppSnackbar.showSuccess(context, 'Document uploaded successfully.');
+      },
+      onFailure: (exception) {
+        controller.removeFile();
+        AppSnackbar.showError(context, exception.message);
+      },
+    );
+    controller.isUploading.value = false;
   }
 
   @override
@@ -91,6 +111,7 @@ class _DocumentFileField extends ConsumerWidget {
         controller.fileName,
         controller.fileUrl,
         controller.fileSizeBytes,
+        controller.isUploading,
         controller.showErrors,
       ]),
       builder: (context, _) {
@@ -103,8 +124,10 @@ class _DocumentFileField extends ConsumerWidget {
           title: controller.documentType.value?.label ?? 'Document',
           hint: 'Choose a file',
           fileName: name,
-          detail: _detailLine(controller),
-          onUpload: () => _pick(ref),
+          detail: controller.isUploading.value
+              ? 'Uploading...'
+              : _detailLine(controller),
+          onUpload: () => _pick(context, ref),
           onRemove: controller.removeFile,
         );
       },

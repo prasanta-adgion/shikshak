@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:Shikshak/core/constants/api_endpoints.dart';
 import 'package:Shikshak/core/network/api_exception.dart';
 import 'package:Shikshak/core/network/api_result.dart';
-import 'package:Shikshak/core/network/file_uploader.dart';
+import 'package:Shikshak/core/network/file_uploader/file_uploader_impl.dart';
 import 'package:Shikshak/features/account_create/about_you/data/about_you_section.dart';
 import 'package:Shikshak/features/account_create/about_you/domain/entities/about_you.dart';
 import 'package:Shikshak/features/account_create/basic_info/data/basic_info_section.dart';
@@ -46,8 +47,13 @@ class _StubUploader implements FileUploader {
   final List<String> uploaded = [];
 
   @override
-  Future<ApiResult<String>> upload(String localPath) async {
-    uploaded.add(localPath);
+  Future<ApiResult<String>> upload(
+    String endpoint, {
+    required String fileField,
+    required List<File> files,
+    Map<String, String>? fields,
+  }) async {
+    uploaded.addAll(files.map((file) => file.path));
     final failure = failWith;
     if (failure != null) return ApiResult.failure(failure);
     return const ApiResult.success(url);
@@ -103,7 +109,8 @@ void main() {
         draft: draft,
         lastSavedBody: null,
       );
-      final savedBody = (first as ApiSuccess<SectionSaveOutcome>).data.savedBody;
+      final savedBody =
+          (first as ApiSuccess<SectionSaveOutcome>).data.savedBody;
 
       final second = await useCase.call(
         step: ProfileStep.aboutYou,
@@ -113,7 +120,10 @@ void main() {
 
       // Still just the first call.
       expect(repository.calls, hasLength(1));
-      expect((second as ApiSuccess<SectionSaveOutcome>).data.wasSkipped, isTrue);
+      expect(
+        (second as ApiSuccess<SectionSaveOutcome>).data.wasSkipped,
+        isTrue,
+      );
     });
 
     test('updates with PATCH when the body has changed', () async {
@@ -124,7 +134,8 @@ void main() {
         draft: draftWithBio('Maths teacher'),
         lastSavedBody: null,
       );
-      final savedBody = (first as ApiSuccess<SectionSaveOutcome>).data.savedBody;
+      final savedBody =
+          (first as ApiSuccess<SectionSaveOutcome>).data.savedBody;
 
       await useCase.call(
         step: ProfileStep.aboutYou,
@@ -217,10 +228,7 @@ void main() {
       // The form is cleared for the next position...
       expect(afterFirst.draft.experience.currentJobTitle, isEmpty);
       // ...but the profile-level answer rides along.
-      expect(
-        afterFirst.draft.experience.totalTeachingExperience,
-        '5-7 years',
-      );
+      expect(afterFirst.draft.experience.totalTeachingExperience, '5-7 years');
 
       // A second entry creates another row — never a PATCH of the first.
       final second = await useCase.call(
@@ -253,7 +261,10 @@ void main() {
       );
 
       expect(repository.calls, isEmpty);
-      expect((result as ApiSuccess<SectionSaveOutcome>).data.wasSkipped, isTrue);
+      expect(
+        (result as ApiSuccess<SectionSaveOutcome>).data.wasSkipped,
+        isTrue,
+      );
     });
 
     test('files each qualification with its own POST', () async {

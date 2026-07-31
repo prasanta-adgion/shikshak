@@ -18,6 +18,10 @@ final documentRepositoryProvider = Provider<DocumentRepository>((ref) {
   );
 });
 
+final uploadDocumentUseCaseProvider = Provider<UploadDocumentUseCase>(
+  (ref) => UploadDocumentUseCase(ref.watch(documentRepositoryProvider)),
+);
+
 final getDocumentsUseCaseProvider = Provider<GetDocumentsUseCase>(
   (ref) => GetDocumentsUseCase(ref.watch(documentRepositoryProvider)),
 );

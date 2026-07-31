@@ -45,7 +45,6 @@ final saveProfileSectionUseCaseProvider = Provider<SaveProfileSectionUseCase>((
   return SaveProfileSectionUseCase(
     sections: ref.watch(profileSectionsProvider),
     repository: ref.watch(profileSectionRepositoryProvider),
-    uploader: ref.watch(fileUploaderProvider),
   );
 });
 

@@ -21,7 +21,7 @@ class TeacherDocument {
   final String? mimeType;
   final int? fileSizeBytes;
 
-  bool get hasFile => fileName != null;
+  bool get hasFile => fileUrl?.isNotEmpty ?? false;
 
   /// `1.2 MB` — for display only; the payload carries raw bytes.
   String get readableSize {

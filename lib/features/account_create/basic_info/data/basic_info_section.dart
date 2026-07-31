@@ -10,11 +10,8 @@ import '../../shared/domain/entities/teacher_profile_draft.dart';
 /// { "profilePhotoUrl", "gender", "dateOfBirth", "addressLine1",
 ///   "addressLine2", "city", "state", "country", "postalCode" }
 /// ```
-class BasicInfoSection implements ProfileSection, UploadingSection {
+class BasicInfoSection implements ProfileSection {
   const BasicInfoSection();
-
-  /// Names the payload field the picked avatar fills.
-  static const String photoField = 'profilePhotoUrl';
 
   @override
   ProfileStep get step => ProfileStep.basicInfo;
@@ -41,29 +38,4 @@ class BasicInfoSection implements ProfileSection, UploadingSection {
     };
   }
 
-  @override
-  List<PendingUpload> pendingUploads(TeacherProfileDraft draft) {
-    final localPath = draft.basicInfo.localPhotoPath;
-    // Nothing to do once the photo already has a URL, or none was picked.
-    if (localPath == null ||
-        localPath.isEmpty ||
-        draft.basicInfo.profilePhotoUrl != null) {
-      return const [];
-    }
-
-    return [PendingUpload(field: photoField, localPath: localPath)];
-  }
-
-  @override
-  TeacherProfileDraft withUploadedUrls(
-    TeacherProfileDraft draft,
-    Map<String, String> urls,
-  ) {
-    final url = urls[photoField];
-    if (url == null) return draft;
-
-    return draft.copyWith(
-      basicInfo: draft.basicInfo.copyWith(profilePhotoUrl: url),
-    );
-  }
 }
