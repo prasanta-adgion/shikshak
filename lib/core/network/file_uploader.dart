@@ -13,7 +13,7 @@ import 'i_api_client.dart';
 /// on it.
 abstract interface class FileUploader {
   /// Uploads the file at [localPath], resolving to its remote URL.
-  Future<ApiResult<String>> upload(String localPath);
+  Future<ApiResult<String>> upload(String localPath, {String? folder});
 }
 
 class FileUploaderImpl implements FileUploader {
@@ -22,22 +22,26 @@ class FileUploaderImpl implements FileUploader {
   final IApiClient _client;
 
   @override
-  Future<ApiResult<String>> upload(String localPath) async {
+  Future<ApiResult<String>> upload(String localPath, {String? folder}) async {
     try {
-      final formData = FormData.fromMap({
-        // Dio derives the filename from the path.
-        'file': await MultipartFile.fromFile(localPath),
-      });
+      final isFolderUpload = folder != null && folder.isNotEmpty;
+      final formData = isFolderUpload
+          ? FormData.fromMap({
+              // The upload API accepts a list, even with one document.
+              'files': [await MultipartFile.fromFile(localPath)],
+              'folder': folder,
+            })
+          : FormData.fromMap({'file': await MultipartFile.fromFile(localPath)});
 
       final json = await _client.post<Map<String, dynamic>>(
-        ApiEndpoints.upload,
+        isFolderUpload ? ApiEndpoints.uploadFile : ApiEndpoints.uploadAvatar,
         data: formData,
       );
 
-      final response = ApiResponse<String>.fromJson(
-        json,
-        (data) => (data! as Map<String, dynamic>)['url'] as String,
-      );
+      final response = ApiResponse<String>.fromJson(json, (data) {
+        final values = data! as Map<String, dynamic>;
+        return values[isFolderUpload ? 'signedUrl' : 'url'] as String;
+      });
       final url = response.data;
 
       if (!response.success || url == null || url.isEmpty) {

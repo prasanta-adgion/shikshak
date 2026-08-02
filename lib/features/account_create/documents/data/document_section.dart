@@ -59,7 +59,13 @@ class DocumentSection
       return const [];
     }
 
-    return [PendingUpload(field: fileField, localPath: localPath)];
+    return [
+      PendingUpload(
+        field: fileField,
+        localPath: localPath,
+        folder: 'teacher-documents',
+      ),
+    ];
   }
 
   @override

@@ -160,7 +160,10 @@ class SaveProfileSectionUseCase {
     final urls = <String, String>{};
 
     for (final upload in pending) {
-      final result = await _uploader.upload(upload.localPath);
+      final result = await _uploader.upload(
+        upload.localPath,
+        folder: upload.folder,
+      );
       switch (result) {
         case ApiSuccess(:final data):
           urls[upload.field] = data;

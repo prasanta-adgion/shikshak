@@ -8,6 +8,8 @@ import 'package:Shikshak/features/account_create/about_you/data/about_you_sectio
 import 'package:Shikshak/features/account_create/about_you/domain/entities/about_you.dart';
 import 'package:Shikshak/features/account_create/basic_info/data/basic_info_section.dart';
 import 'package:Shikshak/features/account_create/basic_info/domain/entities/basic_info.dart';
+import 'package:Shikshak/features/account_create/documents/data/document_section.dart';
+import 'package:Shikshak/features/account_create/documents/domain/entities/teacher_document.dart';
 import 'package:Shikshak/features/account_create/education/data/education_section.dart';
 import 'package:Shikshak/features/account_create/education/domain/entities/education.dart';
 import 'package:Shikshak/features/account_create/experience/data/experience_section.dart';
@@ -44,10 +46,12 @@ class _StubUploader implements FileUploader {
 
   final ApiException? failWith;
   final List<String> uploaded = [];
+  final List<String?> folders = [];
 
   @override
-  Future<ApiResult<String>> upload(String localPath) async {
+  Future<ApiResult<String>> upload(String localPath, {String? folder}) async {
     uploaded.add(localPath);
+    folders.add(folder);
     final failure = failWith;
     if (failure != null) return ApiResult.failure(failure);
     return const ApiResult.success(url);
@@ -64,6 +68,7 @@ void main() {
       ProfileStep.basicInfo: BasicInfoSection(),
       ProfileStep.experience: ExperienceSection(),
       ProfileStep.education: EducationSection(),
+      ProfileStep.documents: DocumentSection(),
     },
     repository: repository,
     uploader: uploader,
@@ -383,6 +388,34 @@ void main() {
       );
 
       expect(uploader.uploaded, isEmpty);
+    });
+
+    test('uploads a document before posting its metadata', () async {
+      await buildUseCase().call(
+        step: ProfileStep.documents,
+        draft: const TeacherProfileDraft(
+          document: TeacherDocument(
+            documentType: DocumentType.resume,
+            fileName: 'resume.pdf',
+            localFilePath: '/tmp/resume.pdf',
+            mimeType: 'application/pdf',
+            fileSizeBytes: 123456,
+          ),
+        ),
+        lastSavedBody: null,
+      );
+
+      expect(uploader.uploaded, ['/tmp/resume.pdf']);
+      expect(uploader.folders, ['teacher-documents']);
+      expect(repository.calls.single.path, ApiEndpoints.documents);
+      expect(repository.calls.single.isUpdate, isFalse);
+      expect(repository.calls.single.body, {
+        'documentType': 'resume',
+        'fileName': 'resume.pdf',
+        'fileUrl': _StubUploader.url,
+        'mimeType': 'application/pdf',
+        'fileSizeBytes': 123456,
+      });
     });
   });
 

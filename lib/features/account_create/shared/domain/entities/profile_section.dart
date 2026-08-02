@@ -34,10 +34,17 @@ abstract interface class UploadingSection {
 
 /// A local file waiting to become a URL.
 class PendingUpload {
-  const PendingUpload({required this.field, required this.localPath});
+  const PendingUpload({
+    required this.field,
+    required this.localPath,
+    this.folder,
+  });
 
   /// Names the payload field this upload fills, e.g. `profilePhotoUrl`.
   final String field;
 
   final String localPath;
+
+  /// Included for uploads that the server groups into a named folder.
+  final String? folder;
 }

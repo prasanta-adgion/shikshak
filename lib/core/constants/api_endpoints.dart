@@ -12,7 +12,7 @@ abstract final class ApiEndpoints {
   static const String resetPassword = 'api/v1/auth/password/reset';
 
   // Files — multipart upload returning the URL the profile payloads carry.
-  static const String upload = '/api/v1/user/profile/avatar';
+  static const String uploadAvatar = '/api/v1/user/profile/avatar';
 
   //upload all images or document
   static const String uploadFile = '/api/v1/upload/image';
