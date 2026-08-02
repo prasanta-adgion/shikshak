@@ -38,11 +38,15 @@ class EducationFormController {
   final ValueNotifier<int?> yearOfPassing;
   final ValueNotifier<bool> isHighest;
 
-  /// Remote URL of a certificate already stored, and the two fields that
-  /// describe one picked on the device but not yet uploaded.
+  /// Remote URL of the certificate, and the two fields describing the file
+  /// picked on the device. The picker uploads straight away, so the URL is set
+  /// moments after the other two.
   final ValueNotifier<String?> certificateUrl;
   final ValueNotifier<String?> certificateFileName;
   final ValueNotifier<String?> certificateLocalPath;
+
+  /// True while that upload is in flight.
+  final isUploading = ValueNotifier<bool>(false);
 
   /// The select fields have no validator of their own, so their errors stay
   /// hidden until the first submit.
@@ -113,6 +117,7 @@ class EducationFormController {
     certificateUrl.dispose();
     certificateFileName.dispose();
     certificateLocalPath.dispose();
+    isUploading.dispose();
     showErrors.dispose();
   }
 }

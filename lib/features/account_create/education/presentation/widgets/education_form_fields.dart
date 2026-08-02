@@ -4,8 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/providers/core_providers.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/utils/file_url.dart';
 import '../../../../../core/utils/validators.dart';
+import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../shared/widgets/app_text_field.dart';
+import '../../../shared/domain/repositories/file_upload_repository.dart';
+import '../../../shared/presentation/providers/account_create_providers.dart';
 import '../../../shared/presentation/widgets/file_upload_tile.dart';
 import '../../../shared/presentation/widgets/wizard_checkbox_tile.dart';
 import '../../../shared/presentation/widgets/wizard_field.dart';
@@ -139,15 +143,38 @@ class _CertificateField extends ConsumerWidget {
 
   final EducationFormController controller;
 
-  Future<void> _pick(WidgetRef ref) async {
+  /// Picks the certificate and uploads it straight away. Only the resulting
+  /// URL is sent with the qualification, so the file has to be up before the
+  /// row is saved.
+  Future<void> _pick(BuildContext context, WidgetRef ref) async {
     final picked = await ref.read(mediaPickerProvider).pickDocument();
-    if (picked == null) return;
+    // The sheet this field lives in can be closed while the picker is open,
+    // and its controller is disposed with it.
+    if (picked == null || !context.mounted) return;
 
     controller.certificateFileName.value = picked.name;
     controller.certificateLocalPath.value = picked.path;
-    // Replacing the file drops the stored URL, so the new one uploads
-    // instead of the old one being sent again.
+    // Replacing the file drops the stored URL, so the old one cannot be sent
+    // again if this upload fails.
     controller.certificateUrl.value = null;
+    controller.isUploading.value = true;
+
+    final result = await ref
+        .read(uploadFileUseCaseProvider)
+        .call(filePath: picked.path, folder: UploadFolders.documents);
+    if (!context.mounted) return;
+
+    result.fold(
+      onSuccess: (url) {
+        controller.certificateUrl.value = url;
+        AppSnackbar.showSuccess(context, 'Certificate uploaded successfully.');
+      },
+      onFailure: (exception) {
+        _remove();
+        AppSnackbar.showError(context, exception.message);
+      },
+    );
+    controller.isUploading.value = false;
   }
 
   void _remove() {
@@ -162,6 +189,7 @@ class _CertificateField extends ConsumerWidget {
       listenable: Listenable.merge([
         controller.certificateFileName,
         controller.certificateUrl,
+        controller.isUploading,
       ]),
       builder: (context, _) => FileUploadTile(
         title: 'Degree certificate',
@@ -171,22 +199,13 @@ class _CertificateField extends ConsumerWidget {
         // the file the URL points at.
         fileName:
             controller.certificateFileName.value ??
-            _nameFromUrl(controller.certificateUrl.value),
-        onUpload: () => _pick(ref),
+            fileNameFromUrl(controller.certificateUrl.value),
+        detail: controller.isUploading.value ? 'Uploading...' : null,
+        onUpload: () => _pick(context, ref),
         onRemove: _remove,
       ),
     );
   }
-}
-
-/// `https://host/path/cert.pdf` → `cert.pdf`.
-String? _nameFromUrl(String? url) {
-  if (url == null || url.isEmpty) return null;
-
-  final path = Uri.tryParse(url)?.pathSegments;
-  if (path == null || path.isEmpty) return url;
-
-  return path.last.isEmpty ? url : path.last;
 }
 
 // Top-level so the closures passed into fields are stable across rebuilds.

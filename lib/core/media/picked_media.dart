@@ -1,15 +1,4 @@
-/// A file the user chose on their device.
-///
-/// Everything an upload or a payload needs, gathered once at pick time so no
-/// caller has to touch `dart:io` or the picker packages again.
 class PickedMedia {
-  const PickedMedia({
-    required this.path,
-    required this.name,
-    required this.sizeBytes,
-    required this.mimeType,
-  });
-
   /// Absolute path on the device — what gets uploaded.
   final String path;
 
@@ -20,6 +9,13 @@ class PickedMedia {
 
   /// Derived from the extension, e.g. `application/pdf`.
   final String mimeType;
+
+  const PickedMedia({
+    required this.path,
+    required this.name,
+    required this.sizeBytes,
+    required this.mimeType,
+  });
 
   /// `1.2 MB` — for display only; payloads carry [sizeBytes].
   String get readableSize {

@@ -26,7 +26,10 @@ final updateDocumentUseCaseProvider = Provider<UpdateDocumentUseCase>(
   (ref) => UpdateDocumentUseCase(ref.watch(documentRepositoryProvider)),
 );
 
+/// Dropped with the step, so a later visit reads the rows fresh instead of
+/// showing what the last one left behind.
 final documentListNotifierProvider =
     NotifierProvider<DocumentListNotifier, DocumentListState>(
       DocumentListNotifier.new,
+      isAutoDispose: true,
     );

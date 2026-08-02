@@ -4,6 +4,7 @@ abstract final class ApiEndpoints {
   static const String register = 'api/v1/auth/signup/request-otp';
   static const String otpVerify = 'api/v1/auth/signup/verify-otp';
   static const String resendOtp = 'api/v1/auth/signup/resend-otp';
+  static const String refreshTokenGenerate = 'api/v1/auth/refresh-token';
 
   static const String requestPasswordResetOtp =
       'api/v1/auth/password/request-otp';

@@ -14,8 +14,11 @@ abstract interface class DocumentRemoteDataSource {
   });
 }
 
+/// The document rows themselves. The file each row points at is uploaded
+/// separately, by the shared upload use case, before the row is saved.
 class DocumentRemoteDataSourceImpl implements DocumentRemoteDataSource {
   final IApiClient _client;
+
   const DocumentRemoteDataSourceImpl(this._client);
 
   @override

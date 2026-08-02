@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Shikshak/core/media/i_media_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -8,17 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
 import 'picked_media.dart';
 
-abstract interface class MediaPicker {
-  Future<PickedMedia?> pickImage({
-    required ImagePickSource source,
-    bool crop = false,
-    CropAspectRatio? aspectRatio,
-  });
-
-  Future<PickedMedia?> pickDocument({List<String>? allowedExtensions});
-}
-
-class MediaPickerImpl implements MediaPicker {
+class MediaPickerImpl implements IMediaPicker {
   MediaPickerImpl({ImagePicker? imagePicker, ImageCropper? cropper})
     : _picker = imagePicker ?? ImagePicker(),
       _cropper = cropper ?? ImageCropper();

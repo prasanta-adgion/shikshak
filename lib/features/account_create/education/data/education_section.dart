@@ -4,18 +4,9 @@ import '../../shared/domain/entities/profile_step.dart';
 import '../../shared/domain/entities/teacher_profile_draft.dart';
 import '../domain/entities/education.dart';
 
-/// Maps [Education] onto the education payload:
-///
-/// ```json
-/// { "degree", "specialization", "universityCollege", "yearOfPassing",
-///   "marksOrGrade", "certificateUrl", "isHighestQualification" }
-/// ```
-class EducationSection
-    implements ProfileSection, RepeatableSection, UploadingSection {
+/// Maps [Education] onto the education payload.
+class EducationSection implements ProfileSection, RepeatableSection {
   const EducationSection();
-
-  /// Names the payload field the picked certificate fills.
-  static const String certificateField = 'certificateUrl';
 
   @override
   ProfileStep get step => ProfileStep.education;
@@ -53,31 +44,4 @@ class EducationSection
     savedEducations: [...draft.savedEducations, draft.education],
     education: const Education(),
   );
-
-  @override
-  List<PendingUpload> pendingUploads(TeacherProfileDraft draft) {
-    // The device path, never the display name — only a real path can be
-    // uploaded. Stays empty until file picking is connected.
-    final localPath = draft.education.certificateLocalPath;
-    if (localPath == null ||
-        localPath.isEmpty ||
-        draft.education.certificateUrl != null) {
-      return const [];
-    }
-
-    return [PendingUpload(field: certificateField, localPath: localPath)];
-  }
-
-  @override
-  TeacherProfileDraft withUploadedUrls(
-    TeacherProfileDraft draft,
-    Map<String, String> urls,
-  ) {
-    final url = urls[certificateField];
-    if (url == null) return draft;
-
-    return draft.copyWith(
-      education: draft.education.copyWith(certificateUrl: url),
-    );
-  }
 }

@@ -52,10 +52,12 @@ class _DocumentEditSheetState extends ConsumerState<DocumentEditSheet> {
     if (id == null) return;
 
     FocusScope.of(context).unfocus();
+    if (_form.isUploading.value) {
+      AppSnackbar.show(context, 'Please wait for the document upload.');
+      return;
+    }
     if (!_form.validate()) return;
 
-    // TODO(upload): a newly picked file still needs uploading before the
-    // PATCH, so an edit that swaps the file keeps the previous URL for now.
     final updated = await ref
         .read(documentListNotifierProvider.notifier)
         .update(UpdateDocumentParams(id: id, document: _form.toDocument()));

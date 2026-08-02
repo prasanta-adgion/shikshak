@@ -7,11 +7,14 @@ import '../../../documents/data/document_section.dart';
 import '../../../education/data/education_section.dart';
 import '../../../experience/data/experience_section.dart';
 import '../../data/datasource/profile_section_remote_datasource.dart';
+import '../../data/repository/file_upload_repository_impl.dart';
 import '../../data/repository/profile_section_repository_impl.dart';
 import '../../domain/entities/profile_section.dart';
 import '../../domain/entities/profile_step.dart';
+import '../../domain/repositories/file_upload_repository.dart';
 import '../../domain/repositories/profile_section_repository.dart';
 import '../../domain/usecases/save_profile_section_usecase.dart';
+import '../../domain/usecases/upload_file_usecase.dart';
 import '../controller/wizard_step_controller.dart';
 import '../notifier/account_create_notifier.dart';
 import '../state/account_create_state.dart';
@@ -45,15 +48,26 @@ final saveProfileSectionUseCaseProvider = Provider<SaveProfileSectionUseCase>((
   return SaveProfileSectionUseCase(
     sections: ref.watch(profileSectionsProvider),
     repository: ref.watch(profileSectionRepositoryProvider),
-    uploader: ref.watch(fileUploaderProvider),
   );
 });
 
-/// The draft lives only as long as the wizard is on screen — disposing it with
-/// the route is deliberate, so an abandoned setup cannot leak into the next.
+/// Every attachment the wizard sends — certificates, documents — goes up
+/// through this one use case.
+final fileUploadRepositoryProvider = Provider<FileUploadRepository>(
+  (ref) => FileUploadRepositoryImpl(ref.watch(fileUploaderProvider)),
+);
+
+final uploadFileUseCaseProvider = Provider<UploadFileUseCase>(
+  (ref) => UploadFileUseCase(ref.watch(fileUploadRepositoryProvider)),
+);
+
+/// The draft lives only as long as the wizard is on screen: `isAutoDispose`
+/// drops it once the last step stops listening, so an abandoned setup cannot
+/// leak into the next one.
 final accountCreateNotifierProvider =
     NotifierProvider<AccountCreateNotifier, AccountCreateState>(
       AccountCreateNotifier.new,
+      isAutoDispose: true,
     );
 
 /// Lets the pinned action bar submit the step currently on screen.

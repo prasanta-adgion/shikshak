@@ -1,5 +1,9 @@
 import 'package:Shikshak/core/constants/app_images_const.dart';
 import 'package:Shikshak/core/theme/app_theme.dart';
+import 'package:Shikshak/features/account_create/about_you/presentation/notifier/about_you_notifier.dart';
+import 'package:Shikshak/features/account_create/about_you/presentation/providers/about_you_providers.dart';
+import 'package:Shikshak/features/account_create/basic_info/presentation/notifier/basic_info_notifier.dart';
+import 'package:Shikshak/features/account_create/basic_info/presentation/providers/basic_info_providers.dart';
 import 'package:Shikshak/features/account_create/documents/presentation/notifier/document_list_notifier.dart';
 import 'package:Shikshak/features/account_create/documents/presentation/providers/document_providers.dart';
 import 'package:Shikshak/features/account_create/education/presentation/notifier/education_list_notifier.dart';
@@ -12,9 +16,9 @@ import 'package:Shikshak/features/account_create/shared/presentation/pages/creat
 import 'package:Shikshak/features/account_create/shared/presentation/providers/account_create_providers.dart';
 import 'package:Shikshak/features/account_create/shared/presentation/state/account_create_state.dart';
 import 'package:Shikshak/features/account_create/shared/presentation/widgets/step_timeline.dart';
+import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_action_bar.dart';
 import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_step_header.dart';
 import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_step_layout.dart';
-import 'package:Shikshak/features/account_create/shared/presentation/widgets/wizard_action_bar.dart';
 import 'package:Shikshak/features/auth/domain/entities/user_entity.dart';
 import 'package:Shikshak/features/auth/domain/entities/user_role.dart';
 import 'package:Shikshak/features/auth/presentation/notifier/auth_notifier.dart';
@@ -46,8 +50,19 @@ class _NotifierAtStep extends AccountCreateNotifier {
   AccountCreateState build() => AccountCreateState(step: step);
 }
 
-/// Keeps the wizard offline: steps 3 and 4 read their saved rows back from the
-/// API as soon as they mount, and these tests only care about what they render.
+/// Keeps the wizard offline: every step reads what was already saved back
+/// from the API as soon as it mounts, and these tests only care about what
+/// they render.
+class _OfflineBasicInfo extends BasicInfoNotifier {
+  @override
+  Future<void> load() async {}
+}
+
+class _OfflineAboutYou extends AboutYouNotifier {
+  @override
+  Future<void> load() async {}
+}
+
 class _OfflineExperienceList extends ExperienceListNotifier {
   @override
   Future<void> load() async {}
@@ -99,6 +114,8 @@ void main() {
             () => _NotifierAtStep(step),
           ),
           authStateNotifierProvider.overrideWith(_SeededAuthNotifier.new),
+          basicInfoNotifierProvider.overrideWith(_OfflineBasicInfo.new),
+          aboutYouNotifierProvider.overrideWith(_OfflineAboutYou.new),
           experienceListNotifierProvider.overrideWith(
             _OfflineExperienceList.new,
           ),

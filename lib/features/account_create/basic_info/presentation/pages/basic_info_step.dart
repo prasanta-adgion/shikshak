@@ -5,9 +5,11 @@ import 'package:image_cropper/image_cropper.dart';
 
 import '../../../../../core/providers/core_providers.dart';
 import '../../../../../core/utils/validators.dart';
+import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../shared/widgets/app_text_field.dart';
 import '../../../../../shared/widgets/media_source_sheet.dart';
 import '../../../../auth/presentation/providers_di/auth_providers.dart';
+import '../../../about_you/presentation/providers/about_you_providers.dart';
 import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
@@ -16,7 +18,10 @@ import '../../../shared/presentation/widgets/wizard_field.dart';
 import '../../../shared/presentation/widgets/wizard_info_note.dart';
 import '../../../shared/presentation/widgets/wizard_select_field.dart';
 import '../../../shared/presentation/widgets/wizard_step_layout.dart';
+import '../../../shared/presentation/widgets/wizard_step_loading.dart';
+import '../../domain/entities/basic_info.dart';
 import '../../domain/entities/gender.dart';
+import '../providers/basic_info_providers.dart';
 import '../widgets/profile_photo_picker.dart';
 
 /// Step 1 — the basic-info payload: photo, gender, date of birth and address.
@@ -44,6 +49,10 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
   final _dateOfBirth = ValueNotifier<DateTime?>(null);
   final _photoPath = ValueNotifier<String?>(null);
 
+  /// Photo already on the profile, shown until a new one is picked.
+  final _photoUrl = ValueNotifier<String?>(null);
+  final _isPhotoUploading = ValueNotifier<bool>(false);
+
   /// Flipped on the first submit, so the pickers only show their errors after
   /// a real attempt — matching how the text fields behave.
   final _showErrors = ValueNotifier<bool>(false);
@@ -69,6 +78,52 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
     _gender.value = info.gender;
     _dateOfBirth.value = info.dateOfBirth;
     _photoPath.value = info.localPhotoPath;
+    _photoUrl.value = info.profilePhotoUrl;
+
+    // Deferred: loading writes to provider state, which cannot happen while
+    // the step is still being built into the tree.
+    Future.microtask(_loadSaved);
+  }
+
+  /// Reads back what the teacher has already filed and puts it in the form.
+  Future<void> _loadSaved() async {
+    if (!mounted) return;
+    await ref.read(basicInfoNotifierProvider.notifier).load();
+    if (!mounted) return;
+
+    final saved = ref.read(basicInfoNotifierProvider).info;
+    if (saved == null) return;
+
+    final info = _keepPickedPhoto(saved);
+
+    // The draft is seeded too, so the next save updates this section instead
+    // of creating a second one.
+    ref.read(accountCreateNotifierProvider.notifier).hydrateBasicInfo(info);
+    _fillForm(info);
+  }
+
+  /// A photo picked on this visit is newer than the one the server answers
+  /// with — the teacher can jump between steps without saving — so it wins.
+  BasicInfo _keepPickedPhoto(BasicInfo saved) {
+    final current = ref.read(accountCreateNotifierProvider).draft.basicInfo;
+    if (current.localPhotoPath == null) return saved;
+
+    return saved.copyWith(
+      localPhotoPath: current.localPhotoPath,
+      profilePhotoUrl: current.profilePhotoUrl,
+    );
+  }
+
+  void _fillForm(BasicInfo info) {
+    _addressLine1Controller.text = info.addressLine1;
+    _addressLine2Controller.text = info.addressLine2;
+    _cityController.text = info.city;
+    _stateController.text = info.state;
+    _countryController.text = info.country;
+    _postalCodeController.text = info.postalCode;
+    _gender.value = info.gender;
+    _dateOfBirth.value = info.dateOfBirth;
+    _photoUrl.value = info.profilePhotoUrl;
   }
 
   @override
@@ -82,6 +137,8 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
     _gender.dispose();
     _dateOfBirth.dispose();
     _photoPath.dispose();
+    _photoUrl.dispose();
+    _isPhotoUploading.dispose();
     _showErrors.dispose();
     super.dispose();
   }
@@ -89,6 +146,11 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
   @override
   void submitStep() {
     FocusScope.of(context).unfocus();
+    if (ref.read(basicInfoNotifierProvider).isLoading) return;
+    if (_isPhotoUploading.value) {
+      AppSnackbar.show(context, 'Please wait for the profile photo upload.');
+      return;
+    }
     _showErrors.value = true;
 
     final formValid = _formKey.currentState?.validate() ?? false;
@@ -116,10 +178,7 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
 
   /// Camera or gallery, then the cropper — square, because the avatar is.
   Future<void> _pickPhoto() async {
-    final source = await MediaSourceSheet.show(
-      context,
-      title: 'Profile photo',
-    );
+    final source = await MediaSourceSheet.show(context, title: 'Profile photo');
     if (source == null || !mounted) return;
 
     final picked = await ref
@@ -131,18 +190,35 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
         );
     if (picked == null || !mounted) return;
 
-    _photoPath.value = picked.path;
+    _isPhotoUploading.value = true;
+    final result = await ref
+        .read(uploadProfileImageUseCaseProvider)
+        .call(picked.path);
+    if (!mounted) return;
 
-    final current = ref.read(accountCreateNotifierProvider).draft.basicInfo;
-    ref
-        .read(accountCreateNotifierProvider.notifier)
-        .setBasicInfo(
-          current.copyWith(
-            localPhotoPath: picked.path,
-            // A new photo has to upload, so the old URL cannot stay.
-            clearProfilePhotoUrl: true,
-          ),
+    result.fold(
+      onSuccess: (url) {
+        _photoPath.value = picked.path;
+        _photoUrl.value = url;
+        final current = ref.read(accountCreateNotifierProvider).draft.basicInfo;
+        ref
+            .read(accountCreateNotifierProvider.notifier)
+            .setBasicInfo(
+              current.copyWith(
+                localPhotoPath: picked.path,
+                profilePhotoUrl: url,
+              ),
+            );
+        AppSnackbar.showSuccess(
+          context,
+          'Profile photo uploaded successfully.',
         );
+      },
+      onFailure: (exception) {
+        AppSnackbar.showError(context, exception.message);
+      },
+    );
+    _isPhotoUploading.value = false;
   }
 
   String? _validatePostalCode(String? value) {
@@ -154,6 +230,27 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
 
   @override
   Widget build(BuildContext context) {
+    // Reading the saved section fails independently of the wizard's own save,
+    // which the page reports.
+    ref.listen(basicInfoNotifierProvider.select((state) => state.error), (
+      previous,
+      next,
+    ) {
+      if (next == null || next == previous) return;
+      AppSnackbar.showError(context, next.message);
+    });
+
+    final isLoading = ref.watch(
+      basicInfoNotifierProvider.select((state) => state.isLoading),
+    );
+
+    if (isLoading) {
+      return const WizardStepLayout(
+        step: ProfileStep.basicInfo,
+        children: [WizardStepLoading()],
+      );
+    }
+
     return Form(
       key: _formKey,
       child: WizardStepLayout(
@@ -168,10 +265,16 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
                 authStateNotifierProvider.select((state) => state.user),
               );
 
-              return ValueListenableBuilder<String?>(
-                valueListenable: _photoPath,
-                builder: (context, path, _) => ProfilePhotoPicker(
-                  photoPath: path,
+              return ListenableBuilder(
+                listenable: Listenable.merge([
+                  _photoPath,
+                  _photoUrl,
+                  _isPhotoUploading,
+                ]),
+                builder: (context, _) => ProfilePhotoPicker(
+                  photoPath: _photoPath.value,
+                  photoUrl: _photoUrl.value,
+                  isLoading: _isPhotoUploading.value,
                   name: user?.fullName ?? '',
                   email: user?.email ?? '',
                   phoneNumber: user?.mobileNumber ?? '',
@@ -289,7 +392,8 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
           ),
 
           const WizardInfoNote(
-            message: 'Your information is secure and will be used only to '
+            message:
+                'Your information is secure and will be used only to '
                 'enhance your teaching experience.',
           ),
         ],

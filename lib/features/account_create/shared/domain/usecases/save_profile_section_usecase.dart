@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import '../../../../../core/network/api_result.dart';
-import '../../../../../core/network/file_uploader.dart';
 import '../../../../../core/network/request_body.dart';
 import '../entities/profile_section.dart';
 import '../entities/profile_step.dart';
@@ -33,14 +32,11 @@ class SaveProfileSectionUseCase {
   const SaveProfileSectionUseCase({
     required Map<ProfileStep, ProfileSection> sections,
     required ProfileSectionRepository repository,
-    required FileUploader uploader,
   }) : _sections = sections,
-       _repository = repository,
-       _uploader = uploader;
+       _repository = repository;
 
   final Map<ProfileStep, ProfileSection> _sections;
   final ProfileSectionRepository _repository;
-  final FileUploader _uploader;
 
   Future<ApiResult<SectionSaveOutcome>> call({
     required ProfileStep step,
@@ -52,36 +48,16 @@ class SaveProfileSectionUseCase {
       throw StateError('No ProfileSection registered for ${step.name}.');
     }
 
-    // Files first: the body cannot be built until their URLs exist.
-    var currentDraft = draft;
-    if (section is UploadingSection) {
-      final uploaded = await _uploadPending(
-        section as UploadingSection,
-        currentDraft,
-      );
-      if (uploaded is ApiFailure<Map<String, String>>) {
-        return ApiResult.failure(uploaded.exception);
-      }
-
-      final urls = (uploaded as ApiSuccess<Map<String, String>>).data;
-      if (urls.isNotEmpty) {
-        currentDraft = (section as UploadingSection).withUploadedUrls(
-          currentDraft,
-          urls,
-        );
-      }
-    }
-
     // Sanitised before encoding, so the body compared for changes is exactly
     // the body sent.
-    final body = RequestBody.nullsAsEmptyStrings(section.body(currentDraft));
+    final body = RequestBody.nullsAsEmptyStrings(section.body(draft));
     final encoded = jsonEncode(body);
 
     if (section is RepeatableSection) {
       return _saveEntry(
         section as RepeatableSection,
         path: section.path,
-        draft: currentDraft,
+        draft: draft,
         body: body,
         encoded: encoded,
         lastSavedBody: lastSavedBody,
@@ -90,11 +66,7 @@ class SaveProfileSectionUseCase {
 
     if (encoded == lastSavedBody) {
       return ApiResult.success(
-        SectionSaveOutcome(
-          draft: currentDraft,
-          savedBody: encoded,
-          wasSkipped: true,
-        ),
+        SectionSaveOutcome(draft: draft, savedBody: encoded, wasSkipped: true),
       );
     }
 
@@ -107,7 +79,7 @@ class SaveProfileSectionUseCase {
 
     return result.map(
       (_) => SectionSaveOutcome(
-        draft: currentDraft,
+        draft: draft,
         savedBody: encoded,
         wasSkipped: false,
       ),
@@ -148,30 +120,5 @@ class SaveProfileSectionUseCase {
         wasSkipped: false,
       ),
     );
-  }
-
-  /// Uploads every pending file, stopping at the first failure so a half
-  /// uploaded section is never sent.
-  Future<ApiResult<Map<String, String>>> _uploadPending(
-    UploadingSection section,
-    TeacherProfileDraft draft,
-  ) async {
-    final pending = section.pendingUploads(draft);
-    final urls = <String, String>{};
-
-    for (final upload in pending) {
-      final result = await _uploader.upload(
-        upload.localPath,
-        folder: upload.folder,
-      );
-      switch (result) {
-        case ApiSuccess(:final data):
-          urls[upload.field] = data;
-        case ApiFailure(:final exception):
-          return ApiResult.failure(exception);
-      }
-    }
-
-    return ApiResult.success(urls);
   }
 }

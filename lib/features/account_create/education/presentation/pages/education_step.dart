@@ -53,10 +53,14 @@ class _EducationStepState extends ConsumerState<EducationStep>
   /// Validates the form and stages it on the draft, ready to be posted.
   bool _stageEntry() {
     FocusScope.of(context).unfocus();
+    if (_form.isUploading.value) {
+      AppSnackbar.show(context, 'Please wait for the certificate upload.');
+      return false;
+    }
     if (!_form.validate()) return false;
 
-    // The whole entity, certificate included: the section uploads whatever
-    // local path it finds here before the body is built.
+    // The certificate is already uploaded by this point — the entity carries
+    // its URL, which is what the payload sends.
     ref
         .read(accountCreateNotifierProvider.notifier)
         .setEducation(_form.toEducation());

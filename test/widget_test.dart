@@ -191,7 +191,6 @@ void main() {
           home: AuthScaffold(
             title: 'Verify',
             subtitle: 'Enter the code',
-            alignToTop: true,
             banner: const ColoredBox(color: Colors.blue, child: Text('Hero')),
             form: LayoutBuilder(
               builder: (context, constraints) =>
