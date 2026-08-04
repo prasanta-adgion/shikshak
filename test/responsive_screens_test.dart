@@ -4,7 +4,7 @@ import 'package:Shikshak/features/auth/domain/entities/user_role.dart';
 import 'package:Shikshak/features/auth/presentation/notifier/auth_notifier.dart';
 import 'package:Shikshak/features/auth/presentation/pages/login_page.dart';
 import 'package:Shikshak/features/auth/presentation/pages/register_page.dart';
-import 'package:Shikshak/features/auth/presentation/providers/auth_providers.dart';
+import 'package:Shikshak/features/auth/presentation/providers_di/auth_providers.dart';
 import 'package:Shikshak/features/auth/presentation/state/auth_state.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_otp_screen.dart';

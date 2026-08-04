@@ -11,14 +11,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AppFlavor', () {
-    test('dev points at the local dev server', () {
-      expect(AppFlavor.dev.baseUrl, 'http://192.168.1.12:5001');
-      expect(AppFlavor.dev.hasBaseUrl, isTrue);
+    // Asserted against the configured value, not a literal: the dev host moves
+    // with whoever is running the backend, and that is not a test failure.
+    test('dev and staging point at a real host', () {
+      for (final flavor in [AppFlavor.dev, AppFlavor.staging]) {
+        expect(flavor.hasBaseUrl, isTrue, reason: '${flavor.label} baseUrl');
+        expect(Uri.parse(flavor.baseUrl).hasScheme, isTrue);
+        expect(Uri.parse(flavor.baseUrl).host, isNotEmpty);
+      }
     });
 
-    test('staging and prod have no host provisioned yet', () {
-      expect(AppFlavor.staging.baseUrl, isEmpty);
-      expect(AppFlavor.staging.hasBaseUrl, isFalse);
+    test('prod has no host provisioned yet', () {
       expect(AppFlavor.prod.baseUrl, isEmpty);
       expect(AppFlavor.prod.hasBaseUrl, isFalse);
     });
@@ -44,13 +47,13 @@ void main() {
 
       expect(AppFlavorConfig.current, AppFlavor.dev);
       expect(AppFlavorConfig.isProd, isFalse);
-      expect(AppFlavorConfig.baseUrl, 'http://192.168.1.12:5001');
+      expect(AppFlavorConfig.baseUrl, AppFlavor.dev.baseUrl);
       expect(AppFlavorConfig.enableNetworkLogging, isTrue);
 
       AppFlavorConfig.set(AppFlavor.staging);
 
       expect(AppFlavorConfig.current, AppFlavor.staging);
-      expect(AppFlavorConfig.baseUrl, isEmpty);
+      expect(AppFlavorConfig.baseUrl, AppFlavor.staging.baseUrl);
       expect(AppFlavorConfig.enableNetworkLogging, isTrue);
     });
 
@@ -123,13 +126,16 @@ void main() {
     }
 
     test('the dev flavor resolves the real login endpoint', () {
+      final configured = Uri.parse(AppFlavor.dev.baseUrl);
+
       final uri = RequestOptions(
         baseUrl: dioFor(AppFlavor.dev.baseUrl).options.baseUrl,
         path: ApiEndpoints.login,
       ).uri;
 
-      expect(uri.host, '192.168.1.12');
-      expect(uri.port, 5001);
+      // Whatever host dev is pointed at, the path must join onto it cleanly.
+      expect(uri.host, configured.host);
+      expect(uri.port, configured.port);
       expect(uri.path, '/api/v1/auth/login');
     });
   });

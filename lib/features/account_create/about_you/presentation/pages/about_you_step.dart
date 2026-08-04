@@ -13,6 +13,9 @@ import '../../../shared/presentation/widgets/subject_select_tile.dart';
 import '../../../shared/presentation/widgets/wizard_field.dart';
 import '../../../shared/presentation/widgets/wizard_multi_select_field.dart';
 import '../../../shared/presentation/widgets/wizard_step_layout.dart';
+import '../../../shared/presentation/widgets/wizard_step_loading.dart';
+import '../../domain/entities/about_you.dart';
+import '../providers/about_you_providers.dart';
 
 /// Step 2 — the about-you payload. Subjects and classes are captured here
 /// only; the experience payload reuses them.
@@ -50,6 +53,34 @@ class _AboutYouStepState extends ConsumerState<AboutYouStep>
     _subjects.value = about.subjectsTaught;
     _classes.value = about.classesTaught;
     _languages.value = about.languagesKnown;
+
+    // Deferred: loading writes to provider state, which cannot happen while
+    // the step is still being built into the tree.
+    Future.microtask(_loadSaved);
+  }
+
+  /// Reads back what the teacher has already filed and puts it in the form.
+  Future<void> _loadSaved() async {
+    if (!mounted) return;
+    await ref.read(aboutYouNotifierProvider.notifier).load();
+    if (!mounted) return;
+
+    final saved = ref.read(aboutYouNotifierProvider).about;
+    if (saved == null) return;
+
+    // The draft is seeded too, so the next save updates this section instead
+    // of creating a second one.
+    ref.read(accountCreateNotifierProvider.notifier).hydrateAboutYou(saved);
+    _fillForm(saved);
+  }
+
+  void _fillForm(AboutYou about) {
+    _shortBioController.text = about.shortBio;
+    _teachingApproachController.text = about.teachingApproach;
+    _uniqueController.text = about.whatMakesYouUnique;
+    _subjects.value = about.subjectsTaught;
+    _classes.value = about.classesTaught;
+    _languages.value = about.languagesKnown;
   }
 
   @override
@@ -73,6 +104,7 @@ class _AboutYouStepState extends ConsumerState<AboutYouStep>
   @override
   void submitStep() {
     FocusScope.of(context).unfocus();
+    if (ref.read(aboutYouNotifierProvider).isLoading) return;
     _showErrors.value = true;
 
     final formValid = _formKey.currentState?.validate() ?? false;
@@ -102,6 +134,27 @@ class _AboutYouStepState extends ConsumerState<AboutYouStep>
 
   @override
   Widget build(BuildContext context) {
+    // Reading the saved section fails independently of the wizard's own save,
+    // which the page reports.
+    ref.listen(aboutYouNotifierProvider.select((state) => state.error), (
+      previous,
+      next,
+    ) {
+      if (next == null || next == previous) return;
+      AppSnackbar.showError(context, next.message);
+    });
+
+    final isLoading = ref.watch(
+      aboutYouNotifierProvider.select((state) => state.isLoading),
+    );
+
+    if (isLoading) {
+      return const WizardStepLayout(
+        step: ProfileStep.aboutYou,
+        children: [WizardStepLoading()],
+      );
+    }
+
     return Form(
       key: _formKey,
       child: WizardStepLayout(

@@ -4,10 +4,10 @@ import 'package:Shikshak/core/network/api_exception.dart';
 import 'package:Shikshak/core/network/api_result.dart';
 import 'package:Shikshak/features/auth/domain/entities/user_entity.dart';
 import 'package:Shikshak/features/auth/domain/entities/user_role.dart';
+import 'package:Shikshak/features/auth/domain/params/auth_params.dart';
 import 'package:Shikshak/features/auth/domain/repositories/auth_repository.dart';
-import 'package:Shikshak/features/auth/domain/usecases/login_usecase.dart';
-import 'package:Shikshak/features/auth/domain/usecases/register_usecase.dart';
-import 'package:Shikshak/features/auth/presentation/providers/auth_providers.dart';
+import 'package:Shikshak/features/auth/domain/usecases/auth_usecases.dart';
+import 'package:Shikshak/features/auth/presentation/providers_di/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -73,22 +73,21 @@ class _FakeAuthRepository implements AuthRepository {
   final Future<ApiResult<void>> Function() onRegister;
 
   @override
-  Future<ApiResult<void>> register({
-    required String fullName,
-    required String email,
-    required String mobileNumber,
-    required String password,
-    required UserRole role,
-  }) => onRegister();
+  Future<ApiResult<void>> register(RegisterParams params) => onRegister();
 
   @override
-  Future<UserRole?> getPersistedRole() async => null;
-
-  @override
-  Future<bool> hasValidSession() async => false;
+  Future<UserRole?> sessionRole() async => null;
 
   @override
   Future<ApiResult<UserEntity>> login(LoginParams params) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ApiResult<UserEntity>> verifySignupOtp(VerifySignupOtpParams params) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ApiResult<void>> resendSignupOtp(ResendOtpParams params) =>
       throw UnimplementedError();
 
   @override

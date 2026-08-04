@@ -9,10 +9,7 @@ import '../notifier/document_list_notifier.dart';
 import '../state/document_list_state.dart';
 
 final documentRemoteDataSourceProvider = Provider<DocumentRemoteDataSource>(
-  (ref) => DocumentRemoteDataSourceImpl(
-    client: ref.watch(apiClientProvider),
-    fileUploader: ref.watch(fileUploaderProvider),
-  ),
+  (ref) => DocumentRemoteDataSourceImpl(ref.watch(apiClientProvider)),
 );
 
 final documentRepositoryProvider = Provider<DocumentRepository>((ref) {
@@ -20,10 +17,6 @@ final documentRepositoryProvider = Provider<DocumentRepository>((ref) {
     remoteDataSource: ref.watch(documentRemoteDataSourceProvider),
   );
 });
-
-final uploadDocumentUseCaseProvider = Provider<UploadDocumentUseCase>(
-  (ref) => UploadDocumentUseCase(ref.watch(documentRepositoryProvider)),
-);
 
 final getDocumentsUseCaseProvider = Provider<GetDocumentsUseCase>(
   (ref) => GetDocumentsUseCase(ref.watch(documentRepositoryProvider)),
@@ -33,7 +26,10 @@ final updateDocumentUseCaseProvider = Provider<UpdateDocumentUseCase>(
   (ref) => UpdateDocumentUseCase(ref.watch(documentRepositoryProvider)),
 );
 
+/// Dropped with the step, so a later visit reads the rows fresh instead of
+/// showing what the last one left behind.
 final documentListNotifierProvider =
     NotifierProvider<DocumentListNotifier, DocumentListState>(
       DocumentListNotifier.new,
+      isAutoDispose: true,
     );

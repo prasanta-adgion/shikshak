@@ -3,14 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/providers/core_providers.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/utils/file_url.dart';
 import '../../../../../shared/widgets/app_snackbar.dart';
+import '../../../shared/domain/repositories/file_upload_repository.dart';
+import '../../../shared/presentation/providers/account_create_providers.dart';
 import '../../../shared/presentation/widgets/file_upload_tile.dart';
 import '../../../shared/presentation/widgets/wizard_field.dart';
 import '../../../shared/presentation/widgets/wizard_info_note.dart';
 import '../../../shared/presentation/widgets/wizard_select_field.dart';
 import '../../domain/entities/teacher_document.dart';
 import '../controller/document_form_controller.dart';
-import '../providers/document_providers.dart';
 
 /// The document form, shared by the step and the edit sheet.
 class DocumentFormFields extends StatelessWidget {
@@ -80,19 +82,21 @@ class _DocumentFileField extends ConsumerWidget {
 
   Future<void> _pick(BuildContext context, WidgetRef ref) async {
     final picked = await ref.read(mediaPickerProvider).pickDocument();
-    if (picked == null) return;
+    // The sheet this field lives in can be closed while the picker is open,
+    // and its controller is disposed with it.
+    if (picked == null || !context.mounted) return;
 
     controller.attach(picked);
     controller.isUploading.value = true;
 
     final result = await ref
-        .read(uploadDocumentUseCaseProvider)
-        .call(picked.path);
+        .read(uploadFileUseCaseProvider)
+        .call(filePath: picked.path, folder: UploadFolders.documents);
     if (!context.mounted) return;
 
     result.fold(
-      onSuccess: (upload) {
-        controller.setUploadedUrl(upload.signedUrl);
+      onSuccess: (url) {
+        controller.setUploadedUrl(url);
         AppSnackbar.showSuccess(context, 'Document uploaded successfully.');
       },
       onFailure: (exception) {
@@ -118,7 +122,8 @@ class _DocumentFileField extends ConsumerWidget {
         // A stored row has a URL and no picked name, so the tile falls back to
         // the file the URL points at.
         final name =
-            controller.fileName.value ?? _nameFromUrl(controller.fileUrl.value);
+            controller.fileName.value ??
+            fileNameFromUrl(controller.fileUrl.value);
 
         return FileUploadTile(
           title: controller.documentType.value?.label ?? 'Document',
@@ -151,16 +156,6 @@ String _readableSize(int bytes) {
   if (bytes < 1024) return '$bytes B';
   if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(0)} KB';
   return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-}
-
-/// `https://host/path/resume.pdf` → `resume.pdf`.
-String? _nameFromUrl(String? url) {
-  if (url == null || url.isEmpty) return null;
-
-  final path = Uri.tryParse(url)?.pathSegments;
-  if (path == null || path.isEmpty) return url;
-
-  return path.last.isEmpty ? url : path.last;
 }
 
 // Top-level so the closure passed into the field is stable across rebuilds.

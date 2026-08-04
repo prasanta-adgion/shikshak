@@ -26,7 +26,10 @@ final updateExperienceUseCaseProvider = Provider<UpdateExperienceUseCase>(
   (ref) => UpdateExperienceUseCase(ref.watch(experienceRepositoryProvider)),
 );
 
+/// Dropped with the step, so a later visit reads the rows fresh instead of
+/// showing what the last one left behind.
 final experienceListNotifierProvider =
     NotifierProvider<ExperienceListNotifier, ExperienceListState>(
       ExperienceListNotifier.new,
+      isAutoDispose: true,
     );

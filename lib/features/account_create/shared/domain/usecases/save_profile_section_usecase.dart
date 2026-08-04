@@ -66,11 +66,7 @@ class SaveProfileSectionUseCase {
 
     if (encoded == lastSavedBody) {
       return ApiResult.success(
-        SectionSaveOutcome(
-          draft: draft,
-          savedBody: encoded,
-          wasSkipped: true,
-        ),
+        SectionSaveOutcome(draft: draft, savedBody: encoded, wasSkipped: true),
       );
     }
 

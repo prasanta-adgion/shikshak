@@ -26,7 +26,10 @@ final updateEducationUseCaseProvider = Provider<UpdateEducationUseCase>(
   (ref) => UpdateEducationUseCase(ref.watch(educationRepositoryProvider)),
 );
 
+/// Dropped with the step, so a later visit reads the rows fresh instead of
+/// showing what the last one left behind.
 final educationListNotifierProvider =
     NotifierProvider<EducationListNotifier, EducationListState>(
       EducationListNotifier.new,
+      isAutoDispose: true,
     );

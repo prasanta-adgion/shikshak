@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/network/request_body.dart';
 import '../../../about_you/domain/entities/about_you.dart';
 import '../../../basic_info/domain/entities/basic_info.dart';
 import '../../../documents/domain/entities/teacher_document.dart';
 import '../../../education/domain/entities/education.dart';
 import '../../../experience/domain/entities/experience_info.dart';
 import '../../domain/entities/profile_step.dart';
+import '../../domain/entities/teacher_profile_draft.dart';
 import '../providers/account_create_providers.dart';
 import '../state/account_create_state.dart';
 
@@ -44,6 +48,36 @@ class AccountCreateNotifier extends Notifier<AccountCreateState> {
 
   void setDocument(TeacherDocument document) =>
       state = state.copyWith(draft: state.draft.copyWith(document: document));
+
+  // ── Seeding from the server ────────────────────────────────────────────
+
+  void hydrateBasicInfo(BasicInfo basicInfo) => _hydrate(
+    ProfileStep.basicInfo,
+    state.draft.copyWith(basicInfo: basicInfo),
+  );
+
+  void hydrateAboutYou(AboutYou aboutYou) =>
+      _hydrate(ProfileStep.aboutYou, state.draft.copyWith(aboutYou: aboutYou));
+
+  /// Fills a section in from what the server already holds, and records that
+  /// body as saved. Two things follow from that: the next save PATCHes the
+  /// existing section instead of POSTing a second one, and a step left
+  /// untouched sends nothing at all.
+  void _hydrate(ProfileStep step, TeacherProfileDraft draft) {
+    final section = ref.read(profileSectionsProvider)[step];
+    if (section == null) return;
+
+    // Encoded exactly the way the save use case encodes it, or the comparison
+    // there would never match.
+    final encoded = jsonEncode(
+      RequestBody.nullsAsEmptyStrings(section.body(draft)),
+    );
+
+    state = state.copyWith(
+      draft: draft,
+      savedBodies: {...state.savedBodies, step: encoded},
+    );
+  }
 
   // ── Saving ─────────────────────────────────────────────────────────────
 
