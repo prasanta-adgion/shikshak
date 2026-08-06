@@ -89,7 +89,9 @@ class ClassRequestTile extends StatelessWidget {
                 ),
               ),
               AppSpacing.hGapMd,
-              Expanded(child: AppButton(label: 'Accept', onPressed: () {})),
+              Expanded(
+                child: AppButton(label: 'Accept', onPressed: () {}),
+              ),
             ],
           ),
         ],

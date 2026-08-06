@@ -45,8 +45,10 @@ void main() {
       expect(profile.aboutYou.subjectsTaught, ['Mathematics', 'Physics']);
       expect(profile.aboutYou.languagesKnown, ['python']);
 
-      expect(profile.experiences.single.currentJobTitle,
-          'Computer Teacher with math');
+      expect(
+        profile.experiences.single.currentJobTitle,
+        'Computer Teacher with math',
+      );
       expect(profile.experiences.single.isCurrent, isTrue);
 
       expect(profile.educations.first.degree, 'btech');
@@ -59,18 +61,18 @@ void main() {
         teacherProfileResponseJson(),
       ).data!.toEntity();
 
-      expect(
-        profile.documents.map((document) => document.typeLabel),
-        [
-          'Resume',
-          'Aadhaar Card',
-          'Pan Card',
-          'Highest Qualification Certificate',
-          'Experience Certificate',
-        ],
-      );
+      expect(profile.documents.map((document) => document.typeLabel), [
+        'Resume',
+        'Aadhaar Card',
+        'Pan Card',
+        'Highest Qualification Certificate',
+        'Experience Certificate',
+      ]);
       expect(profile.documents.first.readableSize, '95 KB');
-      expect(profile.documents.every((document) => !document.isVerified), isTrue);
+      expect(
+        profile.documents.every((document) => !document.isVerified),
+        isTrue,
+      );
     });
 
     test('prefers signedUrl over the stale upload-time fileUrl', () {
@@ -102,7 +104,9 @@ void main() {
       final json = teacherProfileResponseJson();
       (json['data'] as Map<String, dynamic>).remove('submission');
 
-      final profile = TeacherProfileResponseModel.fromJson(json).data!.toEntity();
+      final profile = TeacherProfileResponseModel.fromJson(
+        json,
+      ).data!.toEntity();
 
       expect(profile.status, ProfileReviewStatus.approved);
       expect(profile.isProfileComplete, isTrue);

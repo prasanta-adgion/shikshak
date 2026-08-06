@@ -52,11 +52,20 @@ abstract final class AppIcons {
   static const IconData students = Icons.groups_rounded;
   static const IconData studentsOutlined = Icons.groups_outlined;
   static const IconData earnings = Icons.account_balance_wallet_rounded;
-  static const IconData earningsOutlined = Icons.account_balance_wallet_outlined;
+  static const IconData earningsOutlined =
+      Icons.account_balance_wallet_outlined;
   static const IconData availability = Icons.event_available_rounded;
   static const IconData trendingUp = Icons.trending_up_rounded;
   static const IconData hours = Icons.schedule_rounded;
   static const IconData rating = Icons.grade_rounded;
+
+  // Class schedule
+  static const IconData addClass = Icons.add_rounded;
+  static const IconData classOnline = Icons.videocam_outlined;
+  static const IconData classInPerson = Icons.location_on_outlined;
+  static const IconData classHybrid = Icons.sync_alt_rounded;
+  static const IconData subject = Icons.menu_book_outlined;
+  static const IconData inactive = Icons.pause_circle_outline_rounded;
 
   // Profile
   static const IconData gender = Icons.wc_rounded;

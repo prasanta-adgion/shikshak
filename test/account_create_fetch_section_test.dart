@@ -83,8 +83,9 @@ class _StubAboutYouRepository implements AboutYouRepository {
 
 void main() {
   group('basic info response', () {
-    final profile = BasicInfoResponseModel.fromJson(_basicInfoJson).data!
-        .profile!;
+    final profile = BasicInfoResponseModel.fromJson(
+      _basicInfoJson,
+    ).data!.profile!;
 
     test('maps every field onto the form entity', () {
       final info = profile.toBasicInfo();
@@ -232,9 +233,9 @@ void main() {
         _basicInfoJson,
       ).data!.profile!.toBasicInfo();
 
-      container.read(accountCreateNotifierProvider.notifier).hydrateBasicInfo(
-        info,
-      );
+      container
+          .read(accountCreateNotifierProvider.notifier)
+          .hydrateBasicInfo(info);
 
       final state = container.read(accountCreateNotifierProvider);
       expect(state.draft.basicInfo.city, 'Hh');
@@ -250,9 +251,9 @@ void main() {
         _aboutYouJson,
       ).data!.aboutYou!.toAboutYou();
 
-      container.read(accountCreateNotifierProvider.notifier).hydrateAboutYou(
-        about,
-      );
+      container
+          .read(accountCreateNotifierProvider.notifier)
+          .hydrateAboutYou(about);
 
       final state = container.read(accountCreateNotifierProvider);
       expect(state.draft.aboutYou.subjectsTaught, ['Mathematics']);
@@ -265,9 +266,9 @@ void main() {
         _basicInfoJson,
       ).data!.profile!.toBasicInfo();
 
-      container.read(accountCreateNotifierProvider.notifier).hydrateBasicInfo(
-        info,
-      );
+      container
+          .read(accountCreateNotifierProvider.notifier)
+          .hydrateBasicInfo(info);
 
       final state = container.read(accountCreateNotifierProvider);
       expect(state.savedBodies.containsKey(ProfileStep.aboutYou), isFalse);

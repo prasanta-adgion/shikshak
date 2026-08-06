@@ -18,30 +18,36 @@ abstract final class AppTheme {
   static ThemeData _build(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
 
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: brightness,
-    ).copyWith(
-      primary: isDark ? AppColors.primaryLight : AppColors.primary,
-      secondary: AppColors.secondary,
-      tertiary: AppColors.tertiary,
-      error: AppColors.error,
-      surface: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-      surfaceContainerHighest:
-          isDark ? AppColors.darkSurfaceVariant : AppColors.lightSurfaceVariant,
-      outlineVariant: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-      onSurface: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-      onSurfaceVariant:
-          isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-    );
+    final colorScheme =
+        ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          brightness: brightness,
+        ).copyWith(
+          primary: isDark ? AppColors.primaryLight : AppColors.primary,
+          secondary: AppColors.secondary,
+          tertiary: AppColors.tertiary,
+          error: AppColors.error,
+          surface: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+          surfaceContainerHighest: isDark
+              ? AppColors.darkSurfaceVariant
+              : AppColors.lightSurfaceVariant,
+          outlineVariant: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          onSurface: isDark
+              ? AppColors.darkTextPrimary
+              : AppColors.lightTextPrimary,
+          onSurfaceVariant: isDark
+              ? AppColors.darkTextSecondary
+              : AppColors.lightTextSecondary,
+        );
 
     final textTheme = AppTypography.textTheme.apply(
       bodyColor: colorScheme.onSurface,
       displayColor: colorScheme.onSurface,
     );
 
-    final scaffoldBackground =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final scaffoldBackground = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
 
     return ThemeData(
       useMaterial3: true,
@@ -194,8 +200,9 @@ abstract final class AppTheme {
       // the bottom edge. Floating adds an inset margin on every side.
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.fixed,
-        backgroundColor:
-            isDark ? AppColors.darkSurfaceVariant : AppColors.lightTextPrimary,
+        backgroundColor: isDark
+            ? AppColors.darkSurfaceVariant
+            : AppColors.lightTextPrimary,
         contentTextStyle: textTheme.bodyMedium?.copyWith(color: Colors.white),
         shape: const RoundedRectangleBorder(),
       ),

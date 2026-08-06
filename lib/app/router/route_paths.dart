@@ -18,6 +18,7 @@ abstract final class RoutePaths {
 
   static const String createTeacherAccount = '/signup/teacher-profile';
 
+  //move to dashboard based on role
   static String dashboardFor(UserRole role) => switch (role) {
     UserRole.teacher => teacherDashboard,
     UserRole.student => studentDashboard,

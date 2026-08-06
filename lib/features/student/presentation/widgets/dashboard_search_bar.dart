@@ -36,10 +36,7 @@ class DashboardSearchBar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                AppIcons.search,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              Icon(AppIcons.search, color: theme.colorScheme.onSurfaceVariant),
               AppSpacing.hGapMd,
               Expanded(
                 child: Text(

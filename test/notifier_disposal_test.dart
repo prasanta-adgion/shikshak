@@ -28,20 +28,36 @@ class _SlowApiClient implements IApiClient {
   }
 
   @override
-  Future<T> post<T>(String path, {Object? data, Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) =>
-      throw UnimplementedError();
+  Future<T> post<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => throw UnimplementedError();
 
   @override
-  Future<T> put<T>(String path, {Object? data, Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) =>
-      throw UnimplementedError();
+  Future<T> put<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => throw UnimplementedError();
 
   @override
-  Future<T> patch<T>(String path, {Object? data, Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) =>
-      throw UnimplementedError();
+  Future<T> patch<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => throw UnimplementedError();
 
   @override
-  Future<T> delete<T>(String path, {Object? data, Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) =>
-      throw UnimplementedError();
+  Future<T> delete<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => throw UnimplementedError();
 }
 
 void main() {

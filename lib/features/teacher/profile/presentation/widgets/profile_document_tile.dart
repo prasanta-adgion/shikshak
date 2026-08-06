@@ -35,11 +35,7 @@ class ProfileDocumentTile extends StatelessWidget {
               color: accent.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(AppRadius.xs),
             ),
-            child: Icon(
-              _iconFor(document.mimeType),
-              size: 18,
-              color: accent,
-            ),
+            child: Icon(_iconFor(document.mimeType), size: 18, color: accent),
           ),
           AppSpacing.hGapMd,
           Expanded(

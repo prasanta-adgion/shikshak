@@ -41,9 +41,7 @@ void main() {
 
   testWidgets('attaches only once', (tester) async {
     await pumpPageThatAttaches(tester);
-    NetworkInspector.attach(
-      tester.element(find.byType(NetworkLoggerButton)),
-    );
+    NetworkInspector.attach(tester.element(find.byType(NetworkLoggerButton)));
     await tester.pumpAndSettle();
 
     expect(find.byType(NetworkLoggerButton), findsOneWidget);

@@ -39,7 +39,8 @@ class ProfileStatusBanner extends StatelessWidget {
 
     // Rejections explain themselves through the reviewer's note when there is
     // one; otherwise fall back to the generic copy.
-    final detail = status == ProfileReviewStatus.rejected &&
+    final detail =
+        status == ProfileReviewStatus.rejected &&
             (reviewNotes?.trim().isNotEmpty ?? false)
         ? reviewNotes!
         : status.message;

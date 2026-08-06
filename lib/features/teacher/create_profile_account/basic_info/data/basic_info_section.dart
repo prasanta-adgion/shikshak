@@ -37,5 +37,4 @@ class BasicInfoSection implements ProfileSection {
       'postalCode': info.postalCode,
     };
   }
-
 }

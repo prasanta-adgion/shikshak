@@ -121,7 +121,10 @@ class _EducationStepState extends ConsumerState<EducationStep>
 
         EducationFormFields(controller: _form),
 
-        WizardAddAnotherButton(label: 'Add Another Education', onPressed: _addAnother),
+        WizardAddAnotherButton(
+          label: 'Add Another Education',
+          onPressed: _addAnother,
+        ),
       ],
     );
   }

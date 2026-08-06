@@ -84,7 +84,9 @@ void main() {
         token: 'access-1',
         refreshToken: 'refresh-1',
       );
-      final adapter = _StubAdapter([_json(500, {'success': false})]);
+      final adapter = _StubAdapter([
+        _json(500, {'success': false}),
+      ]);
 
       expect(await _refresherWith(storage, adapter).refresh(), isNull);
       expect(storage.clearCount, 0);
@@ -128,9 +130,15 @@ void main() {
   group('AuthInterceptor', () {
     test('attaches the stored token to every request', () async {
       final storage = _FakeStorage(token: 'access-1');
-      final api = _StubAdapter([_json(200, {'success': true})]);
+      final api = _StubAdapter([
+        _json(200, {'success': true}),
+      ]);
 
-      await _clientWith(storage, api, _StubAdapter([])).get<dynamic>(_protected);
+      await _clientWith(
+        storage,
+        api,
+        _StubAdapter([]),
+      ).get<dynamic>(_protected);
 
       expect(api.requests.single.headers['Authorization'], 'Bearer access-1');
     });
@@ -142,7 +150,9 @@ void main() {
         token: 'access-1',
         refreshToken: 'refresh-1',
       );
-      final api = _StubAdapter([_json(200, {'success': true})]);
+      final api = _StubAdapter([
+        _json(200, {'success': true}),
+      ]);
       final refresh = _StubAdapter([]);
 
       await _clientWith(storage, api, refresh).get<dynamic>(_protected);
@@ -191,7 +201,9 @@ void main() {
       final client = _clientWith(storage, api, refresh);
 
       final first = await client.get<Map<String, dynamic>>(_protected);
-      final second = await client.get<Map<String, dynamic>>(ApiEndpoints.aboutYou);
+      final second = await client.get<Map<String, dynamic>>(
+        ApiEndpoints.aboutYou,
+      );
 
       expect(first['data'], 'first');
       expect(second['data'], 'second');
@@ -222,8 +234,12 @@ void main() {
 
     test('a failed refresh surfaces the original 401', () async {
       final storage = _FakeStorage(token: 'access-1', refreshToken: 'spent');
-      final api = _StubAdapter([_json(401, {'success': false})]);
-      final refresh = _StubAdapter([_json(401, {'success': false})]);
+      final api = _StubAdapter([
+        _json(401, {'success': false}),
+      ]);
+      final refresh = _StubAdapter([
+        _json(401, {'success': false}),
+      ]);
 
       await expectLater(
         _clientWith(storage, api, refresh).get<dynamic>(_protected),
@@ -273,10 +289,11 @@ void main() {
             ApiEndpoints.uploadFile,
             data: FormData.fromMap({
               'folder': 'documents',
-              'files': MultipartFile.fromBytes(
-                const [1, 2, 3],
-                filename: 'note.pdf',
-              ),
+              'files': MultipartFile.fromBytes(const [
+                1,
+                2,
+                3,
+              ], filename: 'note.pdf'),
             }, ListFormat.multi),
           );
 

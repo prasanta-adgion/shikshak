@@ -130,7 +130,10 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
 
         ExperienceFormFields(controller: _form),
 
-        WizardAddAnotherButton(label: 'Add Another Experience', onPressed: _addAnother),
+        WizardAddAnotherButton(
+          label: 'Add Another Experience',
+          onPressed: _addAnother,
+        ),
       ],
     );
   }

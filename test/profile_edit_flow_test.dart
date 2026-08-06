@@ -43,20 +43,36 @@ class _EmptyApiClient implements IApiClient {
           as T;
 
   @override
-  Future<T> post<T>(String path, {Object? data, Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) =>
-      throw UnimplementedError('No write should happen in these tests.');
+  Future<T> post<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => throw UnimplementedError('No write should happen in these tests.');
 
   @override
-  Future<T> put<T>(String path, {Object? data, Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) =>
-      throw UnimplementedError();
+  Future<T> put<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => throw UnimplementedError();
 
   @override
-  Future<T> patch<T>(String path, {Object? data, Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) =>
-      throw UnimplementedError('No write should happen in these tests.');
+  Future<T> patch<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => throw UnimplementedError('No write should happen in these tests.');
 
   @override
-  Future<T> delete<T>(String path, {Object? data, Map<String, dynamic>? queryParameters, Map<String, dynamic>? headers}) =>
-      throw UnimplementedError();
+  Future<T> delete<T>(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) => throw UnimplementedError();
 }
 
 /// Records every call so a test can assert which verbs actually fired.
@@ -70,7 +86,11 @@ class _RecordingApiClient extends _EmptyApiClient {
     Map<String, dynamic>? headers,
   }) {
     calls.add('GET $path');
-    return super.get<T>(path, queryParameters: queryParameters, headers: headers);
+    return super.get<T>(
+      path,
+      queryParameters: queryParameters,
+      headers: headers,
+    );
   }
 
   @override

@@ -124,104 +124,104 @@ class _NewPasswordCard extends StatelessWidget {
             : Breakpoints.formMaxWidth,
       ),
       child: AppCard(
-      padding: EdgeInsets.all(isTablet ? AppSpacing.xxxl : AppSpacing.xl),
-      child: Form(
-        key: formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ValueListenableBuilder<bool>(
-              valueListenable: obscureNewPassword,
-              builder: (context, obscure, _) {
-                return AppTextField(
-                  label: 'New Password',
-                  hint: 'Enter new password',
-                  controller: newPassword,
-                  validator: Validators.password,
-                  obscureText: obscure,
-                  prefixIcon: AppIcons.password,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      obscure
-                          ? AppIcons.passwordHidden
-                          : AppIcons.passwordVisible,
+        padding: EdgeInsets.all(isTablet ? AppSpacing.xxxl : AppSpacing.xl),
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ValueListenableBuilder<bool>(
+                valueListenable: obscureNewPassword,
+                builder: (context, obscure, _) {
+                  return AppTextField(
+                    label: 'New Password',
+                    hint: 'Enter new password',
+                    controller: newPassword,
+                    validator: Validators.password,
+                    obscureText: obscure,
+                    prefixIcon: AppIcons.password,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscure
+                            ? AppIcons.passwordHidden
+                            : AppIcons.passwordVisible,
+                      ),
+                      onPressed: () => obscureNewPassword.value = !obscure,
                     ),
-                    onPressed: () => obscureNewPassword.value = !obscure,
-                  ),
-                  autofillHints: const [AutofillHints.newPassword],
-                );
-              },
-            ),
-            AppSpacing.gapLg,
-            ValueListenableBuilder<bool>(
-              valueListenable: obscureConfirmPassword,
-              builder: (context, obscure, _) {
-                return AppTextField(
-                  label: 'Confirm New Password',
-                  hint: 'Confirm new password',
-                  controller: confirmPassword,
-                  validator: (value) =>
-                      Validators.confirmPassword(value, newPassword.text),
-                  obscureText: obscure,
-                  prefixIcon: AppIcons.password,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      obscure
-                          ? AppIcons.passwordHidden
-                          : AppIcons.passwordVisible,
+                    autofillHints: const [AutofillHints.newPassword],
+                  );
+                },
+              ),
+              AppSpacing.gapLg,
+              ValueListenableBuilder<bool>(
+                valueListenable: obscureConfirmPassword,
+                builder: (context, obscure, _) {
+                  return AppTextField(
+                    label: 'Confirm New Password',
+                    hint: 'Confirm new password',
+                    controller: confirmPassword,
+                    validator: (value) =>
+                        Validators.confirmPassword(value, newPassword.text),
+                    obscureText: obscure,
+                    prefixIcon: AppIcons.password,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscure
+                            ? AppIcons.passwordHidden
+                            : AppIcons.passwordVisible,
+                      ),
+                      onPressed: () => obscureConfirmPassword.value = !obscure,
                     ),
-                    onPressed: () => obscureConfirmPassword.value = !obscure,
-                  ),
-                  autofillHints: const [AutofillHints.newPassword],
-                );
-              },
-            ),
+                    autofillHints: const [AutofillHints.newPassword],
+                  );
+                },
+              ),
 
-            isTablet ? AppSpacing.gapXl : AppSpacing.gapLg,
+              isTablet ? AppSpacing.gapXl : AppSpacing.gapLg,
 
-            AppLoadingButton(
-              label: 'Set New Password',
-              isLoading: isLoading,
-              onPressed: onSubmit,
-              trailingIcon: CupertinoIcons.arrow_right,
-            ),
+              AppLoadingButton(
+                label: 'Set New Password',
+                isLoading: isLoading,
+                onPressed: onSubmit,
+                trailingIcon: CupertinoIcons.arrow_right,
+              ),
 
-            isTablet ? AppSpacing.gapXxxl : AppSpacing.gapXl,
+              isTablet ? AppSpacing.gapXxxl : AppSpacing.gapXl,
 
-            Row(
-              children: [
-                const Expanded(child: Divider()),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                  ),
-                  child: Text(
-                    'OR',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+              Row(
+                children: [
+                  const Expanded(child: Divider()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
+                    child: Text(
+                      'OR',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-                const Expanded(child: Divider()),
-              ],
-            ),
+                  const Expanded(child: Divider()),
+                ],
+              ),
 
-            AppSpacing.gapSm,
+              AppSpacing.gapSm,
 
-            SizedBox(
-              width: double.infinity,
-              child: TextButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(CupertinoIcons.arrow_left),
-                label: Text(
-                  'Back to Login',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.primary,
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(CupertinoIcons.arrow_left),
+                  label: Text(
+                    'Back to Login',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
               ),
-            ),
             ],
           ),
         ),

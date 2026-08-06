@@ -20,10 +20,7 @@ class TeacherProfileNotifier extends Notifier<TeacherProfileState> {
 
     switch (result) {
       case ApiSuccess(:final data):
-        state = TeacherProfileState(
-          profile: data,
-          hasLoaded: true,
-        );
+        state = TeacherProfileState(profile: data, hasLoaded: true);
       case ApiFailure(:final exception):
         // The previous profile is kept: a failed refresh should not blank a
         // screen that was already showing good data.

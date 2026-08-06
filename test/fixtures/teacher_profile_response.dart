@@ -109,10 +109,12 @@ Map<String, dynamic> teacherProfileResponseJson() => {
           'teacherProfileId': 'dadd879f-e50e-4420-b0fb-5bf79d030c93',
           'documentType': type,
           'fileName': 'WhatsApp Image 2026-07-21 at 4.07.46 PM.jpeg',
-          'fileUrl': 'https://shik-shak.s3.ap-south-1.amazonaws.com/$type.jpeg'
+          'fileUrl':
+              'https://shik-shak.s3.ap-south-1.amazonaws.com/$type.jpeg'
               '?X-Amz-Date=20260730T104940Z&X-Amz-Expires=900',
           'fileKey': 'teacher-documents/user/$type.jpeg',
-          'signedUrl': 'https://shik-shak.s3.ap-south-1.amazonaws.com/$type.jpeg'
+          'signedUrl':
+              'https://shik-shak.s3.ap-south-1.amazonaws.com/$type.jpeg'
               '?X-Amz-Date=20260805T053454Z&X-Amz-Expires=900',
           'mimeType': 'image/jpeg',
           'fileSizeBytes': 97116,
