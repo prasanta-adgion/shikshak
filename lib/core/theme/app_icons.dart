@@ -58,6 +58,16 @@ abstract final class AppIcons {
   static const IconData hours = Icons.schedule_rounded;
   static const IconData rating = Icons.grade_rounded;
 
+  // Profile
+  static const IconData gender = Icons.wc_rounded;
+  static const IconData birthday = Icons.cake_outlined;
+  static const IconData address = Icons.location_on_outlined;
+  static const IconData country = Icons.public_rounded;
+  static const IconData postalCode = Icons.markunread_mailbox_outlined;
+  static const IconData about = Icons.info_outline_rounded;
+  static const IconData education = Icons.school_outlined;
+  static const IconData documents = Icons.folder_open_rounded;
+
   // States
   static const IconData error = Icons.error_outline_rounded;
   static const IconData empty = Icons.inbox_rounded;

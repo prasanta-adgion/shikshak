@@ -1,16 +1,16 @@
 import 'package:Shikshak/core/network/api_exception.dart';
 import 'package:Shikshak/core/network/api_result.dart';
-import 'package:Shikshak/features/account_create/about_you/data/model/about_you_response_model.dart';
-import 'package:Shikshak/features/account_create/about_you/domain/entities/about_you.dart';
-import 'package:Shikshak/features/account_create/about_you/domain/repositories/about_you_repository.dart';
-import 'package:Shikshak/features/account_create/about_you/presentation/providers/about_you_providers.dart';
-import 'package:Shikshak/features/account_create/basic_info/data/model/basic_info_response_model.dart';
-import 'package:Shikshak/features/account_create/basic_info/domain/entities/basic_info.dart';
-import 'package:Shikshak/features/account_create/basic_info/domain/entities/gender.dart';
-import 'package:Shikshak/features/account_create/basic_info/domain/repositories/basic_info_repository.dart';
-import 'package:Shikshak/features/account_create/basic_info/presentation/providers/basic_info_providers.dart';
-import 'package:Shikshak/features/account_create/shared/domain/entities/profile_step.dart';
-import 'package:Shikshak/features/account_create/shared/presentation/providers/account_create_providers.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/about_you/data/model/about_you_response_model.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/about_you/domain/entities/about_you.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/about_you/domain/repositories/about_you_repository.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/about_you/presentation/providers/about_you_providers.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/basic_info/data/model/basic_info_response_model.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/basic_info/domain/entities/basic_info.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/basic_info/domain/entities/gender.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/basic_info/domain/repositories/basic_info_repository.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/basic_info/presentation/providers/basic_info_providers.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/providers/account_create_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 

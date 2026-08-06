@@ -4,13 +4,13 @@ import 'package:Shikshak/features/forgot_password/presentation/screens/new_passw
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/account_create/shared/presentation/pages/create_teacher_account_page.dart';
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/signup_otp_screen.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/student/presentation/pages/student_dashboard_page.dart';
+import '../../features/teacher/create_profile_account/shared/presentation/pages/create_teacher_account_page.dart';
 import '../../features/teacher/presentation/pages/teacher_dashboard_page.dart';
 import 'page_transitions.dart';
 import 'route_paths.dart';

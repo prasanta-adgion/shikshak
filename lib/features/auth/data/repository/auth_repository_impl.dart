@@ -1,3 +1,6 @@
+import 'dart:developer' as developer;
+
+import '../../../../core/flavor/app_flavor.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/network/api_result.dart';
 import '../../../../core/storage/secure_storage_service.dart';
@@ -30,6 +33,7 @@ class AuthRepositoryImpl implements AuthRepository {
         password: params.password,
       ),
     );
+    developer.log(response.refreshToken);
     await _persistSession(response);
     return response.user.toEntity();
   });
@@ -71,8 +75,22 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserRole?> sessionRole() async {
     final token = await _storage.getToken();
+    _logRestoredToken(token);
     if (token == null || token.isEmpty) return null;
     return UserRole.tryParse(await _storage.getRole());
+  }
+
+  /// Prints the token the splash screen just restored from secure storage, so
+  /// it can be copied straight into an API client. Dev and staging only.
+  void _logRestoredToken(String? token) {
+    if (!AppFlavorConfig.logRestoredToken) return;
+
+    developer.log(
+      token == null || token.isEmpty
+          ? 'No stored session token — heading to login.'
+          : 'Restored session token:\n$token',
+      name: 'auth',
+    );
   }
 
   @override
