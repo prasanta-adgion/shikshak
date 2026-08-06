@@ -8,11 +8,7 @@ import '../../../../../core/theme/app_spacing.dart';
 /// Styling matches the wizard's multi-select chips so the same data reads the
 /// same on both screens; the delete affordance is the only thing dropped.
 class ProfileChipWrap extends StatelessWidget {
-  const ProfileChipWrap({
-    super.key,
-    required this.label,
-    required this.values,
-  });
+  const ProfileChipWrap({super.key, required this.label, required this.values});
 
   final String label;
   final List<String> values;

@@ -128,7 +128,10 @@ class _DocumentsStepState extends ConsumerState<DocumentsStep>
 
         DocumentFormFields(controller: _form),
 
-        WizardAddAnotherButton(label: 'Add Another Document', onPressed: _addAnother),
+        WizardAddAnotherButton(
+          label: 'Add Another Document',
+          onPressed: _addAnother,
+        ),
       ],
     );
   }

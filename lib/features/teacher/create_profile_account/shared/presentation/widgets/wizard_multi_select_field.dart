@@ -63,9 +63,7 @@ class WizardMultiSelectField extends StatelessWidget {
           onTap: () => _openSheet(context),
           child: FieldShellValue(
             hint: hint,
-            value: selected.isEmpty
-                ? null
-                : '${selected.length} selected',
+            value: selected.isEmpty ? null : '${selected.length} selected',
           ),
         ),
         if (selected.isNotEmpty) ...[
@@ -90,8 +88,7 @@ class WizardMultiSelectField extends StatelessWidget {
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   deleteIcon: const Icon(Icons.close_rounded, size: 14),
                   deleteIconColor: theme.colorScheme.primary,
-                  onDeleted: () =>
-                      onChanged([...selected]..remove(value)),
+                  onDeleted: () => onChanged([...selected]..remove(value)),
                 ),
             ],
           ),
@@ -142,7 +139,10 @@ class _MultiOptionSheetState extends State<_MultiOptionSheet> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(widget.title, style: theme.textTheme.titleLarge),
+                    child: Text(
+                      widget.title,
+                      style: theme.textTheme.titleLarge,
+                    ),
                   ),
                   TextButton(
                     // Pops with the working set: the sheet is the editor, the

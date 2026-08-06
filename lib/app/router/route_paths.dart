@@ -18,6 +18,7 @@ abstract final class RoutePaths {
 
   static const String createTeacherAccount = '/signup/teacher-profile';
 
+  //move to dashboard based on role
   static String dashboardFor(UserRole role) => switch (role) {
     UserRole.teacher => teacherDashboard,
     UserRole.student => studentDashboard,
@@ -32,6 +33,9 @@ abstract final class RoutePaths {
   /// Reopens one wizard step to change a saved section. The step travels as
   /// `extra` — see [RouteNames.editProfileSection].
   static const String editProfileSection = '/teacher/profile/edit';
+
+  /// Form for a new recurring class slot, pushed from the Schedule tab.
+  static const String createClassSlot = '/teacher/class-slot/create';
 }
 
 /// Route names used for named navigation and analytics screen tracking.
@@ -51,4 +55,5 @@ abstract final class RouteNames {
   //teacher
   static const String createAccountScreen = 'createAccount';
   static const String editProfileSection = 'editProfileSection';
+  static const String createClassSlot = 'createClassSlot';
 }

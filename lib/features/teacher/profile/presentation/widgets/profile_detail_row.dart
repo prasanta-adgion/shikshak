@@ -72,11 +72,7 @@ class ProfileDetailRow extends StatelessWidget {
 /// A free-text block — bio, teaching approach — where a one-line value row
 /// would truncate awkwardly.
 class ProfileTextBlock extends StatelessWidget {
-  const ProfileTextBlock({
-    super.key,
-    required this.label,
-    required this.text,
-  });
+  const ProfileTextBlock({super.key, required this.label, required this.text});
 
   final String label;
   final String? text;

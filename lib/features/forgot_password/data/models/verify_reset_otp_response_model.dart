@@ -11,6 +11,5 @@ class VerifyResetOtpResponseModel {
   factory VerifyResetOtpResponseModel.fromJson(Map<String, dynamic> json) =>
       VerifyResetOtpResponseModel(resetToken: json['reset_token'] as String);
 
-  PasswordResetTicket toEntity() =>
-      PasswordResetTicket(resetToken: resetToken);
+  PasswordResetTicket toEntity() => PasswordResetTicket(resetToken: resetToken);
 }

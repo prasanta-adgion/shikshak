@@ -7,27 +7,29 @@ import 'app_colors.dart';
 abstract final class AppShadows {
   /// Subtle lift for resting cards.
   static List<BoxShadow> soft(Brightness brightness) => [
-        BoxShadow(
-          color: (brightness == Brightness.dark
+    BoxShadow(
+      color:
+          (brightness == Brightness.dark
                   ? Colors.black
                   : AppColors.lightTextPrimary)
               .withValues(alpha: brightness == Brightness.dark ? 0.45 : 0.06),
-          blurRadius: 18,
-          offset: const Offset(0, 6),
-        ),
-      ];
+      blurRadius: 18,
+      offset: const Offset(0, 6),
+    ),
+  ];
 
   /// Stronger lift for hero cards and floating elements.
   static List<BoxShadow> medium(Brightness brightness) => [
-        BoxShadow(
-          color: (brightness == Brightness.dark
+    BoxShadow(
+      color:
+          (brightness == Brightness.dark
                   ? Colors.black
                   : AppColors.lightTextPrimary)
               .withValues(alpha: brightness == Brightness.dark ? 0.55 : 0.10),
-          blurRadius: 30,
-          offset: const Offset(0, 12),
-        ),
-      ];
+      blurRadius: 30,
+      offset: const Offset(0, 12),
+    ),
+  ];
 
   /// Colored glow used behind the logo and primary CTAs.
   static List<BoxShadow> primaryGlow = [

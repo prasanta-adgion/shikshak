@@ -99,11 +99,7 @@ void main() {
 
     // (width, height) windows that should resolve to phone chrome — including a
     // landscape phone (wide but short), which must NOT flip to tablet.
-    const phoneWindows = [
-      (390.0, 844.0),
-      (719.0, 900.0),
-      (900.0, 400.0),
-    ];
+    const phoneWindows = [(390.0, 844.0), (719.0, 900.0), (900.0, 400.0)];
 
     for (final (width, height) in phoneWindows) {
       testWidgets(
@@ -125,10 +121,7 @@ void main() {
             find.byKey(const Key('phone-bottom-navigation')),
             findsOneWidget,
           );
-          expect(
-            find.byKey(const Key('tablet-navigation-rail')),
-            findsNothing,
-          );
+          expect(find.byKey(const Key('tablet-navigation-rail')), findsNothing);
         },
       );
     }
@@ -193,8 +186,10 @@ void main() {
             subtitle: 'Enter the code',
             banner: const ColoredBox(color: Colors.blue, child: Text('Hero')),
             form: LayoutBuilder(
-              builder: (context, constraints) =>
-                  SizedBox(width: constraints.maxWidth, child: const Text('OTP')),
+              builder: (context, constraints) => SizedBox(
+                width: constraints.maxWidth,
+                child: const Text('OTP'),
+              ),
             ),
           ),
         ),

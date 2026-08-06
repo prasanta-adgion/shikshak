@@ -35,7 +35,11 @@ class AppOutlinedButton extends StatelessWidget {
               // narrow phones or at large text scales — same guard as
               // [AppLoadingButton].
               Flexible(
-                child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           );

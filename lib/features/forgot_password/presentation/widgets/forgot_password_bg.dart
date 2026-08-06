@@ -38,7 +38,9 @@ class ForgotPasswordBackground extends StatelessWidget {
                         children: [
                           TextSpan(
                             text: 'Forgot\n',
-                            style: TextStyle(color: theme.colorScheme.onSurface),
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurface,
+                            ),
                           ),
                           TextSpan(
                             text: 'Password?',

@@ -227,6 +227,11 @@ class DateTimeUtils {
   static String dayMonthYear(DateTime date) =>
       '${date.day} ${_months[date.month - 1]} ${date.year}';
 
+  /// `12 Mar` — the year is dropped where a surrounding label already carries
+  /// it, as in a date range.
+  static String dayMonth(DateTime date) =>
+      '${date.day} ${_months[date.month - 1]}';
+
   /// `Mar 2020` — enough precision for an employment range.
   static String monthYear(DateTime date) =>
       '${_months[date.month - 1]} ${date.year}';

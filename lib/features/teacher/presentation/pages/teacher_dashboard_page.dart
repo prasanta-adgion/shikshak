@@ -6,72 +6,31 @@ import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../../../shared/widgets/adaptive_navigation_scaffold.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../auth/presentation/widgets/logout_button.dart';
+import '../../class_schedule/presentation/pages/teacher_schedule_page.dart';
 import '../../profile/presentation/pages/teacher_profile_page.dart';
 import '../widgets/availability_card.dart';
 import '../widgets/class_request_tile.dart';
 import '../widgets/earnings_card.dart';
 import '../widgets/stat_card.dart';
+import '../widgets/teacher_nav_bar.dart';
 
-/// Teacher home shell: bottom navigation + tab content.
-/// Only the Home tab has real content for now; the rest are placeholders.
-class TeacherDashboardPage extends ConsumerStatefulWidget {
+class TeacherDashboardPage extends StatelessWidget {
   const TeacherDashboardPage({super.key});
 
-  @override
-  ConsumerState<TeacherDashboardPage> createState() =>
-      _TeacherDashboardPageState();
-}
-
-class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
-  int _tabIndex = 0;
-
-  static const _destinations = [
-    AdaptiveNavigationDestination(
-      icon: AppIcons.homeOutlined,
-      selectedIcon: AppIcons.home,
-      label: 'Home',
-    ),
-    AdaptiveNavigationDestination(
-      icon: AppIcons.scheduleOutlined,
-      selectedIcon: AppIcons.schedule,
-      label: 'Schedule',
-    ),
-    AdaptiveNavigationDestination(
-      icon: AppIcons.studentsOutlined,
-      selectedIcon: AppIcons.students,
-      label: 'Students',
-    ),
-    AdaptiveNavigationDestination(
-      icon: AppIcons.earningsOutlined,
-      selectedIcon: AppIcons.earnings,
-      label: 'Earnings',
-    ),
-    AdaptiveNavigationDestination(
-      icon: AppIcons.profileOutlined,
-      selectedIcon: AppIcons.profile,
-      label: 'Profile',
-    ),
-  ];
-
-  // Keyed by tab index rather than a list: Home and Profile are real screens,
-  // so a positional list would shift every time one of them lands.
+  // Keyed by tab, not by position: a list would silently shift every time one
+  // of these placeholders is replaced by a real screen.
   static const _placeholderTabs = {
-    1: (
-      title: 'Schedule',
-      message: 'Your class calendar and time slots will appear here.',
-    ),
-    2: (
+    TeacherTab.students: (
       title: 'My Students',
       message: 'All your enrolled students will be listed here.',
     ),
-    3: (
+    TeacherTab.earnings: (
       title: 'Earnings',
       message: 'Detailed payout history and invoices are on the way.',
     ),
@@ -79,16 +38,14 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveNavigationScaffold(
-      selectedIndex: _tabIndex,
-      onDestinationSelected: (index) => setState(() => _tabIndex = index),
-      destinations: _destinations,
-      body: switch (_tabIndex) {
-        0 => const _TeacherHomeTab(),
-        4 => const TeacherProfilePage(),
+    return TeacherNavBar(
+      tabBuilder: (context, tab) => switch (tab) {
+        TeacherTab.home => const _TeacherHomeTab(),
+        TeacherTab.schedule => const TeacherSchedulePage(),
+        TeacherTab.profile => const TeacherProfilePage(),
         _ => EmptyState(
-          title: _placeholderTabs[_tabIndex]!.title,
-          message: _placeholderTabs[_tabIndex]!.message,
+          title: _placeholderTabs[tab]!.title,
+          message: _placeholderTabs[tab]!.message,
         ),
       },
     );
