@@ -15,6 +15,10 @@ class EducationListNotifier extends Notifier<EducationListState> {
 
     final result = await ref.read(getEducationsUseCaseProvider).call();
 
+    // The screen can be popped mid-request, which auto-disposes this
+    // notifier — touching state after that throws.
+    if (!ref.mounted) return;
+
     switch (result) {
       case ApiSuccess(:final data):
         state = state.copyWith(items: data, isLoading: false);
@@ -28,6 +32,10 @@ class EducationListNotifier extends Notifier<EducationListState> {
     state = state.copyWith(isUpdating: true, clearError: true);
 
     final result = await ref.read(updateEducationUseCaseProvider).call(params);
+
+    // The screen can be popped mid-request, which auto-disposes this
+    // notifier — touching state after that throws.
+    if (!ref.mounted) return false;
 
     switch (result) {
       case ApiSuccess():

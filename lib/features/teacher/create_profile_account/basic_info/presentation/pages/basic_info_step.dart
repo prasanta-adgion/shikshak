@@ -173,6 +173,12 @@ class _BasicInfoStepState extends ConsumerState<BasicInfoStep>
         postalCode: _postalCodeController.text.trim(),
       ),
     );
+
+    // Editing PATCHes this one section and pops; onboarding advances.
+    if (ref.read(accountCreateNotifierProvider).isEditing) {
+      notifier.submitEdit();
+      return;
+    }
     notifier.submitCurrentStep();
   }
 

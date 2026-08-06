@@ -14,6 +14,10 @@ class TeacherProfileNotifier extends Notifier<TeacherProfileState> {
 
     final result = await ref.read(getTeacherProfileUseCaseProvider).call();
 
+    // The screen can be popped mid-request, which auto-disposes this
+    // notifier — touching state after that throws.
+    if (!ref.mounted) return;
+
     switch (result) {
       case ApiSuccess(:final data):
         state = TeacherProfileState(

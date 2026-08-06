@@ -2,6 +2,7 @@ import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_pa
 import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/new_password_set.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/domain/entities/user_role.dart';
@@ -10,7 +11,11 @@ import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/signup_otp_screen.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/student/presentation/pages/student_dashboard_page.dart';
+import '../../features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
+import '../../features/teacher/create_profile_account/shared/domain/entities/wizard_mode.dart';
+import '../../features/teacher/create_profile_account/shared/presentation/notifier/account_create_notifier.dart';
 import '../../features/teacher/create_profile_account/shared/presentation/pages/create_teacher_account_page.dart';
+import '../../features/teacher/create_profile_account/shared/presentation/providers/account_create_providers.dart';
 import '../../features/teacher/presentation/pages/teacher_dashboard_page.dart';
 import 'page_transitions.dart';
 import 'route_paths.dart';
@@ -129,6 +134,30 @@ abstract final class AppRouter {
         pageBuilder: (context, state) => fadeSlidePage(
           key: state.pageKey,
           child: const CreateTeacherAccountPage(),
+        ),
+      ),
+
+      //edit one saved profile section — the step travels as `extra`
+      GoRoute(
+        path: RoutePaths.editProfileSection,
+        name: RouteNames.editProfileSection,
+        redirect: (context, state) =>
+            state.extra is ProfileStep ? null : RoutePaths.teacherDashboard,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          // Scoped rather than seeded after the fact, so the wizard's first
+          // build is already on this step and no other step ever mounts.
+          child: ProviderScope(
+            overrides: [
+              accountCreateNotifierProvider.overrideWith(
+                () => AccountCreateNotifier(
+                  initialStep: state.extra! as ProfileStep,
+                  initialMode: WizardMode.edit,
+                ),
+              ),
+            ],
+            child: const CreateTeacherAccountPage(),
+          ),
         ),
       ),
     ],

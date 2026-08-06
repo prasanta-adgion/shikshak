@@ -10,12 +10,27 @@ import '../../../education/domain/entities/education.dart';
 import '../../../experience/domain/entities/experience_info.dart';
 import '../../domain/entities/profile_step.dart';
 import '../../domain/entities/teacher_profile_draft.dart';
+import '../../domain/entities/wizard_mode.dart';
 import '../providers/account_create_providers.dart';
 import '../state/account_create_state.dart';
 
 class AccountCreateNotifier extends Notifier<AccountCreateState> {
+  AccountCreateNotifier({
+    this.initialStep,
+    this.initialMode = WizardMode.create,
+  });
+
+  /// Where the wizard opens. Null is onboarding, which always starts at the
+  /// first step; the edit route overrides this provider to name one section.
+  final ProfileStep? initialStep;
+
+  final WizardMode initialMode;
+
   @override
-  AccountCreateState build() => const AccountCreateState();
+  AccountCreateState build() => AccountCreateState(
+    step: initialStep ?? ProfileStep.basicInfo,
+    mode: initialMode,
+  );
 
   // ── Navigation ─────────────────────────────────────────────────────────
 
@@ -85,7 +100,12 @@ class AccountCreateNotifier extends Notifier<AccountCreateState> {
 
   Future<bool> submitEntry() => _save(advance: false);
 
-  Future<bool> _save({required bool advance}) async {
+  /// Saves the section in place: no advance, no completion. Singleton sections
+  /// PATCH here, because the step hydrated [AccountCreateState.savedBodies]
+  /// from the server when it opened.
+  Future<bool> submitEdit() => _save(advance: false, isEdit: true);
+
+  Future<bool> _save({required bool advance, bool isEdit = false}) async {
     if (state.isSubmitting) return false;
 
     final step = state.step;
@@ -99,6 +119,10 @@ class AccountCreateNotifier extends Notifier<AccountCreateState> {
           lastSavedBody: state.savedBodies[step],
         );
 
+    // The wizard can be popped mid-save, which auto-disposes this notifier —
+    // touching state after that throws. The request itself still completed.
+    if (!ref.mounted) return false;
+
     return result.fold(
       onSuccess: (outcome) {
         state = state.copyWith(
@@ -106,6 +130,7 @@ class AccountCreateNotifier extends Notifier<AccountCreateState> {
           draft: outcome.draft,
           savedBodies: {...state.savedBodies, step: outcome.savedBody},
           isComplete: advance && step.isLast ? true : null,
+          isEditSaved: isEdit ? true : null,
         );
         if (advance && !step.isLast) next();
         return true;

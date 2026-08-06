@@ -14,6 +14,10 @@ class AboutYouNotifier extends Notifier<AboutYouState> {
 
     final result = await ref.read(getAboutYouUseCaseProvider).call();
 
+    // The screen can be popped mid-request, which auto-disposes this
+    // notifier — touching state after that throws.
+    if (!ref.mounted) return;
+
     switch (result) {
       case ApiSuccess(:final data):
         state = AboutYouState(about: data);

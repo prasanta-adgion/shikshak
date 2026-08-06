@@ -88,14 +88,18 @@ class _EducationStepState extends ConsumerState<EducationStep>
 
     // A blank form after at least one qualification was filed is not an
     // error — there is nothing left to send, so move on.
-    if (_form.isEmpty && hasSaved) {
+    final isEditing = ref.read(accountCreateNotifierProvider).isEditing;
+
+    // A blank form is not an error: in onboarding it means "nothing left to
+    // file", and when editing it means "I only changed existing rows".
+    if (_form.isEmpty && (hasSaved || isEditing)) {
       FocusScope.of(context).unfocus();
-      notifier.submitCurrentStep();
+      isEditing ? notifier.submitEdit() : notifier.submitCurrentStep();
       return;
     }
 
     if (!_stageEntry()) return;
-    notifier.submitCurrentStep();
+    isEditing ? notifier.submitEdit() : notifier.submitCurrentStep();
   }
 
   @override
@@ -117,10 +121,7 @@ class _EducationStepState extends ConsumerState<EducationStep>
 
         EducationFormFields(controller: _form),
 
-        WizardAddAnotherButton(
-          label: 'Add Another Education',
-          onPressed: _addAnother,
-        ),
+        WizardAddAnotherButton(label: 'Add Another Education', onPressed: _addAnother),
       ],
     );
   }

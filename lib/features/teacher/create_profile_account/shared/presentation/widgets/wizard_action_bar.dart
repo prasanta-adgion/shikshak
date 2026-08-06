@@ -17,6 +17,10 @@ class WizardActionBar extends StatelessWidget {
     required this.onBack,
     required this.continueButtonOnpressed,
     this.isSubmitting = false,
+    this.primaryLabel,
+    this.backLabel = 'Back',
+    this.showBack = true,
+    this.showForwardIcon = true,
   });
 
   final ProfileStep step;
@@ -25,6 +29,20 @@ class WizardActionBar extends StatelessWidget {
   final bool isSubmitting;
   final VoidCallback onBack;
   final VoidCallback continueButtonOnpressed;
+
+  /// Overrides [ProfileStep.primaryLabel] — 'Update' or 'Done' when the wizard
+  /// was opened to change one section rather than to walk all five.
+  final String? primaryLabel;
+
+  /// 'Cancel' when editing — there is no previous step to go back to.
+  final String backLabel;
+
+  /// The caller decides: onboarding hides it on the first step, editing always
+  /// shows it, because there is no other way off the screen.
+  final bool showBack;
+
+  /// The arrow reads as "next", which is wrong on a button that saves in place.
+  final bool showForwardIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +77,11 @@ class WizardActionBar extends StatelessWidget {
                   children: [
                     // The first step has nowhere to go back to on screen —
                     // its Back leaves the wizard, which the page confirms.
-                    if (!step.isFirst) ...[
+                    if (showBack) ...[
                       Expanded(
                         flex: 2,
                         child: AppOutlinedButton(
-                          label: 'Back',
+                          label: backLabel,
                           onPressed: isSubmitting ? null : onBack,
                         ),
                       ),
@@ -72,11 +90,13 @@ class WizardActionBar extends StatelessWidget {
                     Expanded(
                       flex: 3,
                       child: AppLoadingButton(
-                        label: step.primaryLabel,
+                        label: primaryLabel ?? step.primaryLabel,
                         isLoading: isSubmitting,
                         onPressed: continueButtonOnpressed,
                         color: theme.colorScheme.tertiary,
-                        trailingIcon: CupertinoIcons.arrow_right,
+                        trailingIcon: showForwardIcon
+                            ? CupertinoIcons.arrow_right
+                            : null,
                       ),
                     ),
                   ],

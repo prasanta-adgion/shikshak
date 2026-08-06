@@ -14,6 +14,10 @@ class BasicInfoNotifier extends Notifier<BasicInfoState> {
 
     final result = await ref.read(getBasicInfoUseCaseProvider).call();
 
+    // The screen can be popped mid-request, which auto-disposes this
+    // notifier — touching state after that throws.
+    if (!ref.mounted) return;
+
     switch (result) {
       case ApiSuccess(:final data):
         state = BasicInfoState(info: data);

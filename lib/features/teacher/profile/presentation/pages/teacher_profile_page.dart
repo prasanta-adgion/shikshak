@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../../app/router/route_paths.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/utils/date_time_picker_func.dart';
@@ -9,6 +11,7 @@ import '../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../shared/widgets/empty_state.dart';
 import '../../../../../shared/widgets/error_state.dart';
 import '../../../../auth/presentation/widgets/logout_button.dart';
+import '../../../create_profile_account/shared/domain/entities/profile_step.dart';
 import '../../../create_profile_account/shared/presentation/widgets/saved_entry_card.dart';
 import '../../domain/entities/teacher_profile.dart';
 import '../providers/teacher_profile_providers.dart';
@@ -35,6 +38,16 @@ class _TeacherProfilePageState extends ConsumerState<TeacherProfilePage> {
     Future.microtask(
       () => ref.read(teacherProfileNotifierProvider.notifier).load(),
     );
+  }
+
+  /// Reopens [step] in the create-profile wizard, then re-reads the profile.
+  ///
+  /// Refreshed unconditionally: a repeatable section PATCHes its rows through
+  /// their own edit sheets and then closes with Done, which returns nothing.
+  Future<void> _editSection(ProfileStep step) async {
+    await context.push(RoutePaths.editProfileSection, extra: step);
+    if (!mounted) return;
+    await ref.read(teacherProfileNotifierProvider.notifier).refresh();
   }
 
   @override
@@ -100,15 +113,30 @@ class _TeacherProfilePageState extends ConsumerState<TeacherProfilePage> {
                     reviewNotes: profile.reviewNotes,
                   ),
                   AppSpacing.gapLg,
-                  _BasicInfoSection(profile: profile),
+                  _BasicInfoSection(
+                    profile: profile,
+                    onEdit: () => _editSection(ProfileStep.basicInfo),
+                  ),
                   AppSpacing.gapLg,
-                  _AboutYouSection(profile: profile),
+                  _AboutYouSection(
+                    profile: profile,
+                    onEdit: () => _editSection(ProfileStep.aboutYou),
+                  ),
                   AppSpacing.gapLg,
-                  _ExperienceSection(profile: profile),
+                  _ExperienceSection(
+                    profile: profile,
+                    onEdit: () => _editSection(ProfileStep.experience),
+                  ),
                   AppSpacing.gapLg,
-                  _EducationSection(profile: profile),
+                  _EducationSection(
+                    profile: profile,
+                    onEdit: () => _editSection(ProfileStep.education),
+                  ),
                   AppSpacing.gapLg,
-                  _DocumentsSection(profile: profile),
+                  _DocumentsSection(
+                    profile: profile,
+                    onEdit: () => _editSection(ProfileStep.documents),
+                  ),
                   AppSpacing.gapXxxl,
                 ]),
               ),
@@ -161,9 +189,10 @@ class _PlaceholderBody extends StatelessWidget {
 }
 
 class _BasicInfoSection extends StatelessWidget {
-  const _BasicInfoSection({required this.profile});
+  const _BasicInfoSection({required this.profile, required this.onEdit});
 
   final TeacherProfile profile;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -173,8 +202,7 @@ class _BasicInfoSection extends StatelessWidget {
     return ProfileSectionCard(
       title: 'Basic Information',
       icon: AppIcons.identifier,
-      // TODO(profile): open the wizard's basic-info step once editing is wired.
-      onEdit: () {},
+      onEdit: onEdit,
       children: [
         ProfileDetailRow(
           icon: AppIcons.gender,
@@ -217,9 +245,10 @@ class _BasicInfoSection extends StatelessWidget {
 }
 
 class _AboutYouSection extends StatelessWidget {
-  const _AboutYouSection({required this.profile});
+  const _AboutYouSection({required this.profile, required this.onEdit});
 
   final TeacherProfile profile;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -228,8 +257,7 @@ class _AboutYouSection extends StatelessWidget {
     return ProfileSectionCard(
       title: 'About You',
       icon: AppIcons.about,
-      // TODO(profile): open the wizard's about-you step once editing is wired.
-      onEdit: () {},
+      onEdit: onEdit,
       children: [
         ProfileTextBlock(label: 'Short bio', text: aboutYou.shortBio),
         ProfileTextBlock(
@@ -258,9 +286,10 @@ class _AboutYouSection extends StatelessWidget {
 }
 
 class _ExperienceSection extends StatelessWidget {
-  const _ExperienceSection({required this.profile});
+  const _ExperienceSection({required this.profile, required this.onEdit});
 
   final TeacherProfile profile;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -272,8 +301,7 @@ class _ExperienceSection extends StatelessWidget {
       title: 'Experience',
       icon: AppIcons.experience,
       count: profile.experiences.length,
-      // TODO(profile): open the wizard's experience step once editing is wired.
-      onEdit: () {},
+      onEdit: onEdit,
       children: [
         if (profile.experiences.isEmpty)
           const _SectionEmptyNote(message: 'No experience added yet.')
@@ -298,9 +326,10 @@ class _ExperienceSection extends StatelessWidget {
 }
 
 class _EducationSection extends StatelessWidget {
-  const _EducationSection({required this.profile});
+  const _EducationSection({required this.profile, required this.onEdit});
 
   final TeacherProfile profile;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -308,8 +337,7 @@ class _EducationSection extends StatelessWidget {
       title: 'Education',
       icon: AppIcons.education,
       count: profile.educations.length,
-      // TODO(profile): open the wizard's education step once editing is wired.
-      onEdit: () {},
+      onEdit: onEdit,
       children: [
         if (profile.educations.isEmpty)
           const _SectionEmptyNote(message: 'No qualifications added yet.')
@@ -340,9 +368,10 @@ class _EducationSection extends StatelessWidget {
 }
 
 class _DocumentsSection extends StatelessWidget {
-  const _DocumentsSection({required this.profile});
+  const _DocumentsSection({required this.profile, required this.onEdit});
 
   final TeacherProfile profile;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -350,8 +379,7 @@ class _DocumentsSection extends StatelessWidget {
       title: 'Documents',
       icon: AppIcons.documents,
       count: profile.documents.length,
-      // TODO(profile): open the wizard's documents step once editing is wired.
-      onEdit: () {},
+      onEdit: onEdit,
       children: [
         if (profile.documents.isEmpty)
           const _SectionEmptyNote(message: 'No documents uploaded yet.')

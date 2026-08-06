@@ -15,10 +15,20 @@ import '../../../documents/presentation/pages/documents_step.dart';
 import '../../../education/presentation/pages/education_step.dart';
 import '../../../experience/presentation/pages/experience_step.dart';
 import '../../domain/entities/profile_step.dart';
+import '../../domain/entities/wizard_mode.dart';
 import '../providers/account_create_providers.dart';
 import '../widgets/step_timeline.dart';
 import '../widgets/wizard_action_bar.dart';
 
+/// The five-step onboarding wizard, and — when [AccountCreateState.mode] is
+/// [WizardMode.edit] — the single-step editor the profile screen opens for one
+/// section.
+///
+/// Which section, and which mode, come from [accountCreateNotifierProvider].
+/// The edit route overrides that provider in a nested `ProviderScope`, so the
+/// very first build is already on the right step: seeding it afterwards would
+/// mount the default step just long enough to start a request, then dispose it
+/// mid-flight.
 class CreateTeacherAccountPage extends ConsumerStatefulWidget {
   const CreateTeacherAccountPage({super.key});
 
@@ -61,9 +71,18 @@ class _CreateTeacherAccountPageState
 
   /// Back means "previous step" everywhere except the first, where it means
   /// leaving the wizard — which throws away the draft, so it asks first.
+  ///
+  /// Editing has neither: one section, and nothing unsaved worth warning about
+  /// beyond the field currently being typed into.
   Future<void> _handleBack() async {
     final notifier = ref.read(accountCreateNotifierProvider.notifier);
-    final step = ref.read(accountCreateNotifierProvider).step;
+    final state = ref.read(accountCreateNotifierProvider);
+    final step = state.step;
+
+    if (state.isEditing) {
+      Navigator.of(context).pop();
+      return;
+    }
 
     if (!step.isFirst) {
       notifier.previous();
@@ -99,6 +118,9 @@ class _CreateTeacherAccountPageState
     final step = ref.watch(
       accountCreateNotifierProvider.select((state) => state.step),
     );
+    final isEditing = ref.watch(
+      accountCreateNotifierProvider.select((state) => state.isEditing),
+    );
 
     ref.listen(accountCreateNotifierProvider.select((state) => state.step), (
       previous,
@@ -127,6 +149,15 @@ class _CreateTeacherAccountPageState
       },
     );
 
+    // An edit saved — hand control back to the profile screen, which refreshes.
+    ref.listen(
+      accountCreateNotifierProvider.select((state) => state.isEditSaved),
+      (previous, next) {
+        if (!next || previous == next) return;
+        Navigator.of(context).pop(true);
+      },
+    );
+
     final maxWidth = context.isTabletDevice
         ? Breakpoints.tabletFormMaxWidth
         : Breakpoints.formMaxWidth;
@@ -142,28 +173,30 @@ class _CreateTeacherAccountPageState
           child: SafeArea(
             child: Column(
               children: [
-                CenteredConstrainedBox(
-                  maxWidth: maxWidth,
-                  child: Padding(
-                    padding: context.responsivePagePadding.copyWith(
-                      top: 0,
-                      bottom: AppSpacing.md,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        RepaintBoundary(
-                          child: StepTimeline(
-                            current: step,
-                            onStepTapped: ref
-                                .read(accountCreateNotifierProvider.notifier)
-                                .goTo,
+                // Editing is one section — there is no progression to show.
+                if (!isEditing)
+                  CenteredConstrainedBox(
+                    maxWidth: maxWidth,
+                    child: Padding(
+                      padding: context.responsivePagePadding.copyWith(
+                        top: 0,
+                        bottom: AppSpacing.md,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          RepaintBoundary(
+                            child: StepTimeline(
+                              current: step,
+                              onStepTapped: ref
+                                  .read(accountCreateNotifierProvider.notifier)
+                                  .goTo,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
                 Expanded(
                   child: Stack(
                     children: [
@@ -227,6 +260,7 @@ class _CreateTeacherAccountPageState
                               step: step,
                               maxWidth: maxWidth,
                               isVisible: isVisible,
+                              isEditing: isEditing,
                               onBack: _handleBack,
                             ),
                           ),
@@ -249,12 +283,14 @@ class _ActionBar extends ConsumerWidget {
     required this.step,
     required this.maxWidth,
     required this.isVisible,
+    required this.isEditing,
     required this.onBack,
   });
 
   final ProfileStep step;
   final double maxWidth;
   final bool isVisible;
+  final bool isEditing;
   final VoidCallback onBack;
 
   @override
@@ -269,6 +305,11 @@ class _ActionBar extends ConsumerWidget {
       isVisible: isVisible,
       isSubmitting: isSubmitting,
       onBack: onBack,
+      // Editing always offers a way out: there is no app bar behind this.
+      showBack: isEditing || !step.isFirst,
+      backLabel: isEditing ? 'Cancel' : 'Back',
+      showForwardIcon: !isEditing,
+      primaryLabel: isEditing ? 'Update' : null,
       continueButtonOnpressed: ref.read(wizardStepControllerProvider).submit,
     );
   }

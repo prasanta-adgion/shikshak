@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../../shared/widgets/app_snackbar.dart';
+import '../../../about_you/presentation/providers/about_you_providers.dart';
 import '../../../shared/domain/entities/profile_step.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
@@ -44,6 +45,23 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
   void _loadSaved() {
     if (!mounted) return;
     ref.read(experienceListNotifierProvider.notifier).load();
+
+    // Onboarding reaches this step with About You already on the draft.
+    // Editing opens here cold, and every experience row carries those two
+    // lists — a position added now would post them empty.
+    if (ref.read(accountCreateNotifierProvider).isEditing) _loadSubjects();
+  }
+
+  Future<void> _loadSubjects() async {
+    // The use case, not the notifier: nothing on this step watches
+    // `aboutYouNotifierProvider`, so it would be auto-disposed mid-request.
+    final result = await ref.read(getAboutYouUseCaseProvider).call();
+    if (!mounted) return;
+
+    final saved = result.dataOrNull;
+    if (saved == null) return;
+
+    ref.read(accountCreateNotifierProvider.notifier).hydrateAboutYou(saved);
   }
 
   /// Validates the form and stages it on the draft, ready to be posted.
@@ -78,15 +96,19 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
 
     // A blank form after at least one position was filed is not an error —
     // there is simply nothing left to send, so move on.
-    if (_form.isEmpty && hasSaved) {
+    final isEditing = ref.read(accountCreateNotifierProvider).isEditing;
+
+    // A blank form is not an error: in onboarding it means "nothing left to
+    // file", and when editing it means "I only changed existing rows".
+    if (_form.isEmpty && (hasSaved || isEditing)) {
       FocusScope.of(context).unfocus();
-      notifier.submitCurrentStep();
+      isEditing ? notifier.submitEdit() : notifier.submitCurrentStep();
       return;
     }
 
     if (!_stageEntry()) return;
     // teachingSubjects and classesTaught come off the draft, not this screen.
-    notifier.submitCurrentStep();
+    isEditing ? notifier.submitEdit() : notifier.submitCurrentStep();
   }
 
   @override
@@ -108,10 +130,7 @@ class _ExperienceStepState extends ConsumerState<ExperienceStep>
 
         ExperienceFormFields(controller: _form),
 
-        WizardAddAnotherButton(
-          label: 'Add Another Experience',
-          onPressed: _addAnother,
-        ),
+        WizardAddAnotherButton(label: 'Add Another Experience', onPressed: _addAnother),
       ],
     );
   }
