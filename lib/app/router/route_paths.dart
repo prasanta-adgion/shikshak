@@ -28,6 +28,10 @@ abstract final class RoutePaths {
 
   //teacher
   static const String createAccountScreenPath = '/create-teacher-account';
+
+  /// Reopens one wizard step to change a saved section. The step travels as
+  /// `extra` — see [RouteNames.editProfileSection].
+  static const String editProfileSection = '/teacher/profile/edit';
 }
 
 /// Route names used for named navigation and analytics screen tracking.
@@ -46,4 +50,5 @@ abstract final class RouteNames {
 
   //teacher
   static const String createAccountScreen = 'createAccount';
+  static const String editProfileSection = 'editProfileSection';
 }

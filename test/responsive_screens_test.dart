@@ -12,9 +12,16 @@ import 'package:Shikshak/features/forgot_password/presentation/screens/new_passw
 import 'package:Shikshak/features/otp_verification/presentation/pages/otp_verify_screen.dart';
 import 'package:Shikshak/features/student/presentation/pages/student_dashboard_page.dart';
 import 'package:Shikshak/features/teacher/presentation/pages/teacher_dashboard_page.dart';
+import 'package:Shikshak/features/teacher/profile/data/model/teacher_profile_response_model.dart';
+import 'package:Shikshak/features/teacher/profile/presentation/notifier/teacher_profile_notifier.dart';
+import 'package:Shikshak/features/teacher/profile/presentation/pages/teacher_profile_page.dart';
+import 'package:Shikshak/features/teacher/profile/presentation/providers/teacher_profile_providers.dart';
+import 'package:Shikshak/features/teacher/profile/presentation/state/teacher_profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'fixtures/teacher_profile_response.dart';
 
 /// Windows the app must render cleanly in. Device class keys off the shortest
 /// side, so both orientations of each form factor are covered.
@@ -25,6 +32,21 @@ const _windows = <String, Size>{
   'tablet portrait': Size(800, 1280),
   'tablet landscape': Size(1280, 800),
 };
+
+/// Serves the sample payload so the profile screen lays out its real content
+/// instead of a spinner. `load()` is a no-op: these tests never hit the wire.
+class _SeededProfileNotifier extends TeacherProfileNotifier {
+  @override
+  TeacherProfileState build() => TeacherProfileState(
+    profile: TeacherProfileResponseModel.fromJson(
+      teacherProfileResponseJson(),
+    ).data!.toEntity(),
+    hasLoaded: true,
+  );
+
+  @override
+  Future<void> load() async {}
+}
 
 /// Seeds an authenticated session so dashboards render their real content.
 /// The deliberately long name exercises the app-bar overflow guard.
@@ -55,6 +77,9 @@ void main() {
       ProviderScope(
         overrides: [
           authStateNotifierProvider.overrideWith(_SeededAuthNotifier.new),
+          teacherProfileNotifierProvider.overrideWith(
+            _SeededProfileNotifier.new,
+          ),
         ],
         child: MaterialApp(theme: AppTheme.light, home: screen),
       ),
@@ -71,6 +96,9 @@ void main() {
     'NewPasswordSet': () => const NewPasswordSet(),
     'StudentDashboardPage': () => const StudentDashboardPage(),
     'TeacherDashboardPage': () => const TeacherDashboardPage(),
+    // Rendered as a dashboard tab, so it has no Scaffold of its own — the
+    // test supplies the Material ancestor its buttons need.
+    'TeacherProfilePage': () => const Scaffold(body: TeacherProfilePage()),
   };
 
   group('renders without overflow', () {
@@ -95,6 +123,9 @@ void main() {
           ProviderScope(
             overrides: [
               authStateNotifierProvider.overrideWith(_SeededAuthNotifier.new),
+              teacherProfileNotifierProvider.overrideWith(
+                _SeededProfileNotifier.new,
+              ),
             ],
             child: MaterialApp(theme: AppTheme.dark, home: build()),
           ),

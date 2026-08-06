@@ -13,6 +13,7 @@ import '../../../../shared/widgets/initials_avatar.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../auth/presentation/widgets/logout_button.dart';
+import '../../profile/presentation/pages/teacher_profile_page.dart';
 import '../widgets/availability_card.dart';
 import '../widgets/class_request_tile.dart';
 import '../widgets/earnings_card.dart';
@@ -59,24 +60,22 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
     ),
   ];
 
-  static const _placeholderTabs = [
-    (
+  // Keyed by tab index rather than a list: Home and Profile are real screens,
+  // so a positional list would shift every time one of them lands.
+  static const _placeholderTabs = {
+    1: (
       title: 'Schedule',
       message: 'Your class calendar and time slots will appear here.',
     ),
-    (
+    2: (
       title: 'My Students',
       message: 'All your enrolled students will be listed here.',
     ),
-    (
+    3: (
       title: 'Earnings',
       message: 'Detailed payout history and invoices are on the way.',
     ),
-    (
-      title: 'Profile',
-      message: 'Manage your public profile, subjects and pricing.',
-    ),
-  ];
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +83,14 @@ class _TeacherDashboardPageState extends ConsumerState<TeacherDashboardPage> {
       selectedIndex: _tabIndex,
       onDestinationSelected: (index) => setState(() => _tabIndex = index),
       destinations: _destinations,
-      body: _tabIndex == 0
-          ? const _TeacherHomeTab()
-          : EmptyState(
-              title: _placeholderTabs[_tabIndex - 1].title,
-              message: _placeholderTabs[_tabIndex - 1].message,
-            ),
+      body: switch (_tabIndex) {
+        0 => const _TeacherHomeTab(),
+        4 => const TeacherProfilePage(),
+        _ => EmptyState(
+          title: _placeholderTabs[_tabIndex]!.title,
+          message: _placeholderTabs[_tabIndex]!.message,
+        ),
+      },
     );
   }
 }

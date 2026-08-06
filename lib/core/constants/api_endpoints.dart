@@ -24,4 +24,5 @@ abstract final class ApiEndpoints {
   static const String education = '/api/v1/user/teacher/profile/education';
   static const String experience = '/api/v1/user/teacher/profile/experience';
   static const String documents = '/api/v1/user/teacher/profile/documents';
+  static const String getProfile = '/api/v1/user/teacher/profile';
 }

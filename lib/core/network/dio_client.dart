@@ -6,6 +6,7 @@ import 'api_exception.dart';
 import 'i_api_client.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/logger_interceptor.dart';
+import 'token_refresher.dart';
 
 class DioClient implements IApiClient {
   final Dio _dio;
@@ -14,6 +15,7 @@ class DioClient implements IApiClient {
     required SecureStorageService storage,
     bool enableLogging = true,
     Dio? dio,
+    TokenRefresher? refresher,
   }) : _dio = dio ?? Dio() {
     if (baseUrl.isEmpty) {
       throw ArgumentError.value(
@@ -33,7 +35,19 @@ class DioClient implements IApiClient {
       sendTimeout: const Duration(seconds: 15),
       headers: const {'Accept': 'application/json'},
     );
-    _dio.interceptors.add(AuthInterceptor(storage));
+    _dio.interceptors.add(
+      AuthInterceptor(
+        storage,
+        dio: _dio,
+        refresher:
+            refresher ??
+            TokenRefresher(
+              baseUrl: normalizedBaseUrl,
+              storage: storage,
+              enableLogging: enableLogging,
+            ),
+      ),
+    );
     if (enableLogging) {
       // Two audiences: the console for a terminal, and the in-app inspector
       // (the draggable button) for a device with no console attached.

@@ -35,6 +35,7 @@ class LoggerInterceptor extends Interceptor {
       '${response.requestOptions.uri}',
       name: _name,
     );
+
     handler.next(response);
   }
 
