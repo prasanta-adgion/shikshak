@@ -11,6 +11,7 @@ import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/signup_otp_screen.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/student/presentation/pages/student_dashboard_page.dart';
+import '../../features/teacher/create_class_slot/presentation/pages/create_class_slot_page.dart';
 import '../../features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
 import '../../features/teacher/create_profile_account/shared/domain/entities/wizard_mode.dart';
 import '../../features/teacher/create_profile_account/shared/presentation/notifier/account_create_notifier.dart';
@@ -158,6 +159,16 @@ abstract final class AppRouter {
             ],
             child: const CreateTeacherAccountPage(),
           ),
+        ),
+      ),
+
+      //teacher — new class slot
+      GoRoute(
+        path: RoutePaths.createClassSlot,
+        name: RouteNames.createClassSlot,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: const CreateClassSlotPage(),
         ),
       ),
     ],

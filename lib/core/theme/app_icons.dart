@@ -61,6 +61,9 @@ abstract final class AppIcons {
 
   // Class schedule
   static const IconData addClass = Icons.add_rounded;
+  static const IconData classTitle = Icons.title_rounded;
+  static const IconData notes = Icons.notes_rounded;
+  static const IconData repeat = Icons.repeat_rounded;
   static const IconData classOnline = Icons.videocam_outlined;
   static const IconData classInPerson = Icons.location_on_outlined;
   static const IconData classHybrid = Icons.sync_alt_rounded;

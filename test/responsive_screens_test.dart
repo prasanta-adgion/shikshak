@@ -14,6 +14,7 @@ import 'package:Shikshak/features/student/presentation/pages/student_dashboard_p
 import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/class_slots_tab.dart';
 import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/teacher_schedule_page.dart';
 import 'package:Shikshak/features/teacher/class_schedule/presentation/providers/class_schedule_providers.dart';
+import 'package:Shikshak/features/teacher/create_class_slot/presentation/pages/create_class_slot_page.dart';
 import 'package:Shikshak/features/teacher/presentation/pages/teacher_dashboard_page.dart';
 import 'package:Shikshak/features/teacher/profile/data/model/teacher_profile_response_model.dart';
 import 'package:Shikshak/features/teacher/profile/presentation/notifier/teacher_profile_notifier.dart';
@@ -119,6 +120,7 @@ void main() {
     // The shell opens on Calendar, so All Slots would never be laid out here
     // without an entry of its own.
     'ClassSlotsTab': () => const Scaffold(body: ClassSlotsTab()),
+    'CreateClassSlotPage': () => const CreateClassSlotPage(),
   };
 
   group('renders without overflow', () {

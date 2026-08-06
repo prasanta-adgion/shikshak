@@ -43,11 +43,18 @@ class AppButton extends StatelessWidget {
             children: [
               Icon(icon, size: 20),
               AppSpacing.hGapSm,
-              Text(
-                label,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(color: labelColor),
+              // Flexible so a long label ellipsizes instead of overflowing on
+              // narrow phones or at large text scales — same guard as
+              // [AppOutlinedButton] and [AppLoadingButton].
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium?.copyWith(color: labelColor),
+                ),
               ),
             ],
           );

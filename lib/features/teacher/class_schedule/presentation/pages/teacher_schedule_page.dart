@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../../app/router/route_paths.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../shared/widgets/app_button.dart';
@@ -48,8 +50,9 @@ class TeacherSchedulePage extends StatelessWidget {
                   label: 'Create Class',
                   icon: AppIcons.addClass,
                   expanded: false,
-
-                  onPressed: () {},
+                  // Opens the form. Nothing is saved yet — the create endpoint
+                  // is still to come.
+                  onPressed: () => context.push(RoutePaths.createClassSlot),
                 ),
               ],
             ),

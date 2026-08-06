@@ -90,17 +90,16 @@ void main() {
       expect(find.text('Create Class'), findsOneWidget);
     });
 
-    testWidgets('Create Class is inert until the flow is wired', (
-      tester,
-    ) async {
+    testWidgets('Create Class is enabled', (tester) async {
       await pumpShell(tester);
 
-      await tester.tap(find.text('Create Class'));
-      await tester.pumpAndSettle();
+      // Not tapped here: it pushes a route, which needs the real router. The
+      // form's own test covers what opens.
+      final button = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Create Class'),
+      );
 
-      // Nothing navigates or opens yet; the schedule stays on screen.
-      expect(find.byType(ScheduleCalendarTab), findsOneWidget);
-      expect(tester.takeException(), isNull);
+      expect(button.onPressed, isNotNull);
     });
   });
 }
