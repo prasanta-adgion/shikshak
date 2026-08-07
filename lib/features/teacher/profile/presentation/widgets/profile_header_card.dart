@@ -7,10 +7,6 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../shared/widgets/app_card.dart';
 import '../../domain/entities/teacher_profile.dart';
 
-/// Identity block at the top of the profile: photo, name, contact, role.
-///
-/// Sits on the brand gradient, so every colour here is a fixed white tint
-/// rather than a scheme lookup — the card looks the same in both themes.
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({super.key, required this.profile});
 
@@ -19,7 +15,7 @@ class ProfileHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final photoUrl = profile.basicInfo.profilePhotoUrl;
+    final photoUrl = profile.user.avatarUrl;
 
     return AppCard(
       gradient: AppColors.primaryGradient,
@@ -77,9 +73,12 @@ class ProfileHeaderCard extends StatelessWidget {
   }
 }
 
-/// The remote photo when there is one, initials on a translucent disc
-/// otherwise. `InitialsAvatar` is not reused here: it tints itself from the
-/// colour scheme, which disappears against the gradient.
+/// The teacher's photo — `user.avatarUrl`, which the profile payload carries
+/// as `userProfileImageUrl` — on a translucent disc, with their initials
+/// standing in whenever there is no picture to show.
+///
+/// `InitialsAvatar` is not reused here: it tints itself from the colour
+/// scheme, which disappears against the gradient.
 class _Avatar extends StatelessWidget {
   const _Avatar({required this.name, this.photoUrl});
 
@@ -87,6 +86,8 @@ class _Avatar extends StatelessWidget {
   final String? photoUrl;
 
   static const double size = 72;
+
+  bool get _hasPhoto => photoUrl != null && photoUrl!.isNotEmpty;
 
   String get _initials {
     final parts = name
@@ -101,32 +102,52 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       height: size,
       width: size,
       alignment: Alignment.center,
+      // Clipped rather than painted as a DecorationImage: only a real widget
+      // can report that it failed to load, and this URL is signed — it does
+      // expire.
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.18),
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
-        image: photoUrl == null || photoUrl!.isEmpty
-            ? null
-            : DecorationImage(
-                image: NetworkImage(photoUrl!),
-                fit: BoxFit.cover,
-              ),
       ),
-      child: photoUrl == null || photoUrl!.isEmpty
-          ? Text(
-              _initials,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: Colors.white,
-                fontSize: size * 0.34,
-              ),
-            )
-          : null,
+      child: _hasPhoto ? _photo() : _InitialsText(initials: _initials),
+    );
+  }
+
+  /// The initials hold the disc while the bytes are in flight and come back if
+  /// the URL is dead — an empty circle reads as a broken screen.
+  Widget _photo() => Image.network(
+    photoUrl!,
+    height: size,
+    width: size,
+    fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) =>
+        _InitialsText(initials: _initials),
+    loadingBuilder: (context, child, progress) =>
+        progress == null ? child : _InitialsText(initials: _initials),
+  );
+}
+
+class _InitialsText extends StatelessWidget {
+  const _InitialsText({required this.initials});
+
+  final String initials;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        initials,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          color: Colors.white,
+          fontSize: _Avatar.size * 0.34,
+        ),
+      ),
     );
   }
 }

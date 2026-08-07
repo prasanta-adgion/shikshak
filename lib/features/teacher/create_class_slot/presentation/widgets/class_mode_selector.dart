@@ -5,11 +5,6 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../class_schedule/domain/entities/class_mode.dart';
 import '../../../class_schedule/presentation/widgets/slot_accent.dart';
 
-/// Segmented picker for how the class is delivered.
-///
-/// Three options laid out at once rather than hidden behind a sheet: the
-/// choice decides whether the venue fields appear below, so seeing all of it
-/// costs one glance instead of two taps.
 class ClassModeSelector extends StatelessWidget {
   const ClassModeSelector({
     super.key,
@@ -54,12 +49,12 @@ class _ModeOption extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     final foreground = isSelected
         ? colorScheme.primary
         : colorScheme.onSurfaceVariant;
 
     return Material(
+      // Handles background color dynamically
       color: isSelected
           ? colorScheme.primary.withValues(alpha: 0.08)
           : colorScheme.surfaceContainerHighest,
@@ -70,13 +65,13 @@ class _ModeOption extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           decoration: BoxDecoration(
-            borderRadius: AppRadius.input,
             border: Border.all(
               color: isSelected
                   ? colorScheme.primary.withValues(alpha: 0.45)
                   : Colors.transparent,
               width: 1.4,
             ),
+            borderRadius: AppRadius.input,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

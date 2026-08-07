@@ -40,6 +40,8 @@ void main() {
       expect(profile.basicInfo.city, 'Arambagh');
       expect(profile.basicInfo.postalCode, '712602');
       expect(profile.basicInfo.profilePhotoUrl, isNull);
+      // Absent from this payload, so the header falls back to initials.
+      expect(profile.user.avatarUrl, isNull);
 
       expect(profile.aboutYou.shortBio, 'short bio');
       expect(profile.aboutYou.subjectsTaught, ['Mathematics', 'Physics']);
@@ -54,6 +56,19 @@ void main() {
       expect(profile.educations.first.degree, 'btech');
       expect(profile.educations.first.isHighestQualification, isTrue);
       expect(profile.educations.last.isHighestQualification, isFalse);
+    });
+
+    test('reads the user row avatar onto the entity', () {
+      final json = teacherProfileResponseJson();
+      (json['data'] as Map<String, dynamic>)['user'] = {
+        'name': 'Rahul Teacher',
+        'avatarUrl': 'https://example.com/avatar.png',
+      };
+
+      final profile = TeacherProfileResponseModel.fromJson(json).data!
+          .toEntity();
+
+      expect(profile.user.avatarUrl, 'https://example.com/avatar.png');
     });
 
     test('keeps document types the DocumentType enum does not cover', () {

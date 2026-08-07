@@ -77,6 +77,37 @@ void main() {
       expect(find.text('Teacher'), findsOneWidget);
     });
 
+    testWidgets('falls back to initials when there is no photo', (
+      tester,
+    ) async {
+      await pumpLoaded(tester);
+
+      expect(find.text('RT'), findsOneWidget);
+      expect(find.byType(Image), findsNothing);
+    });
+
+    testWidgets('renders the profile photo when the user row carries one', (
+      tester,
+    ) async {
+      final base = parsedProfile();
+
+      await pumpLoaded(
+        tester,
+        profile: TeacherProfile(
+          user: base.user.copyWith(
+            avatarUrl: 'https://example.com/avatar.png',
+          ),
+          status: base.status,
+        ),
+      );
+
+      final image = tester.widget<Image>(find.byType(Image));
+      expect((image.image as NetworkImage).url, 'https://example.com/avatar.png');
+      // The bytes never arrive in a test, so the initials still hold the disc —
+      // which is the point: it is never blank.
+      expect(find.text('RT'), findsOneWidget);
+    });
+
     testWidgets('renders the review status', (tester) async {
       await pumpLoaded(tester);
 

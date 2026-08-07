@@ -14,12 +14,6 @@ import '../state/class_slots_state.dart';
 import '../widgets/class_slot_card.dart';
 import '../widgets/slots_summary_card.dart';
 
-/// Every recurring slot the teacher has created, grouped under the day it
-/// repeats on.
-///
-/// The All Slots half of [TeacherSchedulePage]. Where the Calendar answers
-/// "what am I teaching this week", this answers "what have I set up" — so it
-/// shows the rules themselves, including the ones no longer producing classes.
 class ClassSlotsTab extends ConsumerStatefulWidget {
   const ClassSlotsTab({super.key});
 

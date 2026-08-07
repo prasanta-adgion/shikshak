@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/utils/responsive.dart';
-import '../../../../../shared/widgets/app_button.dart';
 import '../../../../../shared/widgets/app_header.dart';
+import '../../../../../shared/widgets/app_loading_button.dart';
 import '../../../../../shared/widgets/app_outlined_button.dart';
 import '../../../../../shared/widgets/app_snackbar.dart';
 import '../controller/class_slot_form_controller.dart';
+import '../providers/create_class_providers.dart';
 import '../widgets/class_slot_form_fields.dart';
 
 /// Form for creating a recurring class slot.
 ///
-/// UI only: the fields, their validation and the layout are complete, but
-/// there is no create endpoint yet, so submitting validates and stops there.
-/// The controller already holds the values in the shapes the payload wants.
-class CreateClassSlotPage extends StatefulWidget {
+/// Validates locally, then `POST`s the slot. It pops with `true` on success,
+/// which is how the Schedule tab knows to re-read itself.
+class CreateClassSlotPage extends ConsumerStatefulWidget {
   const CreateClassSlotPage({super.key});
 
   @override
-  State<CreateClassSlotPage> createState() => _CreateClassSlotPageState();
+  ConsumerState<CreateClassSlotPage> createState() =>
+      _CreateClassSlotPageState();
 }
 
-class _CreateClassSlotPageState extends State<CreateClassSlotPage> {
+class _CreateClassSlotPageState extends ConsumerState<CreateClassSlotPage> {
   final _controller = ClassSlotFormController();
 
   @override
@@ -31,7 +33,7 @@ class _CreateClassSlotPageState extends State<CreateClassSlotPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_controller.validate()) {
       // The invalid fields now carry their own messages; the first one is
       // usually above the fold, so there is nothing more to say.
@@ -39,15 +41,25 @@ class _CreateClassSlotPageState extends State<CreateClassSlotPage> {
       return;
     }
 
-    AppSnackbar.show(
-      context,
-      'Class details are complete. Saving turns on with the create endpoint.',
-    );
+    final created = await ref
+        .read(createClassNotifierProvider.notifier)
+        .submit(_controller.toParams());
+
+    // A failure is surfaced by the listener in [build]; there is nothing to do
+    // here but leave the form as it stands so it can be retried.
+    if (!created || !mounted) return;
+
+    AppSnackbar.showSuccess(context, 'Class slot created.');
+    // The true tells the Schedule tab the list it is showing is now stale.
+    Navigator.of(context).pop(true);
   }
 
   /// Guards a half-typed form against a stray back gesture.
   Future<void> _handlePop(bool didPop) async {
     if (didPop) return;
+
+    // Leaving mid-request would strand a slot that is already being created.
+    if (ref.read(createClassNotifierProvider).isSubmitting) return;
 
     final shouldLeave = !_controller.isDirty || await _confirmDiscard();
     if (shouldLeave && mounted) Navigator.of(context).pop();
@@ -81,6 +93,17 @@ class _CreateClassSlotPageState extends State<CreateClassSlotPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    ref.listen(createClassNotifierProvider, (previous, next) {
+      final error = next.error;
+      if (error != null && previous?.error != error) {
+        AppSnackbar.showError(context, error.message);
+      }
+    });
+
+    final isSubmitting = ref.watch(
+      createClassNotifierProvider.select((state) => state.isSubmitting),
+    );
 
     return PopScope(
       // Always intercepted: `isDirty` changes as the teacher types, and a
@@ -119,6 +142,7 @@ class _CreateClassSlotPageState extends State<CreateClassSlotPage> {
           ),
         ),
         bottomNavigationBar: _ActionBar(
+          isSubmitting: isSubmitting,
           onCancel: () => _handlePop(false),
           onSubmit: _submit,
         ),
@@ -130,8 +154,13 @@ class _CreateClassSlotPageState extends State<CreateClassSlotPage> {
 /// Pinned footer, so the primary action stays reachable however long the form
 /// scrolls.
 class _ActionBar extends StatelessWidget {
-  const _ActionBar({required this.onCancel, required this.onSubmit});
+  const _ActionBar({
+    required this.isSubmitting,
+    required this.onCancel,
+    required this.onSubmit,
+  });
 
+  final bool isSubmitting;
   final VoidCallback onCancel;
   final VoidCallback onSubmit;
 
@@ -162,7 +191,8 @@ class _ActionBar extends StatelessWidget {
                   Expanded(
                     child: AppOutlinedButton(
                       label: 'Cancel',
-                      onPressed: onCancel,
+                      // Nothing to go back to while the slot is being filed.
+                      onPressed: isSubmitting ? null : onCancel,
                     ),
                   ),
                   AppSpacing.hGapMd,
@@ -171,8 +201,9 @@ class _ActionBar extends StatelessWidget {
                   // the label room to render in full on a narrow phone.
                   Expanded(
                     flex: 2,
-                    child: AppButton(
+                    child: AppLoadingButton(
                       label: 'Create Class',
+                      isLoading: isSubmitting,
                       onPressed: onSubmit,
                     ),
                   ),

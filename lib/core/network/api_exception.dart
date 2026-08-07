@@ -14,15 +14,15 @@ enum ApiExceptionType {
 }
 
 class ApiException implements Exception {
+  final String message;
+  final ApiExceptionType type;
+  final int? statusCode;
+
   const ApiException({
     required this.message,
     required this.type,
     this.statusCode,
   });
-
-  final String message;
-  final ApiExceptionType type;
-  final int? statusCode;
 
   factory ApiException.fromDioException(DioException exception) {
     switch (exception.type) {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../class_schedule/domain/entities/class_mode.dart';
 import '../../../class_schedule/domain/entities/schedule_day.dart';
+import '../../../class_schedule/domain/entities/slot_time.dart';
+import '../../domain/params/create_class_params.dart';
 
 /// Holds every field of the create-class form.
 ///
@@ -117,10 +119,33 @@ class ClassSlotFormController {
         validUntilError == null;
   }
 
+  /// The form's values in the shape the create endpoint wants.
+  ///
+  /// Only valid after [validate] has returned true — that is what makes the
+  /// pickers below non-null. The optional text fields are passed through as
+  /// typed; blanking them out is the mapper's job.
+  CreateClassParams toParams() => CreateClassParams(
+    title: title.text.trim(),
+    day: day.value!,
+    startTime: _slotTime(startTime.value!),
+    endTime: _slotTime(endTime.value!),
+    validFrom: validFrom.value!,
+    validUntil: validUntil.value,
+    mode: mode.value,
+    description: description.text,
+    subjects: subjects.value,
+    classes: classes.value,
+    venueName: venueName.text,
+    venueAddress: venueAddress.text,
+  );
+
   /// Reads back only once [showErrors] is set, so the message appears on
   /// submit and then live-corrects as the field is filled in.
   String? _pickerError(bool isInvalid, String message) =>
       showErrors.value && isInvalid ? message : null;
+
+  static SlotTime _slotTime(TimeOfDay time) =>
+      SlotTime(hour: time.hour, minute: time.minute);
 
   void dispose() {
     title.dispose();

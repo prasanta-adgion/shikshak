@@ -1,8 +1,3 @@
-/// An inclusive span of calendar days, as the calendar endpoint's `from`/`to`
-/// query parameters and its `range` response both express it.
-///
-/// Both ends are date-only: any time component is dropped on construction, so
-/// two ranges for the same days always compare equal.
 class DateRange {
   DateRange({required DateTime from, required DateTime to})
     : from = dateOnly(from),

@@ -25,7 +25,8 @@ abstract final class ApiEndpoints {
   static const String experience = '/api/v1/user/teacher/profile/experience';
   static const String documents = '/api/v1/user/teacher/profile/documents';
   static const String getProfile = '/api/v1/user/teacher/profile';
-  static const String getClassSlots = '/api/v1/user/teacher/class-slot';
+  /// `GET` lists the teacher's recurrences; `POST` files a new one.
+  static const String classSlots = '/api/v1/user/teacher/class-slot';
   static const String getClassSlotsCalendar =
       '/api/v1/user/teacher/class-slot/calendar';
 }

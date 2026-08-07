@@ -1,9 +1,3 @@
-/// A day of the weekly repeating schedule.
-///
-/// [wireIndex] is what `dayOfWeek` carries on the class-slot endpoint:
-/// `0` is Sunday through `6` for Saturday. Note this is *not* Dart's
-/// [DateTime.weekday], which runs 1 (Monday) to 7 (Sunday) — [fromDateTime]
-/// is the bridge between the two.
 enum ScheduleDay {
   sunday(wireIndex: 0, label: 'Sunday', shortLabel: 'Sun'),
   monday(wireIndex: 1, label: 'Monday', shortLabel: 'Mon'),
@@ -21,8 +15,6 @@ enum ScheduleDay {
 
   final int wireIndex;
   final String label;
-
-  /// Used by the day strip, where a full name would not fit.
   final String shortLabel;
 
   /// Null for anything outside 0–6 — the caller decides whether an unplaceable

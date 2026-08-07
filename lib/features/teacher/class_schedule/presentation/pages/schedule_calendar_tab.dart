@@ -59,8 +59,6 @@ class _ScheduleCalendarTabState extends ConsumerState<ScheduleCalendarTab> {
       child: RefreshIndicator(
         onRefresh: notifier.refresh,
         child: CustomScrollView(
-          // Always scrollable, so pull-to-refresh works even when the day has
-          // too little content to fill the screen.
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
@@ -87,9 +85,7 @@ class _ScheduleCalendarTabState extends ConsumerState<ScheduleCalendarTab> {
                       onToday: notifier.goToToday,
                     ),
                     AppSpacing.gapLg,
-                    // Held back until the week's classes land: totals of zero
-                    // would read as "nothing scheduled" rather than "still
-                    // counting".
+
                     if (!state.isLoadingWeek) ...[
                       ScheduleSummaryCard(
                         classCount: state.weekClassCount,

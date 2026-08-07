@@ -42,6 +42,7 @@ dependencies:
 
   # crop image
   image_cropper: ^12.2.1
+  lottie: ^3.3.3
 
 dev_dependencies:
   flutter_test:

@@ -61,6 +61,7 @@ abstract final class AppIcons {
 
   // Class schedule
   static const IconData addClass = Icons.add_rounded;
+  static const IconData allSlots = Icons.grid_view_rounded;
   static const IconData classTitle = Icons.title_rounded;
   static const IconData notes = Icons.notes_rounded;
   static const IconData repeat = Icons.repeat_rounded;
