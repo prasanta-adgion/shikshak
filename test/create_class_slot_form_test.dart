@@ -2,6 +2,7 @@ import 'package:Shikshak/core/theme/app_icons.dart';
 import 'package:Shikshak/features/teacher/create_class_slot/presentation/controller/class_slot_form_controller.dart';
 import 'package:Shikshak/features/teacher/create_class_slot/presentation/pages/create_class_slot_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -12,7 +13,11 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const MaterialApp(home: CreateClassSlotPage()));
+    // No provider overrides: these tests never get as far as a request, since
+    // an invalid form stops at validation.
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: CreateClassSlotPage())),
+    );
     // Settled, not a single frame: the route's entrance transition wraps the
     // page in an IgnorePointer until it finishes, and taps would not land.
     await tester.pumpAndSettle();

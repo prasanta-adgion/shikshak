@@ -1,3 +1,4 @@
+import 'package:Shikshak/features/teacher/profile/data/model/user_profile_model.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../auth/domain/entities/user_entity.dart';
@@ -133,48 +134,6 @@ class TeacherProfileData extends Equatable {
     documents,
     submission,
   ];
-}
-
-class ProfileUserModel extends Equatable {
-  const ProfileUserModel({
-    this.id,
-    this.name,
-    this.email,
-    this.role,
-    this.verified,
-    this.phoneNo,
-  });
-
-  final String? id;
-  final String? name;
-  final String? email;
-  final String? role;
-  final bool? verified;
-  final String? phoneNo;
-
-  factory ProfileUserModel.fromJson(Map<String, dynamic> json) {
-    return ProfileUserModel(
-      id: json['id'] as String?,
-      // `fullName` is what the auth endpoints return for the same person.
-      name: json['name'] as String? ?? json['fullName'] as String?,
-      email: json['email'] as String?,
-      role: json['role'] as String?,
-      verified: json['verified'] as bool?,
-      phoneNo: json['phoneNo'] as String? ?? json['mobileNumber'] as String?,
-    );
-  }
-
-  UserEntity toEntity() => UserEntity(
-    id: id ?? '',
-    fullName: name ?? '',
-    email: email ?? '',
-    mobileNumber: phoneNo,
-    // This endpoint is teacher-only, so an unreadable role is still a teacher.
-    role: UserRole.tryParse(role) ?? UserRole.teacher,
-  );
-
-  @override
-  List<Object?> get props => [id, name, email, role, verified, phoneNo];
 }
 
 class ProfileSubmissionModel extends Equatable {

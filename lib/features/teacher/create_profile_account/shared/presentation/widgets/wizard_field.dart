@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../../../core/theme/app_spacing.dart';
 
-/// One labelled field inside the step container: a small tinted icon, the
-/// field name, then the input beneath it.
-///
-/// No card chrome of its own — the step is a single white surface, and these
-/// are just rows within it.
 class WizardField extends StatelessWidget {
   const WizardField({
     super.key,
@@ -20,10 +15,8 @@ class WizardField extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  /// Appends a muted "(Optional)" to the label.
   final bool isOptional;
 
-  /// Shown in a tooltip behind a `?` affordance; omitted when null.
   final String? helpText;
 
   final Widget child;

@@ -7,11 +7,8 @@ import '../model/class_slot_list_response_model.dart';
 import '../model/class_slot_model.dart';
 
 abstract interface class ClassScheduleRemoteDataSource {
-  /// The teacher's calendar for [range] — recurring slots plus the dated
-  /// classes the server expands inside the window.
-  Future<ClassCalendarDataModel> fetchCalendar(DateRange range);
+  Future<ClassCalendarDataModel> fetchWeeklyCalendar(DateRange range);
 
-  /// Every recurrence the teacher has created, with no date window applied.
   Future<List<ClassSlotModel>> fetchSlots();
 }
 
@@ -22,7 +19,7 @@ class ClassScheduleRemoteDataSourceImpl
   final IApiClient _client;
 
   @override
-  Future<ClassCalendarDataModel> fetchCalendar(DateRange range) async {
+  Future<ClassCalendarDataModel> fetchWeeklyCalendar(DateRange range) async {
     try {
       final json = await _client.get<Map<String, dynamic>>(
         ApiEndpoints.getClassSlotsCalendar,
@@ -51,7 +48,7 @@ class ClassScheduleRemoteDataSourceImpl
   Future<List<ClassSlotModel>> fetchSlots() async {
     try {
       final json = await _client.get<Map<String, dynamic>>(
-        ApiEndpoints.getClassSlots,
+        ApiEndpoints.classSlots,
       );
 
       final response = ClassSlotListResponseModel.fromJson(json);

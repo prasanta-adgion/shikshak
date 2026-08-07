@@ -21,7 +21,7 @@ enum AppFlavor {
       case AppFlavor.staging:
         return 'https://backend.shiksak.in/';
       case AppFlavor.prod:
-        return '';
+        return 'https://backend.shiksak.in/';
     }
   }
 

@@ -21,7 +21,7 @@ class _FakeDataSource implements ClassScheduleRemoteDataSource {
   DateRange? requestedRange;
 
   @override
-  Future<ClassCalendarDataModel> fetchCalendar(DateRange range) async {
+  Future<ClassCalendarDataModel> fetchWeeklyCalendar(DateRange range) async {
     requestedRange = range;
     final error = throws;
     if (error != null) throw error;
@@ -41,7 +41,7 @@ ClassCalendarDataModel _fixtureData() =>
 Future<ScheduleCalendar> _calendarFrom(_FakeDataSource remote) async {
   final result = await ClassScheduleRepositoryImpl(
     remoteDataSource: remote,
-  ).fetchCalendar(_week);
+  ).fetchWeeklyCalendar(_week);
   return result.dataOrNull!;
 }
 
@@ -143,7 +143,7 @@ void main() {
 
       final result = await ClassScheduleRepositoryImpl(
         remoteDataSource: _FakeDataSource(throws: exception),
-      ).fetchCalendar(_week);
+      ).fetchWeeklyCalendar(_week);
 
       expect(result, isA<ApiFailure<ScheduleCalendar>>());
       expect(
@@ -155,7 +155,7 @@ void main() {
     test('an unexpected error is wrapped rather than thrown', () async {
       final result = await ClassScheduleRepositoryImpl(
         remoteDataSource: _FakeDataSource(throws: StateError('boom')),
-      ).fetchCalendar(_week);
+      ).fetchWeeklyCalendar(_week);
 
       expect(result, isA<ApiFailure<ScheduleCalendar>>());
     });

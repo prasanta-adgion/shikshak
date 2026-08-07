@@ -1,5 +1,12 @@
+import 'package:Shikshak/core/media/i_media_picker.dart';
+import 'package:Shikshak/core/media/picked_media.dart';
 import 'package:Shikshak/core/network/api_exception.dart';
+import 'package:Shikshak/core/network/api_result.dart';
+import 'package:Shikshak/core/providers/core_providers.dart';
+import 'package:Shikshak/core/theme/app_icons.dart';
 import 'package:Shikshak/core/theme/app_theme.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/about_you/domain/repositories/profile_image_repository.dart';
+import 'package:Shikshak/features/teacher/create_profile_account/about_you/presentation/providers/about_you_providers.dart';
 import 'package:Shikshak/features/teacher/profile/data/model/teacher_profile_response_model.dart';
 import 'package:Shikshak/features/teacher/profile/domain/entities/teacher_profile.dart';
 import 'package:Shikshak/features/teacher/profile/presentation/notifier/teacher_profile_notifier.dart';
@@ -8,7 +15,10 @@ import 'package:Shikshak/features/teacher/profile/presentation/providers/teacher
 import 'package:Shikshak/features/teacher/profile/presentation/state/teacher_profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// `Override` — the type of a ProviderScope override — lives here in Riverpod 3.
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 import 'fixtures/teacher_profile_response.dart';
 
@@ -30,10 +40,53 @@ TeacherProfile parsedProfile() => TeacherProfileResponseModel.fromJson(
   teacherProfileResponseJson(),
 ).data!.toEntity();
 
+/// Answers the avatar's pick with a fixed file instead of opening a camera.
+class _FakeMediaPicker implements IMediaPicker {
+  ImagePickSource? requestedSource;
+
+  @override
+  Future<PickedMedia?> pickImage({
+    required ImagePickSource source,
+    bool crop = false,
+    CropAspectRatio? aspectRatio,
+  }) async {
+    requestedSource = source;
+    return const PickedMedia(
+      path: '/tmp/new-avatar.png',
+      name: 'new-avatar.png',
+      sizeBytes: 1024,
+      mimeType: 'image/png',
+    );
+  }
+
+  @override
+  Future<PickedMedia?> pickDocument({List<String>? allowedExtensions}) async =>
+      null;
+}
+
+/// Stands in for the avatar upload — records the file, answers with a URL or
+/// the given failure.
+class _FakeImageRepository implements ProfileImageRepository {
+  _FakeImageRepository({this.failure});
+
+  final ApiException? failure;
+  String? uploadedPath;
+
+  @override
+  Future<ApiResult<String>> uploadProfileImage(String filePath) async {
+    uploadedPath = filePath;
+    final error = failure;
+    return error == null
+        ? const ApiResult.success('https://example.com/new-avatar.png')
+        : ApiResult.failure(error);
+  }
+}
+
 void main() {
   Future<void> pumpProfile(
     WidgetTester tester, {
     required TeacherProfileState state,
+    List<Override> overrides = const [],
   }) async {
     tester.view.devicePixelRatio = 1.0;
     // Tall enough for the whole page: the sliver list builds lazily, so
@@ -48,6 +101,7 @@ void main() {
           teacherProfileNotifierProvider.overrideWith(
             () => _SeededProfileNotifier(state),
           ),
+          ...overrides,
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -58,14 +112,18 @@ void main() {
     await tester.pump();
   }
 
-  Future<void> pumpLoaded(WidgetTester tester, {TeacherProfile? profile}) =>
-      pumpProfile(
-        tester,
-        state: TeacherProfileState(
-          profile: profile ?? parsedProfile(),
-          hasLoaded: true,
-        ),
-      );
+  Future<void> pumpLoaded(
+    WidgetTester tester, {
+    TeacherProfile? profile,
+    List<Override> overrides = const [],
+  }) => pumpProfile(
+    tester,
+    state: TeacherProfileState(
+      profile: profile ?? parsedProfile(),
+      hasLoaded: true,
+    ),
+    overrides: overrides,
+  );
 
   group('TeacherProfilePage', () {
     testWidgets('renders the identity block', (tester) async {
@@ -75,6 +133,107 @@ void main() {
       expect(find.text('rahul.adgion@gmail.com'), findsOneWidget);
       expect(find.text('8617463209'), findsOneWidget);
       expect(find.text('Teacher'), findsOneWidget);
+    });
+
+    testWidgets('falls back to initials when there is no photo', (
+      tester,
+    ) async {
+      await pumpLoaded(tester);
+
+      expect(find.text('RT'), findsOneWidget);
+      expect(find.byType(Image), findsNothing);
+    });
+
+    testWidgets('renders the profile photo when the user row carries one', (
+      tester,
+    ) async {
+      final base = parsedProfile();
+
+      await pumpLoaded(
+        tester,
+        profile: TeacherProfile(
+          user: base.user.copyWith(
+            avatarUrl: 'https://example.com/avatar.png',
+          ),
+          status: base.status,
+        ),
+      );
+
+      final image = tester.widget<Image>(find.byType(Image));
+      expect((image.image as NetworkImage).url, 'https://example.com/avatar.png');
+      // The bytes never arrive in a test, so the initials still hold the disc —
+      // which is the point: it is never blank.
+      expect(find.text('RT'), findsOneWidget);
+    });
+
+    testWidgets('tapping the avatar asks where the photo comes from', (
+      tester,
+    ) async {
+      await pumpLoaded(tester);
+
+      await tester.tap(find.byIcon(AppIcons.camera));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Profile photo'), findsOneWidget);
+      expect(find.text('Take a photo'), findsOneWidget);
+      expect(find.text('Choose from gallery'), findsOneWidget);
+    });
+
+    testWidgets('a picked photo is uploaded and shown straight away', (
+      tester,
+    ) async {
+      final picker = _FakeMediaPicker();
+      final repository = _FakeImageRepository();
+
+      await pumpLoaded(
+        tester,
+        overrides: [
+          mediaPickerProvider.overrideWithValue(picker),
+          profileImageRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+
+      await tester.tap(find.byIcon(AppIcons.camera));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Choose from gallery'));
+      await tester.pumpAndSettle();
+
+      expect(picker.requestedSource, ImagePickSource.gallery);
+      expect(repository.uploadedPath, '/tmp/new-avatar.png');
+
+      // The picked file goes up immediately, ahead of the profile re-read.
+      final image = tester.widget<Image>(find.byType(Image));
+      expect((image.image as FileImage).file.path, '/tmp/new-avatar.png');
+      expect(find.text('Profile photo updated.'), findsOneWidget);
+    });
+
+    testWidgets('a failed upload says so and keeps the old photo', (
+      tester,
+    ) async {
+      await pumpLoaded(
+        tester,
+        overrides: [
+          mediaPickerProvider.overrideWithValue(_FakeMediaPicker()),
+          profileImageRepositoryProvider.overrideWithValue(
+            _FakeImageRepository(
+              failure: const ApiException(
+                message: 'Upload failed. Try again.',
+                type: ApiExceptionType.server,
+              ),
+            ),
+          ),
+        ],
+      );
+
+      await tester.tap(find.byIcon(AppIcons.camera));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Choose from gallery'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Upload failed. Try again.'), findsOneWidget);
+      // Nothing was swapped in, so the initials still hold the disc.
+      expect(find.byType(Image), findsNothing);
+      expect(find.text('RT'), findsOneWidget);
     });
 
     testWidgets('renders the review status', (tester) async {

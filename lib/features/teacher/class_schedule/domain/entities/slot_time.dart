@@ -30,6 +30,11 @@ class SlotTime implements Comparable<SlotTime> {
 
   int get minutesFromMidnight => hour * 60 + minute;
 
+  /// `09:00` — the inverse of [tryParse], for payloads that carry a time.
+  String get wire =>
+      '${hour.toString().padLeft(2, '0')}:'
+      '${minute.toString().padLeft(2, '0')}';
+
   /// `9:00 AM`
   String get label {
     final period = hour < 12 ? 'AM' : 'PM';

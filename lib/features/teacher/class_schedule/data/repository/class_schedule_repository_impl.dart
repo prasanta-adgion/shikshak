@@ -14,31 +14,32 @@ class ClassScheduleRepositoryImpl implements ClassScheduleRepository {
   final ClassScheduleRemoteDataSource _remote;
 
   @override
-  Future<ApiResult<ScheduleCalendar>> fetchCalendar(DateRange range) =>
-      ApiResult.guard(() async {
-        final data = await _remote.fetchCalendar(range);
+  Future<ApiResult<ScheduleCalendar>> fetchWeeklyCalendar(
+    DateRange range,
+  ) => ApiResult.guard(() async {
+    final data = await _remote.fetchWeeklyCalendar(range);
 
-        // Sorted once here so every consumer — the date strip, the week
-        // summary, the day's list — reads the same order without re-sorting.
-        final occurrences =
-            [
-              // Null-aware element: rows the model could not place are dropped.
-              for (final model in data.occurrences) ?model.toEntity(),
-            ]..sort((a, b) {
-              final byDate = a.date.compareTo(b.date);
-              return byDate != 0 ? byDate : a.startTime.compareTo(b.startTime);
-            });
+    // Sorted once here so every consumer — the date strip, the week
+    // summary, the day's list — reads the same order without re-sorting.
+    final occurrences =
+        [
+          // Null-aware element: rows the model could not place are dropped.
+          for (final model in data.occurrences) ?model.toEntity(),
+        ]..sort((a, b) {
+          final byDate = a.date.compareTo(b.date);
 
-        return ScheduleCalendar(
-          // The server echoes the window it actually served; falling back to
-          // the requested one keeps the strip and the data in step if it does
-          // not, or sends something unreadable.
-          range: data.range?.toEntity() ?? range,
-          slots: _sortedSlots(data.slots),
-          occurrences: occurrences,
-        );
-      });
+          return byDate != 0 ? byDate : a.startTime.compareTo(b.startTime);
+        });
 
+    return ScheduleCalendar(
+      // The server echoes the window it actually served; falling back to the requested one keeps the strip and the data in step if it does not, or sends something unreadable.
+      range: data.range?.toEntity() ?? range,
+      slots: _sortedSlots(data.slots),
+      occurrences: occurrences,
+    );
+  });
+
+  //fetchSlots() is used to fetch all the class slots for a teacher. It calls the remote data source's fetchSlots() method and sorts the returned list of ClassSlotModel objects by day and start time before returning them as a list of ClassSlot entities.
   @override
   Future<ApiResult<List<ClassSlot>>> fetchSlots() =>
       ApiResult.guard(() async => _sortedSlots(await _remote.fetchSlots()));

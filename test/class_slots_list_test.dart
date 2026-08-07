@@ -28,7 +28,7 @@ class _FakeDataSource implements ClassScheduleRemoteDataSource {
   }
 
   @override
-  Future<ClassCalendarDataModel> fetchCalendar(DateRange range) async =>
+  Future<ClassCalendarDataModel> fetchWeeklyCalendar(DateRange range) async =>
       const ClassCalendarDataModel();
 }
 

@@ -1,8 +1,7 @@
 /// How a class is delivered.
 enum ClassMode {
   offline(wire: 'offline', label: 'In person'),
-  online(wire: 'online', label: 'Online'),
-  hybrid(wire: 'hybrid', label: 'Hybrid');
+  online(wire: 'online', label: 'Online');
 
   const ClassMode({required this.wire, required this.label});
 
@@ -22,5 +21,5 @@ enum ClassMode {
 
   /// Only these two put the student and teacher in the same room, so only
   /// these two make the venue worth showing.
-  bool get hasVenue => this == offline || this == hybrid;
+  bool get hasVenue => this == offline;
 }

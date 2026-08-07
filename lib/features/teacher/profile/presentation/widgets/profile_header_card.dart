@@ -1,16 +1,21 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_cropper/image_cropper.dart';
+
+import '../../../../../core/providers/core_providers.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_radius.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../shared/widgets/app_card.dart';
+import '../../../../../shared/widgets/app_snackbar.dart';
+import '../../../../../shared/widgets/media_source_sheet.dart';
+import '../../../create_profile_account/about_you/presentation/providers/about_you_providers.dart';
 import '../../domain/entities/teacher_profile.dart';
+import '../providers/teacher_profile_providers.dart';
 
-/// Identity block at the top of the profile: photo, name, contact, role.
-///
-/// Sits on the brand gradient, so every colour here is a fixed white tint
-/// rather than a scheme lookup — the card looks the same in both themes.
 class ProfileHeaderCard extends StatelessWidget {
   const ProfileHeaderCard({super.key, required this.profile});
 
@@ -19,7 +24,7 @@ class ProfileHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final photoUrl = profile.basicInfo.profilePhotoUrl;
+    final photoUrl = profile.user.avatarUrl;
 
     return AppCard(
       gradient: AppColors.primaryGradient,
@@ -77,19 +82,43 @@ class ProfileHeaderCard extends StatelessWidget {
   }
 }
 
-/// The remote photo when there is one, initials on a translucent disc
-/// otherwise. `InitialsAvatar` is not reused here: it tints itself from the
-/// colour scheme, which disappears against the gradient.
-class _Avatar extends StatelessWidget {
+/// The teacher's photo, and the control that replaces it.
+///
+/// Tapping the disc picks an image, uploads it to the avatar endpoint and
+/// re-reads the profile. The camera badge is the affordance; the whole 72pt
+/// circle is the target, since the badge alone is well under a thumb.
+class _Avatar extends ConsumerStatefulWidget {
   const _Avatar({required this.name, this.photoUrl});
 
   final String name;
   final String? photoUrl;
 
   static const double size = 72;
+  static const double badgeSize = 26;
+
+  @override
+  ConsumerState<_Avatar> createState() => _AvatarState();
+}
+
+class _AvatarState extends ConsumerState<_Avatar> {
+  /// The file just picked. Shown ahead of [_Avatar.photoUrl] — it is the newer
+  /// of the two, and it renders without waiting on a round trip.
+  final _localPath = ValueNotifier<String?>(null);
+
+  final _isUploading = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    _localPath.dispose();
+    _isUploading.dispose();
+    super.dispose();
+  }
+
+  bool get _hasPhoto =>
+      _localPath.value != null || (widget.photoUrl?.isNotEmpty ?? false);
 
   String get _initials {
-    final parts = name
+    final parts = widget.name
         .trim()
         .split(RegExp(r'\s+'))
         .where((part) => part.isNotEmpty)
@@ -99,34 +128,171 @@ class _Avatar extends StatelessWidget {
     return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 
+  Future<void> _changePhoto() async {
+    // A second tap mid-upload would race the first one's result.
+    if (_isUploading.value) return;
+
+    final source = await MediaSourceSheet.show(context, title: 'Profile photo');
+    if (source == null || !mounted) return;
+
+    final picked = await ref
+        .read(mediaPickerProvider)
+        .pickImage(
+          source: source,
+          crop: true,
+          // Square, because the avatar is a circle: better the teacher decides
+          // what gets cut off than BoxFit.cover.
+          aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        );
+    if (picked == null || !mounted) return;
+
+    _isUploading.value = true;
+    final result = await ref
+        .read(uploadProfileImageUseCaseProvider)
+        .call(picked.path);
+    if (!mounted) return;
+
+    _isUploading.value = false;
+
+    result.fold(
+      onSuccess: (_) {
+        _localPath.value = picked.path;
+        AppSnackbar.showSuccess(context, 'Profile photo updated.');
+        // The upload lands on the user row, so what is on screen is now stale.
+        // The picked file keeps showing either way.
+        ref.read(teacherProfileNotifierProvider.notifier).refresh();
+      },
+      onFailure: (exception) =>
+          AppSnackbar.showError(context, exception.message),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      height: size,
-      width: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.18),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
-        image: photoUrl == null || photoUrl!.isEmpty
-            ? null
-            : DecorationImage(
-                image: NetworkImage(photoUrl!),
-                fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: _changePhoto,
+      child: SizedBox.square(
+        dimension: _Avatar.size,
+        child: Stack(
+          children: [
+            // Two listeners rather than one merged builder: a repaint of the
+            // spinner must not decode the photo again.
+            ValueListenableBuilder<String?>(
+              valueListenable: _localPath,
+              builder: (context, localPath, _) => Semantics(
+                button: true,
+                label: _hasPhoto ? 'Change profile photo' : 'Add profile photo',
+                child: Container(
+                  height: _Avatar.size,
+                  width: _Avatar.size,
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.45),
+                    ),
+                  ),
+                  child: _hasPhoto
+                      ? _photo(localPath)
+                      : _InitialsText(initials: _initials),
+                ),
               ),
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: _isUploading,
+              builder: (context, isUploading, _) => !isUploading
+                  ? const SizedBox.shrink()
+                  : Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.35),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: SizedBox.square(
+                            dimension: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+            ),
+            // Inside the 72pt box rather than hanging off it, so the badge
+            // does not push the name and role beside it out of place.
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: _Avatar.badgeSize,
+                width: _Avatar.badgeSize,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  AppIcons.camera,
+                  size: 13,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-      child: photoUrl == null || photoUrl!.isEmpty
-          ? Text(
-              _initials,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: Colors.white,
-                fontSize: size * 0.34,
-              ),
-            )
-          : null,
+    );
+  }
+
+  /// The initials hold the disc while the bytes are in flight and come back if
+  /// the URL is dead — an empty circle reads as a broken screen.
+  Widget _photo(String? localPath) {
+    if (localPath != null) {
+      return Image.file(
+        File(localPath),
+        height: _Avatar.size,
+        width: _Avatar.size,
+        fit: BoxFit.cover,
+        // The picker writes into a cache directory, which can be swept.
+        errorBuilder: (context, error, stackTrace) =>
+            _InitialsText(initials: _initials),
+      );
+    }
+
+    return Image.network(
+      widget.photoUrl!,
+      height: _Avatar.size,
+      width: _Avatar.size,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) =>
+          _InitialsText(initials: _initials),
+      loadingBuilder: (context, child, progress) =>
+          progress == null ? child : _InitialsText(initials: _initials),
+    );
+  }
+}
+
+class _InitialsText extends StatelessWidget {
+  const _InitialsText({required this.initials});
+
+  final String initials;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        initials,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          color: Colors.white,
+          fontSize: _Avatar.size * 0.34,
+        ),
+      ),
     );
   }
 }

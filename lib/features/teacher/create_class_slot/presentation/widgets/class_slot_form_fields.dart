@@ -17,18 +17,11 @@ import 'class_mode_selector.dart';
 import 'form_section.dart';
 import 'slot_time_field.dart';
 
-/// Every field of the create-class form, grouped into three sections.
-///
-/// Each picker sits in its own [ListenableBuilder] so filling one field
-/// repaints that field alone rather than the whole form.
 class ClassSlotFormFields extends StatelessWidget {
   const ClassSlotFormFields({super.key, required this.controller});
 
   final ClassSlotFormController controller;
 
-  /// A class can be scheduled from today up to two years out; an end date may
-  /// run three years past that. Wide enough for any real timetable, narrow
-  /// enough that the picker opens somewhere useful.
   static DateTime get _today => DateTime.now();
 
   @override
