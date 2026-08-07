@@ -72,6 +72,7 @@ abstract final class AppIcons {
   static const IconData inactive = Icons.pause_circle_outline_rounded;
 
   // Profile
+  static const IconData camera = Icons.photo_camera_rounded;
   static const IconData gender = Icons.wc_rounded;
   static const IconData birthday = Icons.cake_outlined;
   static const IconData address = Icons.location_on_outlined;
