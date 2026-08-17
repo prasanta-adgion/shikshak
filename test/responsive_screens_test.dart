@@ -11,6 +11,11 @@ import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_pa
 import 'package:Shikshak/features/forgot_password/presentation/screens/new_password_set.dart';
 import 'package:Shikshak/features/otp_verification/presentation/pages/otp_verify_screen.dart';
 import 'package:Shikshak/features/student/presentation/pages/student_dashboard_page.dart';
+import 'package:Shikshak/features/student/profile/data/model/student_profile_response_model.dart';
+import 'package:Shikshak/features/student/profile/presentation/notifier/student_profile_notifier.dart';
+import 'package:Shikshak/features/student/profile/presentation/pages/student_profile_page.dart';
+import 'package:Shikshak/features/student/profile/presentation/providers/student_profile_providers.dart';
+import 'package:Shikshak/features/student/profile/presentation/state/student_profile_state.dart';
 import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/class_slots_tab.dart';
 import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/teacher_schedule_page.dart';
 import 'package:Shikshak/features/teacher/class_schedule/presentation/providers/class_schedule_providers.dart';
@@ -26,6 +31,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fixtures/schedule_test_data.dart';
+import 'fixtures/student_profile_response.dart';
 import 'fixtures/teacher_profile_response.dart';
 
 /// Windows the app must render cleanly in. Device class keys off the shortest
@@ -51,6 +57,41 @@ class _SeededProfileNotifier extends TeacherProfileNotifier {
 
   @override
   Future<void> load() async {}
+}
+
+/// Serves one of the sample student payloads. Seeded per screen entry rather
+/// than once for the suite, so both ends of the range — a profile with
+/// nothing filled in and one with everything — get laid out.
+class _SeededStudentProfileNotifier extends StudentProfileNotifier {
+  _SeededStudentProfileNotifier(this._json);
+
+  final Map<String, dynamic> _json;
+
+  @override
+  StudentProfileState build() => StudentProfileState(
+    profile: StudentProfileResponseModel.fromJson(_json).data!.toEntity(),
+    hasLoaded: true,
+  );
+
+  @override
+  Future<void> load() async {}
+}
+
+/// A nested scope, so each entry in the screen table can seed its own payload.
+Widget _studentProfile(Map<String, dynamic> json) => ProviderScope(
+  overrides: [
+    studentProfileNotifierProvider.overrideWith(
+      () => _SeededStudentProfileNotifier(json),
+    ),
+  ],
+  child: const Scaffold(body: StudentProfilePage()),
+);
+
+/// Exercises the header's overflow guards with a name no card can fit.
+Map<String, dynamic> _withLongName(Map<String, dynamic> json) {
+  (json['data'] as Map<String, dynamic>)['user']['name'] =
+      'Bartholomew Fitzgerald-Montgomery Wellington';
+  return json;
 }
 
 /// Serves the sample schedule so the week header, the date strip, a full
@@ -113,6 +154,12 @@ void main() {
     'NewPasswordSet': () => const NewPasswordSet(),
     'StudentDashboardPage': () => const StudentDashboardPage(),
     'TeacherDashboardPage': () => const TeacherDashboardPage(),
+    // Rendered as a dashboard tab, so it has no Scaffold of its own. Both
+    // payloads are covered: a fresh profile shows the completion chips, a
+    // finished one shows the sections they stand in for.
+    'StudentProfilePage': () => _studentProfile(studentProfileResponseJson()),
+    'StudentProfilePage (complete)': () =>
+        _studentProfile(_withLongName(completeStudentProfileResponseJson())),
     // Rendered as a dashboard tab, so it has no Scaffold of its own — the
     // test supplies the Material ancestor its buttons need.
     'TeacherProfilePage': () => const Scaffold(body: TeacherProfilePage()),
