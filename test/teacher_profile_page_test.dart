@@ -13,6 +13,7 @@ import 'package:Shikshak/features/teacher/profile/presentation/notifier/teacher_
 import 'package:Shikshak/features/teacher/profile/presentation/pages/teacher_profile_page.dart';
 import 'package:Shikshak/features/teacher/profile/presentation/providers/teacher_profile_providers.dart';
 import 'package:Shikshak/features/teacher/profile/presentation/state/teacher_profile_state.dart';
+import 'package:Shikshak/features/teacher/profile/presentation/widgets/profile_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // `Override` — the type of a ProviderScope override — lives here in Riverpod 3.
@@ -124,6 +125,18 @@ void main() {
     ),
     overrides: overrides,
   );
+
+  /// Only one section is on screen at a time, so a test has to open its tab
+  /// before it can find anything in it.
+  Future<void> openTab(WidgetTester tester, ProfileTab tab) async {
+    await tester.tap(
+      find.descendant(
+        of: find.byType(ProfileTabBar),
+        matching: find.text(tab.label),
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
 
   group('TeacherProfilePage', () {
     testWidgets('renders the identity block', (tester) async {
@@ -260,6 +273,7 @@ void main() {
 
     testWidgets('renders about-you text and chips', (tester) async {
       await pumpLoaded(tester);
+      await openTab(tester, ProfileTab.aboutYou);
 
       expect(find.text('short bio'), findsOneWidget);
       expect(find.text('Discussion Based'), findsOneWidget);
@@ -274,24 +288,49 @@ void main() {
     ) async {
       await pumpLoaded(tester);
 
+      await openTab(tester, ProfileTab.experience);
       expect(find.text('Experience (1)'), findsOneWidget);
-      expect(find.text('Education (2)'), findsOneWidget);
-      expect(find.text('Documents (5)'), findsOneWidget);
-
       expect(find.text('Computer Teacher with math'), findsOneWidget);
       expect(find.text('Arambagh Vivekananda Academy'), findsOneWidget);
       expect(find.text('Current'), findsOneWidget);
 
+      await openTab(tester, ProfileTab.education);
+      expect(find.text('Education (2)'), findsOneWidget);
       expect(find.text('btech'), findsOneWidget);
       expect(find.text('cse · Techno'), findsOneWidget);
       expect(find.text('Passed 2025'), findsOneWidget);
       expect(find.text('Highest'), findsOneWidget);
+
+      await openTab(tester, ProfileTab.documents);
+      expect(find.text('Documents (5)'), findsOneWidget);
+    });
+
+    testWidgets('only the selected section is on screen', (tester) async {
+      await pumpLoaded(tester);
+
+      // Basic Info opens first.
+      expect(find.text('Basic Information'), findsOneWidget);
+      expect(find.text('Short bio'), findsNothing);
+
+      await openTab(tester, ProfileTab.aboutYou);
+      expect(find.text('Short bio'), findsOneWidget);
+      expect(find.text('Basic Information'), findsNothing);
+    });
+
+    testWidgets('the header and status stay put across tabs', (tester) async {
+      await pumpLoaded(tester);
+      await openTab(tester, ProfileTab.documents);
+
+      // They sit above the strip, so they belong to the profile, not a tab.
+      expect(find.text('Rahul Teacher'), findsOneWidget);
+      expect(find.text('Approved'), findsOneWidget);
     });
 
     testWidgets('humanises document types the enum does not cover', (
       tester,
     ) async {
       await pumpLoaded(tester);
+      await openTab(tester, ProfileTab.documents);
 
       expect(find.text('Resume'), findsOneWidget);
       expect(find.text('Aadhaar Card'), findsOneWidget);
@@ -312,12 +351,18 @@ void main() {
 
       await pumpLoaded(tester, profile: empty);
 
-      expect(find.text('No experience added yet.'), findsOneWidget);
-      expect(find.text('No qualifications added yet.'), findsOneWidget);
-      expect(find.text('No documents uploaded yet.'), findsOneWidget);
       expect(find.text('Pending review'), findsOneWidget);
       // Unanswered fields read as an em dash rather than vanishing.
       expect(find.text('—'), findsWidgets);
+
+      await openTab(tester, ProfileTab.experience);
+      expect(find.text('No experience added yet.'), findsOneWidget);
+
+      await openTab(tester, ProfileTab.education);
+      expect(find.text('No qualifications added yet.'), findsOneWidget);
+
+      await openTab(tester, ProfileTab.documents);
+      expect(find.text('No documents uploaded yet.'), findsOneWidget);
     });
 
     testWidgets('shows a spinner on the first load', (tester) async {

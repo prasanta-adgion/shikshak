@@ -19,6 +19,7 @@ import 'package:Shikshak/features/teacher/profile/presentation/notifier/teacher_
 import 'package:Shikshak/features/teacher/profile/presentation/pages/teacher_profile_page.dart';
 import 'package:Shikshak/features/teacher/profile/presentation/providers/teacher_profile_providers.dart';
 import 'package:Shikshak/features/teacher/profile/presentation/state/teacher_profile_state.dart';
+import 'package:Shikshak/features/teacher/profile/presentation/widgets/profile_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -164,26 +165,26 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // One Edit per section, in the order the page lists them. The saved-row
-      // cards on this screen carry no Edit of their own, so the count is exact.
-      expect(find.text('Edit'), findsNWidgets(5));
+      for (final tab in ProfileTab.values) {
+        await tester.tap(
+          find.descendant(
+            of: find.byType(ProfileTabBar),
+            matching: find.text(tab.label),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      const expected = [
-        ProfileStep.basicInfo,
-        ProfileStep.aboutYou,
-        ProfileStep.experience,
-        ProfileStep.education,
-        ProfileStep.documents,
-      ];
+        // One section is on screen, so it owns the only Edit. The saved-row
+        // cards here carry none of their own.
+        expect(find.text('Edit'), findsOneWidget);
 
-      for (var index = 0; index < expected.length; index++) {
-        await tester.tap(find.text('Edit').at(index));
+        await tester.tap(find.text('Edit'));
         await tester.pumpAndSettle();
 
         expect(
           capturedExtra,
-          expected[index],
-          reason: 'Edit #$index should open ${expected[index].name}',
+          tab.step,
+          reason: 'Edit on ${tab.label} should open ${tab.step.name}',
         );
 
         router.go('/');
