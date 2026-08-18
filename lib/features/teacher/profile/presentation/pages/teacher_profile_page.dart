@@ -21,6 +21,7 @@ import '../widgets/profile_document_tile.dart';
 import '../widgets/profile_header_card.dart';
 import '../widgets/profile_section_card.dart';
 import '../widgets/profile_status_banner.dart';
+import '../widgets/profile_tab_bar.dart';
 
 /// Read-only view of the signed-in teacher's profile.
 class TeacherProfilePage extends ConsumerStatefulWidget {
@@ -31,6 +32,10 @@ class TeacherProfilePage extends ConsumerStatefulWidget {
 }
 
 class _TeacherProfilePageState extends ConsumerState<TeacherProfilePage> {
+  /// Which section is on screen. A notifier rather than `setState`, so picking
+  /// a tab repaints the strip and the section under it, not the whole page.
+  final _tab = ValueNotifier(ProfileTab.basicInfo);
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +43,12 @@ class _TeacherProfilePageState extends ConsumerState<TeacherProfilePage> {
     Future.microtask(
       () => ref.read(teacherProfileNotifierProvider.notifier).load(),
     );
+  }
+
+  @override
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
   }
 
   /// Reopens [step] in the create-profile wizard, then re-reads the profile.
@@ -113,29 +124,23 @@ class _TeacherProfilePageState extends ConsumerState<TeacherProfilePage> {
                     reviewNotes: profile.reviewNotes,
                   ),
                   AppSpacing.gapLg,
-                  _BasicInfoSection(
-                    profile: profile,
-                    onEdit: () => _editSection(ProfileStep.basicInfo),
-                  ),
-                  AppSpacing.gapLg,
-                  _AboutYouSection(
-                    profile: profile,
-                    onEdit: () => _editSection(ProfileStep.aboutYou),
-                  ),
-                  AppSpacing.gapLg,
-                  _ExperienceSection(
-                    profile: profile,
-                    onEdit: () => _editSection(ProfileStep.experience),
-                  ),
-                  AppSpacing.gapLg,
-                  _EducationSection(
-                    profile: profile,
-                    onEdit: () => _editSection(ProfileStep.education),
-                  ),
-                  AppSpacing.gapLg,
-                  _DocumentsSection(
-                    profile: profile,
-                    onEdit: () => _editSection(ProfileStep.documents),
+                  ValueListenableBuilder<ProfileTab>(
+                    valueListenable: _tab,
+                    builder: (context, tab, _) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ProfileTabBar(
+                          selected: tab,
+                          onSelected: (next) => _tab.value = next,
+                        ),
+                        AppSpacing.gapLg,
+                        _SectionFor(
+                          tab: tab,
+                          profile: profile,
+                          onEdit: () => _editSection(tab.step),
+                        ),
+                      ],
+                    ),
                   ),
                   AppSpacing.gapXxxl,
                 ]),
@@ -145,6 +150,40 @@ class _TeacherProfilePageState extends ConsumerState<TeacherProfilePage> {
       ),
     );
   }
+}
+
+/// The one section the selected tab asks for.
+class _SectionFor extends StatelessWidget {
+  const _SectionFor({
+    required this.tab,
+    required this.profile,
+    required this.onEdit,
+  });
+
+  final ProfileTab tab;
+  final TeacherProfile profile;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) => switch (tab) {
+    ProfileTab.basicInfo => _BasicInfoSection(
+      profile: profile,
+      onEdit: onEdit,
+    ),
+    ProfileTab.aboutYou => _AboutYouSection(profile: profile, onEdit: onEdit),
+    ProfileTab.experience => _ExperienceSection(
+      profile: profile,
+      onEdit: onEdit,
+    ),
+    ProfileTab.education => _EducationSection(
+      profile: profile,
+      onEdit: onEdit,
+    ),
+    ProfileTab.documents => _DocumentsSection(
+      profile: profile,
+      onEdit: onEdit,
+    ),
+  };
 }
 
 /// Shown in place of the sections while there is no profile to render:

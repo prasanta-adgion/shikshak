@@ -10,6 +10,7 @@ import '../../../../shared/widgets/initials_avatar.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../auth/presentation/providers_di/auth_providers.dart';
 import '../../../auth/presentation/widgets/logout_button.dart';
+import '../../profile/presentation/pages/student_profile_page.dart';
 import '../models/tutor_info.dart';
 import '../widgets/category_card.dart';
 import '../widgets/dashboard_search_bar.dart';
@@ -52,6 +53,7 @@ class _StudentDashboardPageState extends ConsumerState<StudentDashboardPage> {
     ),
   ];
 
+  /// Stands in for the tabs that have no screen yet — indices 1 to 3.
   static const _placeholderTabs = [
     (
       title: 'Search Tutors',
@@ -62,10 +64,6 @@ class _StudentDashboardPageState extends ConsumerState<StudentDashboardPage> {
       title: 'Study Materials',
       message: 'Purchased notes and materials will live here.',
     ),
-    (
-      title: 'Profile',
-      message: 'Manage your account, preferences and payments.',
-    ),
   ];
 
   @override
@@ -74,12 +72,14 @@ class _StudentDashboardPageState extends ConsumerState<StudentDashboardPage> {
       selectedIndex: _tabIndex,
       onDestinationSelected: (index) => setState(() => _tabIndex = index),
       destinations: _destinations,
-      body: _tabIndex == 0
-          ? const _StudentHomeTab()
-          : EmptyState(
-              title: _placeholderTabs[_tabIndex - 1].title,
-              message: _placeholderTabs[_tabIndex - 1].message,
-            ),
+      body: switch (_tabIndex) {
+        0 => const _StudentHomeTab(),
+        4 => const StudentProfilePage(),
+        _ => EmptyState(
+          title: _placeholderTabs[_tabIndex - 1].title,
+          message: _placeholderTabs[_tabIndex - 1].message,
+        ),
+      },
     );
   }
 }

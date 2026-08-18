@@ -81,6 +81,15 @@ abstract final class AppIcons {
   static const IconData about = Icons.info_outline_rounded;
   static const IconData education = Icons.school_outlined;
   static const IconData documents = Icons.folder_open_rounded;
+  static const IconData account = Icons.manage_accounts_outlined;
+  static const IconData verified = Icons.verified_rounded;
+  static const IconData unverified = Icons.gpp_maybe_outlined;
+  static const IconData language = Icons.translate_rounded;
+  static const IconData link = Icons.link_rounded;
+  static const IconData joined = Icons.calendar_today_rounded;
+  static const IconData lastSeen = Icons.access_time_rounded;
+  static const IconData preferenceOn = Icons.check_circle_outline_rounded;
+  static const IconData preferenceOff = Icons.do_not_disturb_on_outlined;
 
   // States
   static const IconData error = Icons.error_outline_rounded;
