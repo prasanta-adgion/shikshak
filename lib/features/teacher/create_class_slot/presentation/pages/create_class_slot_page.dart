@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/responsive/responsive.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/utils/responsive.dart';
 import '../../../../../shared/widgets/app_header.dart';
 import '../../../../../shared/widgets/app_loading_button.dart';
 import '../../../../../shared/widgets/app_outlined_button.dart';
@@ -120,7 +120,7 @@ class _CreateClassSlotPageState extends ConsumerState<CreateClassSlotPage> {
           ),
         ),
         body: CenteredConstrainedBox(
-          maxWidth: Breakpoints.tabletFormMaxWidth,
+          maxWidth: AppBreakpoints.tabletFormMaxWidth,
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             padding: context.responsivePagePadding,
@@ -184,7 +184,7 @@ class _ActionBar extends StatelessWidget {
             heightFactor: 1,
             child: ConstrainedBox(
               constraints: const BoxConstraints(
-                maxWidth: Breakpoints.tabletFormMaxWidth,
+                maxWidth: AppBreakpoints.tabletFormMaxWidth,
               ),
               child: Row(
                 children: [

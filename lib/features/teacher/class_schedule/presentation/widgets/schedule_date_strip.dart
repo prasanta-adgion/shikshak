@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/responsive/responsive.dart';
 import '../../../../../core/theme/app_radius.dart';
 import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/utils/responsive.dart';
 import '../../domain/entities/date_range.dart';
 import '../../domain/entities/schedule_day.dart';
 
@@ -39,7 +39,7 @@ class ScheduleDateStrip extends StatelessWidget {
     final today = DateRange.dateOnly(this.today ?? DateTime.now());
 
     return ResponsiveBuilder(
-      builder: (context, constraints) {
+      builder: (context, _, constraints) {
         final pills = [
           for (final day in days)
             _DatePill(

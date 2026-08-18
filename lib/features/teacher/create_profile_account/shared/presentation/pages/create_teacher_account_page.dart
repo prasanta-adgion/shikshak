@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../../app/router/route_paths.dart';
+import '../../../../../../core/responsive/responsive.dart';
 import '../../../../../../core/theme/app_spacing.dart';
-import '../../../../../../core/utils/responsive.dart';
 import '../../../../../../shared/widgets/app_button.dart';
 import '../../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../../shared/widgets/gradient_background.dart';
@@ -158,9 +158,7 @@ class _CreateTeacherAccountPageState
       },
     );
 
-    final maxWidth = context.isTabletDevice
-        ? Breakpoints.tabletFormMaxWidth
-        : Breakpoints.formMaxWidth;
+    final maxWidth = context.responsiveFormMaxWidth;
 
     return PopScope(
       canPop: false,

@@ -8,10 +8,10 @@ import 'package:pinput/pinput.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_images_const.dart';
+import '../../../../core/responsive/responsive.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_header.dart';
 import '../../../../shared/widgets/app_hero_banner.dart';
@@ -115,8 +115,10 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Device class, not layout size: a phone in landscape is wide but short,
+      // and the tablet layout needs the height.
       body: ResponsiveBuilder(
-        builder: (context, constraints) => context.isTabletDevice
+        builder: (context, _, _) => context.isTabletDevice
             ? _buildTablet(context)
             : _buildPhone(context),
       ),
@@ -130,7 +132,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: CenteredConstrainedBox(
-            maxWidth: Breakpoints.formMaxWidth,
+            maxWidth: AppBreakpoints.formMaxWidth,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -155,7 +157,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
             : AppColors.lightPageGradient,
       ),
       child: SafeArea(
-        child: context.orientation == Orientation.landscape
+        child: context.isLandscape
             ? _buildTabletLandscape(context)
             : _buildTabletPortrait(context),
       ),
@@ -164,7 +166,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
 
   Widget _buildTabletLandscape(BuildContext context) {
     return CenteredConstrainedBox(
-      maxWidth: Breakpoints.contentMaxWidth,
+      maxWidth: AppBreakpoints.contentMaxWidth,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -180,7 +182,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                     alignment: Alignment.topCenter,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(
-                        maxWidth: Breakpoints.tabletFormMaxWidth,
+                        maxWidth: AppBreakpoints.tabletFormMaxWidth,
                       ),
                       child: _buildFormCard(
                         context,
@@ -203,7 +205,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: CenteredConstrainedBox(
-          maxWidth: Breakpoints.formMaxWidth,
+          maxWidth: AppBreakpoints.formMaxWidth,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

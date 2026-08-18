@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/responsive/responsive.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_header.dart';
 
@@ -34,8 +34,10 @@ class AuthScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Device class, not layout size: a phone in landscape is wide enough for
+      // two panes but too short to read well in them, so it stays stacked.
       body: ResponsiveBuilder(
-        builder: (context, constraints) => context.isTabletDevice
+        builder: (context, _, constraints) => context.isTabletDevice
             ? _buildTablet(context, constraints)
             : _buildPhone(),
       ),
@@ -50,7 +52,7 @@ class AuthScaffold extends StatelessWidget {
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: CenteredConstrainedBox(
-            maxWidth: Breakpoints.formMaxWidth,
+            maxWidth: AppBreakpoints.formMaxWidth,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -72,7 +74,7 @@ class AuthScaffold extends StatelessWidget {
     return SafeArea(
       child: CenteredConstrainedBox(
         key: const Key('auth-tablet-layout'),
-        maxWidth: Breakpoints.contentMaxWidth,
+        maxWidth: AppBreakpoints.contentMaxWidth,
         child: SizedBox(
           height: constraints.maxHeight,
           child: Row(
@@ -97,7 +99,7 @@ class AuthScaffold extends StatelessWidget {
         SafeArea(
           child: CenteredConstrainedBox(
             key: const Key('auth-tablet-layout'),
-            maxWidth: Breakpoints.contentMaxWidth,
+            maxWidth: AppBreakpoints.contentMaxWidth,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -127,7 +129,7 @@ class AuthScaffold extends StatelessWidget {
             alignment: Alignment.center,
             child: ConstrainedBox(
               constraints: const BoxConstraints(
-                maxWidth: Breakpoints.tabletFormMaxWidth,
+                maxWidth: AppBreakpoints.tabletFormMaxWidth,
               ),
               child: _FormContent(
                 pagePadding: context.responsivePagePadding,

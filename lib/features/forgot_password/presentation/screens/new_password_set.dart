@@ -1,7 +1,7 @@
 import 'package:Shikshak/app/router/route_paths.dart';
+import 'package:Shikshak/core/responsive/responsive.dart';
 import 'package:Shikshak/core/theme/app_icons.dart';
 import 'package:Shikshak/core/theme/app_spacing.dart';
-import 'package:Shikshak/core/utils/responsive.dart';
 import 'package:Shikshak/core/utils/validators.dart';
 import 'package:Shikshak/features/forgot_password/presentation/providers/forgot_password_providers.dart';
 import 'package:Shikshak/features/forgot_password/presentation/state/forgot_password_state.dart';
@@ -118,11 +118,7 @@ class _NewPasswordCard extends StatelessWidget {
     final isTablet = context.isTabletDevice;
 
     return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: isTablet
-            ? Breakpoints.tabletFormMaxWidth
-            : Breakpoints.formMaxWidth,
-      ),
+      constraints: BoxConstraints(maxWidth: context.responsiveFormMaxWidth),
       child: AppCard(
         padding: EdgeInsets.all(isTablet ? AppSpacing.xxxl : AppSpacing.xl),
         child: Form(

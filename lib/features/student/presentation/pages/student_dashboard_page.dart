@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/responsive/responsive.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/adaptive_navigation_scaffold.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
@@ -247,12 +247,13 @@ class _StudentHomeTab extends ConsumerWidget {
                   mainAxisSpacing: AppSpacing.md,
                   crossAxisSpacing: AppSpacing.md,
                   // Cards get narrower as columns grow (3→4→6), so give them a
-                  // little more height to keep icon + label balanced.
-                  childAspectRatio: context.isDesktop
-                      ? 0.95
-                      : context.isTabletOrLarger
-                      ? 1.1
-                      : 1.05,
+                  // little more height to keep icon + label balanced. Tiers
+                  // match gridColumns above.
+                  childAspectRatio: switch (context.layoutSize) {
+                    LayoutSize.compact => 1.05,
+                    LayoutSize.medium => 1.1,
+                    LayoutSize.expanded => 0.95,
+                  },
                   children: [
                     for (final category in _categories)
                       CategoryCard(category: category),

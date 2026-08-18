@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/responsive/responsive.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/utils/responsive.dart';
 import '../../../../../core/utils/validators.dart';
 import '../../../../../shared/widgets/app_text_field.dart';
 import '../../../class_schedule/domain/entities/class_mode.dart';
@@ -332,7 +332,7 @@ class _FieldPair extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
-      builder: (context, constraints) {
+      builder: (context, _, constraints) {
         if (constraints.maxWidth < _minPairWidth) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/responsive/responsive.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/initials_avatar.dart';
@@ -204,9 +204,11 @@ class _TeacherSummaryCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Sizes off the width this row is actually given, not the window, so it
+    // stacks correctly inside a narrow pane as well as on a narrow screen.
     return ResponsiveBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < Breakpoints.tablet) {
+      builder: (context, layoutSize, _) {
+        if (layoutSize.isCompact) {
           return const Column(
             children: [EarningsCard(), AppSpacing.gapXl, AvailabilityCard()],
           );
