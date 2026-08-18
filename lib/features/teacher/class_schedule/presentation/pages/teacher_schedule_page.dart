@@ -5,10 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../app/router/route_paths.dart';
+import '../../../../../core/responsive/responsive.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_radius.dart';
 import '../../../../../core/theme/app_spacing.dart';
-import '../../../../../core/utils/responsive.dart';
 import '../../../../../shared/widgets/app_button.dart';
 import '../providers/class_schedule_providers.dart';
 import 'class_slots_tab.dart';
@@ -55,7 +55,7 @@ class TeacherSchedulePage extends ConsumerWidget {
               AppSpacing.lg,
             ),
             child: ResponsiveBuilder(
-              builder: (context, constraints) {
+              builder: (context, _, constraints) {
                 final title = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

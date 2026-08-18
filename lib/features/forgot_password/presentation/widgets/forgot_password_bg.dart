@@ -1,8 +1,8 @@
 import 'package:Shikshak/core/constants/app_images_const.dart';
+import 'package:Shikshak/core/responsive/responsive.dart';
 import 'package:Shikshak/core/theme/app_colors.dart';
 import 'package:Shikshak/core/theme/app_radius.dart';
 import 'package:Shikshak/core/theme/app_spacing.dart';
-import 'package:Shikshak/core/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordBackground extends StatelessWidget {
@@ -26,9 +26,7 @@ class ForgotPasswordBackground extends StatelessWidget {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               child: CenteredConstrainedBox(
-                maxWidth: isTablet
-                    ? Breakpoints.tabletFormMaxWidth
-                    : Breakpoints.formMaxWidth,
+                maxWidth: context.responsiveFormMaxWidth,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

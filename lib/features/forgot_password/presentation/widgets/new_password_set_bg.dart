@@ -1,6 +1,6 @@
 import 'package:Shikshak/core/constants/app_images_const.dart';
+import 'package:Shikshak/core/responsive/responsive.dart';
 import 'package:Shikshak/core/theme/app_spacing.dart';
-import 'package:Shikshak/core/utils/responsive.dart';
 import 'package:flutter/material.dart';
 
 class NewPasswordSetBg extends StatelessWidget {
@@ -24,9 +24,7 @@ class NewPasswordSetBg extends StatelessWidget {
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               child: CenteredConstrainedBox(
-                maxWidth: isTablet
-                    ? Breakpoints.tabletFormMaxWidth
-                    : Breakpoints.formMaxWidth,
+                maxWidth: context.responsiveFormMaxWidth,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [

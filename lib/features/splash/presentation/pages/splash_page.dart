@@ -8,9 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/network/network_inspector.dart';
+import '../../../../core/responsive/responsive.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../auth/presentation/providers_di/auth_providers.dart';
@@ -265,9 +265,9 @@ class _SplashPageState extends ConsumerState<SplashPage>
             child: SafeArea(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
-                  Breakpoints.phonePadding,
+                  AppBreakpoints.compactPadding,
                   0,
-                  Breakpoints.phonePadding,
+                  AppBreakpoints.compactPadding,
                   context.isTabletDevice ? 72 : 50,
                 ),
                 child: FadeTransition(

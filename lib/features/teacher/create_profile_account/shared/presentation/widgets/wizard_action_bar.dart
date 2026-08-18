@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../../core/responsive/responsive.dart';
 import '../../../../../../core/theme/app_shadows.dart';
 import '../../../../../../core/theme/app_spacing.dart';
-import '../../../../../../core/utils/responsive.dart';
 import '../../../../../../shared/widgets/app_loading_button.dart';
 import '../../../../../../shared/widgets/app_outlined_button.dart';
 import '../../domain/entities/profile_step.dart';

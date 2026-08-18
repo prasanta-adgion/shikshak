@@ -1,11 +1,11 @@
 import 'dart:ui';
 
-import 'package:Shikshak/core/utils/responsive.dart';
 import 'package:Shikshak/shared/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_images_const.dart';
+import '../../../../core/responsive/responsive.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/user_role.dart';
@@ -41,14 +41,16 @@ class _RoleCheckDialogState extends State<RoleCheckDialog> {
     final theme = Theme.of(context);
 
     return Dialog(
-      insetPadding: context.isTablet
-          ? const EdgeInsets.all(100)
-          : const EdgeInsets.all(20),
+      // Layout size, not device class: the dialog only cares how much window
+      // it has to breathe in.
+      insetPadding: context.isCompact
+          ? const EdgeInsets.all(20)
+          : const EdgeInsets.all(100),
       backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
       child: Padding(
         padding: EdgeInsets.all(
-          context.isTablet ? AppSpacing.huge : AppSpacing.xxl,
+          context.isCompact ? AppSpacing.xxl : AppSpacing.huge,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

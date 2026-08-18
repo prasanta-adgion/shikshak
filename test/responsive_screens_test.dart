@@ -35,11 +35,16 @@ import 'fixtures/student_profile_response.dart';
 import 'fixtures/teacher_profile_response.dart';
 
 /// Windows the app must render cleanly in. Device class keys off the shortest
-/// side, so both orientations of each form factor are covered.
+/// side, so both orientations of each form factor are covered — and each of
+/// the three layout sizes gets a window, including the medium band (600-839)
+/// where a large phone in landscape and a small tablet meet.
 const _windows = <String, Size>{
   'phone portrait': Size(390, 844),
   'phone landscape': Size(844, 390),
   'small phone': Size(320, 640),
+  // Medium layout on a handset-class device: the case where the two
+  // responsive axes disagree.
+  'small tablet portrait': Size(700, 1000),
   'tablet portrait': Size(800, 1280),
   'tablet landscape': Size(1280, 800),
 };

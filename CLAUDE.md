@@ -64,8 +64,20 @@ lands. Do not create empty layer folders in advance.
   `Theme.of(context).colorScheme` / `.textTheme`, `AppSpacing`, `AppRadius`, `AppShadows`,
   `AppIcons`. `AppColors` is for gradients and the semantic `success`/`warning` only. There is no
   `AppTextStyles` class.
-- **Responsive**: wrap scroll pages in `CenteredConstrainedBox` and pad with
-  `context.responsivePagePadding` (`lib/core/utils/responsive.dart`).
+- **Responsive**: everything comes from `lib/core/responsive/` — import the barrel,
+  `core/responsive/responsive.dart`. Wrap scroll pages in `CenteredConstrainedBox` and pad with
+  `context.responsivePagePadding`. Two axes, kept apart on purpose:
+  - **Device form factor** — `context.isTabletDevice`, off the window's *shortest side*, so it
+    survives rotation. Use it for structural choices that shouldn't flip when a phone turns
+    sideways: nav rail vs bottom bar, two-pane vs stacked auth, base component sizing.
+  - **Layout size** — compact (`<600`) / medium (`600–839`) / expanded (`≥840`). Use it for
+    choices that *should* react to available space: column counts, gutters, whether a pair fits
+    on one row. `context.isCompact`/`isMedium`/`isExpanded` reads the window, for page-level
+    decisions; `ResponsiveBuilder` resolves the same enum from the constraints a widget is
+    actually given, for decisions inside a page.
+
+  Never swap one axis for the other — `isExpanded` is true on a landscape phone, `isTabletDevice`
+  is not.
 - **Dates**: `DateTimeUtils` in `lib/core/utils/date_time_picker_func.dart`. The project has no
   `intl` dependency — formatting is hand-rolled there.
 

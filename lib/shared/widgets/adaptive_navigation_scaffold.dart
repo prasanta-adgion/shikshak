@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/utils/responsive.dart';
+import '../../core/responsive/responsive.dart';
 
 class AdaptiveNavigationDestination {
   const AdaptiveNavigationDestination({
