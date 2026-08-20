@@ -14,22 +14,11 @@ import '../providers/class_schedule_providers.dart';
 import 'class_slots_tab.dart';
 import 'schedule_calendar_tab.dart';
 
-/// Header width at which the title and the Create Class button stop sharing a
-/// line — a small phone in portrait, roughly.
 const double _stackedHeaderWidth = 300;
 
-/// The Schedule tab of the teacher dashboard, split in two.
-///
-/// **Calendar** answers "what am I teaching this week" from the dated
-/// occurrences the server expands; **All Slots** answers "what have I set up"
-/// from the recurrence rules themselves. They are separate endpoints and
-/// separate notifiers, so each tab loads independently the first time it is
-/// opened.
 class TeacherSchedulePage extends ConsumerWidget {
   const TeacherSchedulePage({super.key});
 
-  /// Opens the form and, if it comes back having created a slot, re-reads both
-  /// tabs — the new recurrence belongs in the week and in the list.
   Future<void> _openCreateForm(BuildContext context, WidgetRef ref) async {
     final created = await context.push<bool>(RoutePaths.createClassSlot);
     if (created != true) return;

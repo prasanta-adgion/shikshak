@@ -22,9 +22,8 @@ class AuthInterceptor extends Interceptor {
     ApiEndpoints.otpVerify,
     ApiEndpoints.resendOtp,
     ApiEndpoints.refreshTokenGenerate,
-    ApiEndpoints.requestPasswordResetOtp,
-    ApiEndpoints.verifyPasswordResetOtp,
-    ApiEndpoints.resetPassword,
+    ApiEndpoints.verifyPasswordResetOtpAndSetNewPassword,
+    ApiEndpoints.sendPasswordResetOtp,
   };
 
   @override

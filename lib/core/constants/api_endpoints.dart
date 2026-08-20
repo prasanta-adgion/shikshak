@@ -6,11 +6,13 @@ abstract final class ApiEndpoints {
   static const String resendOtp = 'api/v1/auth/signup/resend-otp';
   static const String refreshTokenGenerate = 'api/v1/auth/refresh-token';
 
-  static const String requestPasswordResetOtp =
-      'api/v1/auth/password/request-otp';
-  static const String verifyPasswordResetOtp =
-      'api/v1/auth/password/verify-otp';
-  static const String resetPassword = 'api/v1/auth/password/reset';
+  //this is only send OTp for reset password.
+  static const String sendPasswordResetOtp =
+      'api/v1/auth/forgot-password/request-otp';
+
+  //this is used for both verify password rest otp and set new password.
+  static const String verifyPasswordResetOtpAndSetNewPassword =
+      'api/v1/auth/forgot-password/reset';
 
   // Files — multipart upload returning the URL the profile payloads carry.
   static const String uploadAvatar = '/api/v1/user/profile/avatar';

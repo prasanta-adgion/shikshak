@@ -7,11 +7,6 @@ import '../../domain/entities/class_occurrence.dart';
 import 'schedule_chips.dart';
 import 'slot_accent.dart';
 
-/// One class on one date, colour-coded by its `colorTag`.
-///
-/// Everything that can vary in length — the time range, the badges, the
-/// subject and class tags — sits in a [Wrap], so the card reflows instead of
-/// overflowing on a small phone or at a large text scale.
 class ClassOccurrenceCard extends StatelessWidget {
   const ClassOccurrenceCard({
     super.key,

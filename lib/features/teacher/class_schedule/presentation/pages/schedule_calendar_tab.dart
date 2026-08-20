@@ -19,10 +19,6 @@ import '../widgets/schedule_date_strip.dart';
 import '../widgets/schedule_summary_card.dart';
 import '../widgets/schedule_week_header.dart';
 
-/// The teacher's classes for one week at a time, a day at a time.
-///
-/// The Calendar half of [TeacherSchedulePage]; the shell owns the header, so
-/// this contributes a scrollable body only.
 class ScheduleCalendarTab extends ConsumerStatefulWidget {
   const ScheduleCalendarTab({super.key});
 

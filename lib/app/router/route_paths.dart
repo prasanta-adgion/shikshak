@@ -24,7 +24,8 @@ abstract final class RoutePaths {
     UserRole.student => studentDashboard,
   };
   static const String forgotPassword = '/password-forgot';
-  static const String forgotPasswordOtp = '/password-forgot/otp';
+
+  /// Step 2 of the reset flow: OTP and the new password on one screen.
   static const String newPasswordSet = '/new-password-set';
 
   //teacher
@@ -49,7 +50,6 @@ abstract final class RouteNames {
   static const String studentDashboard = 'studentDashboard';
   static const String teacherDashboard = 'teacherDashboard';
   static const String forgotPassword = 'passwordForgot';
-  static const String forgotPasswordOtp = 'passwordForgotOtp';
   static const String newPasswordSet = 'newPasswordSet';
 
   //teacher

@@ -1,5 +1,4 @@
 import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
-import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/new_password_set.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -108,17 +107,7 @@ abstract final class AppRouter {
         ),
       ),
 
-      //forgot password — OTP entry
-      GoRoute(
-        path: RoutePaths.forgotPasswordOtp,
-        name: RouteNames.forgotPasswordOtp,
-        pageBuilder: (context, state) => fadeSlidePage(
-          key: state.pageKey,
-          child: const ForgotPasswordOtpScreen(),
-        ),
-      ),
-
-      //new password set
+      //forgot password — OTP entry + new password, submitted together
       GoRoute(
         path: RoutePaths.newPasswordSet,
         name: RouteNames.newPasswordSet,

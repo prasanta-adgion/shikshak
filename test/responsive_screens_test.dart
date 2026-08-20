@@ -7,7 +7,6 @@ import 'package:Shikshak/features/auth/presentation/pages/register_page.dart';
 import 'package:Shikshak/features/auth/presentation/providers_di/auth_providers.dart';
 import 'package:Shikshak/features/auth/presentation/state/auth_state.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
-import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/new_password_set.dart';
 import 'package:Shikshak/features/otp_verification/presentation/pages/otp_verify_screen.dart';
 import 'package:Shikshak/features/student/presentation/pages/student_dashboard_page.dart';
@@ -155,7 +154,6 @@ void main() {
     'RegisterPage': () => const RegisterPage(role: UserRole.student),
     'OtpVerifyScreen': () => const OtpVerifyScreen(),
     'ForgotPasswordScreen': () => const ForgotPasswordScreen(),
-    'ForgotPasswordOtpScreen': () => const ForgotPasswordOtpScreen(),
     'NewPasswordSet': () => const NewPasswordSet(),
     'StudentDashboardPage': () => const StudentDashboardPage(),
     'TeacherDashboardPage': () => const TeacherDashboardPage(),
