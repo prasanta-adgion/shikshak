@@ -44,13 +44,16 @@ dependencies:
   image_cropper: ^12.2.1
   lottie: ^3.3.3
   cached_network_image: ^3.4.1
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  # Pinned below 2.15.2, which requires Dart ^3.11.0 — this project is on 3.10.0.
+  json_serializable: ^6.11.2
   build_runner: ^2.15.1
+  # Pinned below 2.15.2, which requires Dart ^3.11.0 — this project is on 3.10.0.
+ 
 
 flutter:
   uses-material-design: true

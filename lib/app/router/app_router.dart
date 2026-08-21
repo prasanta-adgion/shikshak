@@ -9,6 +9,7 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/signup_otp_screen.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
+import '../../features/student/all_teachers/presentation/pages/all_teachers_page.dart';
 import '../../features/student/presentation/pages/student_dashboard_page.dart';
 import '../../features/teacher/create_class_slot/presentation/pages/create_class_slot_page.dart';
 import '../../features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
@@ -87,6 +88,13 @@ abstract final class AppRouter {
           key: state.pageKey,
           child: const StudentDashboardPage(),
         ),
+      ),
+      //student — teacher discovery
+      GoRoute(
+        path: RoutePaths.studentAllTeachers,
+        name: RouteNames.studentAllTeachers,
+        pageBuilder: (context, state) =>
+            fadeSlidePage(key: state.pageKey, child: const AllTeachersPage()),
       ),
       GoRoute(
         path: RoutePaths.teacherDashboard,

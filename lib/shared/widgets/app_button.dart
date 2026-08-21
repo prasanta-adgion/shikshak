@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_spacing.dart';
 
-/// Primary filled button. Inherits shape/size/typography from
-/// `FilledButtonThemeData` in the app theme.
 class AppButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -18,6 +16,10 @@ class AppButton extends StatelessWidget {
   final Color? foregroundColor;
   final Color? labelColor;
 
+  final Color? disabledColor;
+  final Color? disabledForegroundColor;
+  final Color? disabledLabelColor;
+
   const AppButton({
     super.key,
     required this.label,
@@ -27,46 +29,52 @@ class AppButton extends StatelessWidget {
     this.expanded = true,
     this.color,
     this.foregroundColor,
+    this.disabledColor,
+    this.disabledForegroundColor,
+    this.disabledLabelColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isEnabled = onPressed != null;
+    final labelStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+      color: isEnabled ? labelColor : (disabledLabelColor ?? labelColor),
+    );
+
     final child = icon == null
-        ? Text(
-            label,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(color: labelColor),
-          )
+        ? Text(label, style: labelStyle)
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, size: 20),
               AppSpacing.hGapSm,
-              // Flexible so a long label ellipsizes instead of overflowing on
-              // narrow phones or at large text scales — same guard as
-              // [AppOutlinedButton] and [AppLoadingButton].
               Flexible(
                 child: Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(color: labelColor),
+                  style: labelStyle,
                 ),
               ),
             ],
           );
 
+    final hasColorOverride =
+        color != null ||
+        foregroundColor != null ||
+        disabledColor != null ||
+        disabledForegroundColor != null;
+
     final button = FilledButton(
       onPressed: onPressed,
-      style: (color == null && foregroundColor == null)
-          ? null
-          : FilledButton.styleFrom(
+      style: hasColorOverride
+          ? FilledButton.styleFrom(
               backgroundColor: color,
               foregroundColor: foregroundColor,
-            ),
+              disabledBackgroundColor: disabledColor,
+              disabledForegroundColor: disabledForegroundColor,
+            )
+          : null,
       child: child,
     );
 

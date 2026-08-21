@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/router/route_paths.dart';
 import '../../../../core/responsive/responsive.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -260,9 +262,11 @@ class _StudentHomeTab extends ConsumerWidget {
                   ],
                 ),
                 AppSpacing.gapXxl,
-                const SectionHeader(
+                SectionHeader(
                   title: 'Featured Teachers',
                   actionLabel: 'See All',
+                  onAction: () =>
+                      context.pushNamed(RouteNames.studentAllTeachers),
                 ),
                 AppSpacing.gapMd,
                 SizedBox(

@@ -12,6 +12,9 @@ abstract final class RoutePaths {
   static const String studentDashboard = '/student/dashboard';
   static const String teacherDashboard = '/teacher/dashboard';
 
+  /// Teacher discovery, pushed from the dashboard's "See All".
+  static const String studentAllTeachers = '/student/teachers';
+
   static String registerFor(UserRole role) => '/register/${role.name}';
 
   static const String signupOtp = '/signup/otp';
@@ -49,6 +52,7 @@ abstract final class RouteNames {
   static const String createTeacherAccount = 'createTeacherAccount';
   static const String studentDashboard = 'studentDashboard';
   static const String teacherDashboard = 'teacherDashboard';
+  static const String studentAllTeachers = 'studentAllTeachers';
   static const String forgotPassword = 'passwordForgot';
   static const String newPasswordSet = 'newPasswordSet';
 

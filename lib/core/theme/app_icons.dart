@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Semantic icon registry.
-///
-/// Widgets reference icons by meaning (`AppIcons.teacher`) instead of raw
-/// [Icons] constants, so swapping to a custom icon font later is a
-/// single-file change.
 abstract final class AppIcons {
   // Brand / identity
   static const IconData logo = Icons.auto_stories_rounded;
