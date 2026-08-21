@@ -116,5 +116,24 @@ class TeacherQueryParams {
       _hasText(gender) ||
       hasProfilePhoto != null;
 
+  /// How many filters the filter sheet owns are on — what the badge over the
+  /// filter button counts. Free text is deliberately left out: it is visible
+  /// in the field itself, and counting it would badge the button for something
+  /// the button does not control. Sort order is not narrowing, so it is out
+  /// too. Each group counts once, however many values it holds.
+  int get activeFilterCount => [
+    classes.isNotEmpty,
+    languages.isNotEmpty,
+    subjects.isNotEmpty,
+    _hasText(classRegex),
+    _hasText(languageRegex),
+    _hasText(subjectRegex),
+    _hasText(city),
+    _hasText(state),
+    _hasText(country),
+    _hasText(gender),
+    hasProfilePhoto != null,
+  ].where((isOn) => isOn).length;
+
   static bool _hasText(String value) => value.trim().isNotEmpty;
 }

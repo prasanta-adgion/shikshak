@@ -36,4 +36,7 @@ abstract final class ApiEndpoints {
   // Student account
   static const String getStudentProfile = '/api/v1/user/profile';
   static const String getAvailableTeacher = '/api/v1/user/student/teachers';
+
+  static String availableTeacherById(String teacherId) =>
+      '$getAvailableTeacher/$teacherId';
 }

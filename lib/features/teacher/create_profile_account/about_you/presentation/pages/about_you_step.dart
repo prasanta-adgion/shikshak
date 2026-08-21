@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../../core/constants/reference_data.dart';
 import '../../../../../../core/theme/app_spacing.dart';
 import '../../../../../../core/utils/validators.dart';
 import '../../../../../../shared/widgets/app_snackbar.dart';
 import '../../../../../../shared/widgets/app_text_field.dart';
 import '../../../shared/domain/entities/profile_step.dart';
-import '../../../shared/domain/entities/reference_data.dart';
 import '../../../shared/presentation/mixins/wizard_step_registration.dart';
 import '../../../shared/presentation/providers/account_create_providers.dart';
 import '../../../shared/presentation/widgets/subject_select_tile.dart';

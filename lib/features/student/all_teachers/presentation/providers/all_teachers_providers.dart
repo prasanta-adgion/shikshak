@@ -23,8 +23,7 @@ final getAllTeachersUseCaseProvider = Provider<GetAllTeachersUseCase>(
   (ref) => GetAllTeachersUseCase(ref.watch(allTeachersRepositoryProvider)),
 );
 
-/// Dropped with the screen: the pages appended by scrolling are a lot of
-/// state to carry around, and reopening the list should start at the top.
+//this is point which is calling in user action section means in UI.
 final allTeachersNotifierProvider =
     NotifierProvider<AllTeachersNotifier, AllTeachersState>(
       AllTeachersNotifier.new,

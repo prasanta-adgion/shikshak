@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/constants/reference_data.dart';
 import '../../../../../core/responsive/responsive.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -7,7 +8,6 @@ import '../../../../../core/utils/validators.dart';
 import '../../../../../shared/widgets/app_text_field.dart';
 import '../../../class_schedule/domain/entities/class_mode.dart';
 import '../../../class_schedule/domain/entities/schedule_day.dart';
-import '../../../create_profile_account/shared/domain/entities/reference_data.dart';
 import '../../../create_profile_account/shared/presentation/widgets/wizard_date_field.dart';
 import '../../../create_profile_account/shared/presentation/widgets/wizard_field.dart';
 import '../../../create_profile_account/shared/presentation/widgets/wizard_multi_select_field.dart';

@@ -54,9 +54,7 @@ class TeachersPageModel extends Equatable {
   }
 
   TeachersPage toEntity() {
-    final teachers = [
-      for (final teacher in this.teachers) teacher.toEntity(),
-    ];
+    final teachers = [for (final teacher in this.teachers) teacher.toEntity()];
 
     return TeachersPage(
       teachers: teachers,
@@ -383,11 +381,15 @@ class PaginationModel extends Equatable {
     );
   }
 
+  /// `page` and `totalPages` are the two the scroller runs on — a response
+  /// missing either is read as "one page, already showing", so the list stops
+  /// asking rather than paging forever against a server that stopped
+  /// counting.
   TeacherPageInfo toEntity() => TeacherPageInfo(
     page: page ?? 1,
     limit: limit ?? TeacherPageInfo.defaultPageSize,
     total: total ?? 0,
-    totalPages: totalPages ?? 0,
+    totalPages: totalPages ?? 1,
   );
 
   @override

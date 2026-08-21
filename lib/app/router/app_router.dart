@@ -11,6 +11,7 @@ import '../../features/auth/presentation/pages/signup_otp_screen.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/student/all_teachers/presentation/pages/all_teachers_page.dart';
 import '../../features/student/presentation/pages/student_dashboard_page.dart';
+import '../../features/student/single_teacher_details/presentation/pages/single_teacher_details_page.dart';
 import '../../features/teacher/create_class_slot/presentation/pages/create_class_slot_page.dart';
 import '../../features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
 import '../../features/teacher/create_profile_account/shared/domain/entities/wizard_mode.dart';
@@ -95,6 +96,23 @@ abstract final class AppRouter {
         name: RouteNames.studentAllTeachers,
         pageBuilder: (context, state) =>
             fadeSlidePage(key: state.pageKey, child: const AllTeachersPage()),
+      ),
+      //student — one teacher's profile and classes
+      GoRoute(
+        path: RoutePaths.studentTeacherDetails,
+        name: RouteNames.studentTeacherDetails,
+        // An empty id would fetch `/teachers/` and 404 — back to the list,
+        // which is where the only real ids come from.
+        redirect: (context, state) =>
+            (state.pathParameters['id'] ?? '').trim().isEmpty
+            ? RoutePaths.studentAllTeachers
+            : null,
+        pageBuilder: (context, state) => fadeSlidePage(
+          key: state.pageKey,
+          child: SingleTeacherDetailsPage(
+            teacherId: state.pathParameters['id']!,
+          ),
+        ),
       ),
       GoRoute(
         path: RoutePaths.teacherDashboard,
