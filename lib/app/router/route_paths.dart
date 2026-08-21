@@ -12,6 +12,15 @@ abstract final class RoutePaths {
   static const String studentDashboard = '/student/dashboard';
   static const String teacherDashboard = '/teacher/dashboard';
 
+  /// Teacher discovery, pushed from the dashboard's "See All".
+  static const String studentAllTeachers = '/student/teachers';
+
+  /// One teacher's profile and their classes, pushed from a discovery card.
+  static const String studentTeacherDetails = '/student/teachers/:id';
+
+  static String studentTeacherDetailsFor(String teacherId) =>
+      '/student/teachers/$teacherId';
+
   static String registerFor(UserRole role) => '/register/${role.name}';
 
   static const String signupOtp = '/signup/otp';
@@ -24,7 +33,8 @@ abstract final class RoutePaths {
     UserRole.student => studentDashboard,
   };
   static const String forgotPassword = '/password-forgot';
-  static const String forgotPasswordOtp = '/password-forgot/otp';
+
+  /// Step 2 of the reset flow: OTP and the new password on one screen.
   static const String newPasswordSet = '/new-password-set';
 
   //teacher
@@ -48,8 +58,9 @@ abstract final class RouteNames {
   static const String createTeacherAccount = 'createTeacherAccount';
   static const String studentDashboard = 'studentDashboard';
   static const String teacherDashboard = 'teacherDashboard';
+  static const String studentAllTeachers = 'studentAllTeachers';
+  static const String studentTeacherDetails = 'studentTeacherDetails';
   static const String forgotPassword = 'passwordForgot';
-  static const String forgotPasswordOtp = 'passwordForgotOtp';
   static const String newPasswordSet = 'newPasswordSet';
 
   //teacher

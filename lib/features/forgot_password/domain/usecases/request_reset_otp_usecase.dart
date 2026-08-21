@@ -10,9 +10,8 @@ class RequestResetOtpParams {
 
 /// Step 1 of the reset flow: send a one-time code to the registered email.
 class RequestResetOtpUseCase {
-  const RequestResetOtpUseCase(this._repository);
-
   final ForgotPasswordRepository _repository;
+  const RequestResetOtpUseCase(this._repository);
 
   Future<ApiResult<void>> call(RequestResetOtpParams params) =>
       _repository.requestResetOtp(params);

@@ -22,7 +22,7 @@ class NewPasswordSetBg extends StatelessWidget {
 
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              //     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               child: CenteredConstrainedBox(
                 maxWidth: context.responsiveFormMaxWidth,
                 child: Column(
@@ -40,7 +40,7 @@ class NewPasswordSetBg extends StatelessWidget {
                     AppSpacing.gapSm,
 
                     Text(
-                      'Your new password must be different from previously used passwords.',
+                      'Enter the code we emailed you and choose a new password.',
                       textAlign: TextAlign.center,
                       style:
                           (isTablet

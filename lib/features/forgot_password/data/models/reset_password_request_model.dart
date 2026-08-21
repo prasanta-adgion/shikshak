@@ -1,21 +1,22 @@
-// TODO(api): field names unconfirmed with the backend.
-
-/// Body for the reset-password endpoint.
+/// Body for the reset endpoint, which verifies the OTP and stores the new
+/// password in a single call.
 class ResetPasswordRequestModel {
   const ResetPasswordRequestModel({
     required this.email,
+    required this.otp,
     required this.newPassword,
-    this.resetToken,
+    required this.confirmPassword,
   });
 
   final String email;
+  final String otp;
   final String newPassword;
-  final String? resetToken;
+  final String confirmPassword;
 
   Map<String, dynamic> toJson() => {
     'email': email,
-    'new_password': newPassword,
-    // Omitted entirely when the backend tracks verification server-side.
-    if (resetToken != null) 'reset_token': resetToken,
+    'otp': otp,
+    'password': newPassword,
+    'confirmPassword': confirmPassword,
   };
 }

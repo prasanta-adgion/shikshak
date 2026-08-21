@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:Shikshak/shared/widgets/app_snackbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:pinput/pinput.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_images_const.dart';
@@ -16,6 +14,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_header.dart';
 import '../../../../shared/widgets/app_hero_banner.dart';
 import '../../../../shared/widgets/app_loading_button.dart';
+import '../../../../shared/widgets/app_otp_field.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
   /// Masked phone number or email address to which the OTP was sent.
@@ -256,68 +255,11 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const separatorWidth = AppSpacing.sm;
-              final pinWidth =
-                  ((constraints.maxWidth - (separatorWidth * 5)) / 6)
-                      .clamp(36.0, 52.0)
-                      .toDouble();
-              final basePinTheme = PinTheme(
-                width: pinWidth,
-                height: 56,
-                textStyle: theme.textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w700,
-                ),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  borderRadius: BorderRadius.circular(AppSpacing.md),
-                  border: Border.all(color: colorScheme.outlineVariant),
-                ),
-              );
-
-              return Center(
-                child: Pinput(
-                  length: 6,
-                  controller: _pinController,
-                  focusNode: _pinFocusNode,
-                  autofocus: true,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(6),
-                  ],
-                  defaultPinTheme: basePinTheme,
-                  focusedPinTheme: basePinTheme.copyWith(
-                    decoration: basePinTheme.decoration?.copyWith(
-                      border: Border.all(color: colorScheme.primary, width: 2),
-                    ),
-                  ),
-                  submittedPinTheme: basePinTheme.copyWith(
-                    decoration: basePinTheme.decoration?.copyWith(
-                      color: colorScheme.primaryContainer.withValues(
-                        alpha: 0.35,
-                      ),
-                      border: Border.all(color: colorScheme.primary),
-                    ),
-                  ),
-                  errorPinTheme: basePinTheme.copyWith(
-                    decoration: basePinTheme.decoration?.copyWith(
-                      border: Border.all(color: colorScheme.error),
-                    ),
-                  ),
-                  separatorBuilder: (_) => AppSpacing.hGapSm,
-                  validator: (pin) {
-                    if (pin == null || pin.length != 6) {
-                      return 'Please enter the complete 6-digit OTP';
-                    }
-                    return null;
-                  },
-                  onCompleted: (_) => _verifyOtp(),
-                ),
-              );
-            },
+          AppOtpField(
+            controller: _pinController,
+            focusNode: _pinFocusNode,
+            autofocus: true,
+            onCompleted: (_) => _verifyOtp(),
           ),
           AppSpacing.gapXxl,
           AppLoadingButton(

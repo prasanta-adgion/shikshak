@@ -7,12 +7,6 @@ import '../../../../../core/utils/date_time_picker_func.dart';
 import '../../domain/entities/class_slot.dart';
 import 'slot_accent.dart';
 
-/// Recurrences that produced no class in the week on screen, each with the
-/// reason why.
-///
-/// Without this, a teacher who set a class up and then sees an empty day has
-/// no way to tell whether the app lost it or the class simply is not running
-/// yet.
 class DormantSlotsSection extends StatelessWidget {
   const DormantSlotsSection({super.key, required this.entries});
 

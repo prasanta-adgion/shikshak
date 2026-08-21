@@ -7,15 +7,24 @@ import 'package:Shikshak/features/auth/presentation/pages/register_page.dart';
 import 'package:Shikshak/features/auth/presentation/providers_di/auth_providers.dart';
 import 'package:Shikshak/features/auth/presentation/state/auth_state.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
-import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_otp_screen.dart';
 import 'package:Shikshak/features/forgot_password/presentation/screens/new_password_set.dart';
 import 'package:Shikshak/features/otp_verification/presentation/pages/otp_verify_screen.dart';
+import 'package:Shikshak/features/student/all_teachers/data/model/teachers_details_model.dart';
+import 'package:Shikshak/features/student/all_teachers/presentation/notifier/all_teachers_notifier.dart';
+import 'package:Shikshak/features/student/all_teachers/presentation/pages/all_teachers_page.dart';
+import 'package:Shikshak/features/student/all_teachers/presentation/providers/all_teachers_providers.dart';
+import 'package:Shikshak/features/student/all_teachers/presentation/state/all_teachers_state.dart';
 import 'package:Shikshak/features/student/presentation/pages/student_dashboard_page.dart';
 import 'package:Shikshak/features/student/profile/data/model/student_profile_response_model.dart';
 import 'package:Shikshak/features/student/profile/presentation/notifier/student_profile_notifier.dart';
 import 'package:Shikshak/features/student/profile/presentation/pages/student_profile_page.dart';
 import 'package:Shikshak/features/student/profile/presentation/providers/student_profile_providers.dart';
 import 'package:Shikshak/features/student/profile/presentation/state/student_profile_state.dart';
+import 'package:Shikshak/features/student/single_teacher_details/data/model/single_teacher_details_model.dart';
+import 'package:Shikshak/features/student/single_teacher_details/presentation/notifier/single_teacher_notifier.dart';
+import 'package:Shikshak/features/student/single_teacher_details/presentation/pages/single_teacher_details_page.dart';
+import 'package:Shikshak/features/student/single_teacher_details/presentation/providers/single_teacher_providers.dart';
+import 'package:Shikshak/features/student/single_teacher_details/presentation/state/single_teacher_state.dart';
 import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/class_slots_tab.dart';
 import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/teacher_schedule_page.dart';
 import 'package:Shikshak/features/teacher/class_schedule/presentation/providers/class_schedule_providers.dart';
@@ -31,8 +40,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fixtures/schedule_test_data.dart';
+import 'fixtures/single_teacher_response.dart';
 import 'fixtures/student_profile_response.dart';
 import 'fixtures/teacher_profile_response.dart';
+import 'fixtures/teachers_response.dart';
 
 /// Windows the app must render cleanly in. Device class keys off the shortest
 /// side, so both orientations of each form factor are covered — and each of
@@ -81,6 +92,73 @@ class _SeededStudentProfileNotifier extends StudentProfileNotifier {
   @override
   Future<void> load() async {}
 }
+
+/// Serves the sample teachers page, so the discovery list lays out real cards
+/// — including the teacher who filled in nothing but a name, where every
+/// optional block on the card has to collapse. `load()` and friends are
+/// no-ops: these tests never hit the wire.
+class _SeededAllTeachersNotifier extends AllTeachersNotifier {
+  @override
+  AllTeachersState build() {
+    final page = TeachersDetailsModel.fromJson(
+      teachersResponseJson(),
+    ).data!.toEntity();
+
+    return AllTeachersState(
+      teachers: page.teachers,
+      pagination: page.pagination,
+      hasLoaded: true,
+    );
+  }
+
+  @override
+  Future<void> load() async {}
+
+  @override
+  Future<void> refresh() async {}
+
+  @override
+  Future<void> loadMore() async {}
+}
+
+/// Serves one teacher's profile, so the detail page lays out the header, the
+/// about blocks and the selectable class list for real. Seeded per screen
+/// entry: the full payload and the barely-filled-in one lay out differently.
+class _SeededSingleTeacherNotifier extends SingleTeacherNotifier {
+  _SeededSingleTeacherNotifier(this._json);
+
+  final Map<String, dynamic> _json;
+
+  @override
+  SingleTeacherState build() {
+    final teacher = SingleTeachersDetailsModel.fromJson(_json).data!.toEntity();
+
+    return SingleTeacherState(
+      teacherId: teacher.id,
+      teacher: teacher,
+      // Everything picked, so the action bar lays out in the state that
+      // carries the most text.
+      selectedClassIds: {for (final slot in teacher.availableClasses) slot.id},
+      hasLoaded: true,
+    );
+  }
+
+  @override
+  Future<void> load(String teacherId) async {}
+
+  @override
+  Future<void> refresh() async {}
+}
+
+/// A nested scope, so each entry in the screen table can seed its own payload.
+Widget _singleTeacher(Map<String, dynamic> json) => ProviderScope(
+  overrides: [
+    singleTeacherNotifierProvider.overrideWith(
+      () => _SeededSingleTeacherNotifier(json),
+    ),
+  ],
+  child: const SingleTeacherDetailsPage(teacherId: 'seeded'),
+);
 
 /// A nested scope, so each entry in the screen table can seed its own payload.
 Widget _studentProfile(Map<String, dynamic> json) => ProviderScope(
@@ -143,6 +221,9 @@ void main() {
           classSlotsNotifierProvider.overrideWith(
             () => SeededSlotsNotifier(_schedule.slotsState),
           ),
+          allTeachersNotifierProvider.overrideWith(
+            _SeededAllTeachersNotifier.new,
+          ),
         ],
         child: MaterialApp(theme: AppTheme.light, home: screen),
       ),
@@ -155,7 +236,6 @@ void main() {
     'RegisterPage': () => const RegisterPage(role: UserRole.student),
     'OtpVerifyScreen': () => const OtpVerifyScreen(),
     'ForgotPasswordScreen': () => const ForgotPasswordScreen(),
-    'ForgotPasswordOtpScreen': () => const ForgotPasswordOtpScreen(),
     'NewPasswordSet': () => const NewPasswordSet(),
     'StudentDashboardPage': () => const StudentDashboardPage(),
     'TeacherDashboardPage': () => const TeacherDashboardPage(),
@@ -173,6 +253,13 @@ void main() {
     // without an entry of its own.
     'ClassSlotsTab': () => const Scaffold(body: ClassSlotsTab()),
     'CreateClassSlotPage': () => const CreateClassSlotPage(),
+    'AllTeachersPage': () => const AllTeachersPage(),
+    'SingleTeacherDetailsPage': () =>
+        _singleTeacher(singleTeacherResponseJson()),
+    // Nothing filled in: every optional block collapses and the class list
+    // falls back to its empty state.
+    'SingleTeacherDetailsPage (sparse)': () =>
+        _singleTeacher(sparseSingleTeacherResponseJson()),
   };
 
   group('renders without overflow', () {
@@ -206,6 +293,9 @@ void main() {
               ),
               classSlotsNotifierProvider.overrideWith(
                 () => SeededSlotsNotifier(_schedule.slotsState),
+              ),
+              allTeachersNotifierProvider.overrideWith(
+                _SeededAllTeachersNotifier.new,
               ),
             ],
             child: MaterialApp(theme: AppTheme.dark, home: build()),

@@ -1,34 +1,45 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/utils/date_time_picker_func.dart';
+import '../../../../../shared/widgets/app_button.dart';
 import '../../../../../shared/widgets/app_card.dart';
 import '../../domain/entities/class_slot.dart';
 import 'schedule_chips.dart';
 import 'slot_accent.dart';
 
-/// One recurring slot as the teacher created it.
-///
-/// The sibling of [ClassOccurrenceCard]: that one shows a class on a date,
-/// this one shows the rule behind it — so it carries the validity window and
-/// the on/off state instead of a "done" marker.
 class ClassSlotCard extends StatelessWidget {
-  const ClassSlotCard({super.key, required this.slot, this.onTap});
+  const ClassSlotCard({
+    super.key,
+    required this.slot,
+    this.onTap,
+    this.onMessage,
+    this.onEdit,
+    this.onDelete,
+    this.onToggleActive,
+  });
 
   final ClassSlot slot;
+
   final VoidCallback? onTap;
+  final VoidCallback? onMessage;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final VoidCallback? onToggleActive;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
     final accent = SlotAccent.of(slot.colorTag, colorScheme);
+
     final dormancy = slot.dormancy();
 
     return Opacity(
-      // A slot that is switched off or out of its window is dimmed, never
-      // hidden — the teacher still has to be able to find and fix it.
       opacity: dormancy == null ? 1 : 0.7,
       child: AppCard(
         padding: EdgeInsets.zero,
@@ -37,27 +48,43 @@ class ClassSlotCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Full-height accent rail. AppCard clips to its radius, so the
-              // rail picks up the rounded corners for free.
+              // Full-height accent rail.
               Container(width: 4, color: accent),
+
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // -----------------------------------------------------
+                      // HEADER
+                      // -----------------------------------------------------
                       _HeaderRow(
                         slot: slot,
                         accent: accent,
                         dormancy: dormancy,
+                        onMessage: onMessage,
+                        onEdit: onEdit,
+                        onDelete: onDelete,
+                        onToggleActive: onToggleActive,
                       ),
+
                       AppSpacing.gapMd,
+
+                      // -----------------------------------------------------
+                      // TITLE
+                      // -----------------------------------------------------
                       Text(
                         slot.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.titleSmall,
                       ),
+
+                      // -----------------------------------------------------
+                      // DESCRIPTION
+                      // -----------------------------------------------------
                       if (slot.description?.trim().isNotEmpty ?? false) ...[
                         AppSpacing.gapXs,
                         Text(
@@ -69,6 +96,10 @@ class ClassSlotCard extends StatelessWidget {
                           ),
                         ),
                       ],
+
+                      // -----------------------------------------------------
+                      // SUBJECT / CLASS TAGS
+                      // -----------------------------------------------------
                       if (slot.subjects.isNotEmpty ||
                           slot.classes.isNotEmpty) ...[
                         AppSpacing.gapMd,
@@ -86,8 +117,34 @@ class ClassSlotCard extends StatelessWidget {
                           ],
                         ),
                       ],
+
                       AppSpacing.gapMd,
-                      _FooterRows(slot: slot),
+
+                      Divider(height: 1, color: colorScheme.outlineVariant),
+
+                      AppSpacing.gapMd,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(child: _FooterRows(slot: slot)),
+
+                          const SizedBox(width: AppSpacing.md),
+
+                          SizedBox(
+                            height: 40,
+                            child: AppButton(
+                              color: AppColors.success,
+                              foregroundColor: Colors.white,
+                              disabledColor: AppColors.success,
+                              disabledForegroundColor: Colors.white,
+                              icon: CupertinoIcons.chat_bubble_text_fill,
+                              label: 'Message',
+                              onPressed: onMessage,
+                              expanded: false,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -100,17 +157,34 @@ class ClassSlotCard extends StatelessWidget {
   }
 }
 
-/// Time range, duration, and why the slot is quiet when it is.
+///
+/// Header
+///
+/// Contains:
+/// - Time
+/// - Duration
+/// - Dormancy status
+/// - More menu
+///
 class _HeaderRow extends StatelessWidget {
   const _HeaderRow({
     required this.slot,
     required this.accent,
     required this.dormancy,
+    this.onMessage,
+    this.onEdit,
+    this.onDelete,
+    this.onToggleActive,
   });
 
   final ClassSlot slot;
   final Color accent;
   final SlotDormancy? dormancy;
+
+  final VoidCallback? onMessage;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final VoidCallback? onToggleActive;
 
   @override
   Widget build(BuildContext context) {
@@ -118,48 +192,194 @@ class _HeaderRow extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final duration = slot.durationLabel;
 
-    return Wrap(
-      spacing: AppSpacing.sm,
-      runSpacing: AppSpacing.sm,
-      crossAxisAlignment: WrapCrossAlignment.center,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TimeRangePill(
-          label: slot.timeRangeLabel,
-          accent: accent,
-          icon: AppIcons.hours,
+        // Time + duration + status
+        Expanded(
+          child: Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              TimeRangePill(
+                label: slot.timeRangeLabel,
+                accent: accent,
+                icon: AppIcons.hours,
+              ),
+
+              if (duration.isNotEmpty)
+                Text(
+                  duration,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+
+              // Only show badge for exceptional states.
+              if (dormancy case final reason?)
+                StatusBadge(
+                  label: reason.label,
+                  icon: reason == SlotDormancy.paused
+                      ? AppIcons.inactive
+                      : AppIcons.schedule,
+                  color: reason == SlotDormancy.ended
+                      ? colorScheme.error
+                      : colorScheme.onSurfaceVariant,
+                ),
+            ],
+          ),
         ),
-        if (duration.isNotEmpty)
-          Text(
-            duration,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-        // Only the exceptions are badged. Running is the normal case, and
-        // marking it too would put a badge on every card for no information.
-        if (dormancy case final reason?)
-          StatusBadge(
-            label: reason.label,
-            icon: reason == SlotDormancy.paused
-                ? AppIcons.inactive
-                : AppIcons.schedule,
-            color: reason == SlotDormancy.ended
-                ? colorScheme.error
-                : colorScheme.onSurfaceVariant,
-          ),
+
+        const SizedBox(width: AppSpacing.xs),
+
+        // ---------------------------------------------------------------
+        // MORE BUTTON
+        // ---------------------------------------------------------------
+        _SlotMoreButton(
+          slot: slot,
+          onMessage: onMessage,
+          onEdit: onEdit,
+          onDelete: onDelete,
+          onToggleActive: onToggleActive,
+        ),
       ],
     );
   }
 }
 
-/// Delivery mode, venue, and the window the recurrence runs for.
+class _SlotMoreButton extends StatelessWidget {
+  const _SlotMoreButton({
+    required this.slot,
+    this.onMessage,
+    this.onEdit,
+    this.onDelete,
+    this.onToggleActive,
+  });
+
+  final ClassSlot slot;
+
+  final VoidCallback? onMessage;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final VoidCallback? onToggleActive;
+
+  Future<void> _showActions(BuildContext context) async {
+    final buttonContext = context;
+
+    final RenderBox button = buttonContext.findRenderObject()! as RenderBox;
+
+    final RenderBox overlay =
+        Overlay.of(buttonContext).context.findRenderObject()! as RenderBox;
+
+    final buttonPosition = button.localToGlobal(Offset.zero, ancestor: overlay);
+
+    final buttonBottomRight = button.localToGlobal(
+      button.size.bottomRight(Offset.zero),
+      ancestor: overlay,
+    );
+
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(buttonPosition, buttonBottomRight),
+      Offset.zero & overlay.size,
+    );
+
+    final result = await showMenu<String>(
+      context: context,
+      position: position,
+      elevation: 8,
+      color: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      items: [
+        // ---------------------------------------------------------------
+        // MESSAGE
+        // ---------------------------------------------------------------
+        const PopupMenuItem<String>(
+          value: 'message',
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.message_outlined),
+            title: Text('Message'),
+          ),
+        ),
+
+        // ---------------------------------------------------------------
+        // EDIT
+        // ---------------------------------------------------------------
+        const PopupMenuItem<String>(
+          value: 'edit',
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.edit_outlined),
+            title: Text('Edit'),
+          ),
+        ),
+
+        // ---------------------------------------------------------------
+        // DELETE
+        // ---------------------------------------------------------------
+        const PopupMenuItem<String>(
+          value: 'delete',
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.delete_outline),
+            title: Text('Delete'),
+          ),
+        ),
+
+        // ---------------------------------------------------------------
+        // ACTIVE / DEACTIVE
+        // ---------------------------------------------------------------
+        PopupMenuItem<String>(
+          value: 'toggle',
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(
+              slot.isActive
+                  ? Icons.toggle_on_outlined
+                  : Icons.toggle_off_outlined,
+            ),
+            title: Text(slot.isActive ? 'Deactivate' : 'Activate'),
+          ),
+        ),
+      ],
+    );
+
+    switch (result) {
+      case 'message':
+        onMessage?.call();
+        break;
+
+      case 'edit':
+        onEdit?.call();
+        break;
+
+      case 'delete':
+        onDelete?.call();
+        break;
+
+      case 'toggle':
+        onToggleActive?.call();
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: 'More options',
+      visualDensity: VisualDensity.compact,
+      icon: const Icon(Icons.more_vert),
+      onPressed: () => _showActions(context),
+    );
+  }
+}
+
 class _FooterRows extends StatelessWidget {
   const _FooterRows({required this.slot});
 
   final ClassSlot slot;
 
-  /// `From 5 Aug 2026`, `Until 30 Sep 2026`, or both ends when both are set.
-  /// Empty when the slot repeats with no bounds at all.
   static String validityLabel(ClassSlot slot) {
     final from = slot.validFrom;
     final until = slot.validUntil;
@@ -168,15 +388,20 @@ class _FooterRows extends StatelessWidget {
       return '${DateTimeUtils.dayMonthYear(from)} – '
           '${DateTimeUtils.dayMonthYear(until)}';
     }
-    if (from != null) return 'From ${DateTimeUtils.dayMonthYear(from)}';
-    if (until != null) return 'Until ${DateTimeUtils.dayMonthYear(until)}';
+
+    if (from != null) {
+      return 'From ${DateTimeUtils.dayMonthYear(from)}';
+    }
+
+    if (until != null) {
+      return 'Until ${DateTimeUtils.dayMonthYear(until)}';
+    }
+
     return '';
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final mode = slot.mode;
     final venue = slot.venueLabel;
     final validity = validityLabel(slot);
@@ -187,19 +412,18 @@ class _FooterRows extends StatelessWidget {
           icon: mode.icon,
           text: venue.isEmpty ? mode.label : '${mode.label} · $venue',
         ),
+
       if (validity.isNotEmpty)
         _MetaLine(icon: AppIcons.schedule, text: validity),
     ];
 
-    // Nothing to add beyond the times and tags above; the divider alone would
-    // just be a dangling line.
-    if (rows.isEmpty) return const SizedBox.shrink();
+    if (rows.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Divider(height: 1, color: colorScheme.outlineVariant),
-        AppSpacing.gapMd,
         for (final (index, row) in rows.indexed) ...[
           if (index > 0) AppSpacing.gapXs,
           row,
@@ -209,6 +433,11 @@ class _FooterRows extends StatelessWidget {
   }
 }
 
+///
+/// Metadata row.
+///
+/// Expanded is safe here because _FooterRows is now inside the
+/// Expanded child of the outer Row.
 class _MetaLine extends StatelessWidget {
   const _MetaLine({required this.icon, required this.text});
 
@@ -224,8 +453,9 @@ class _MetaLine extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: 15, color: colorScheme.onSurfaceVariant),
+
         AppSpacing.hGapSm,
-        // Expanded: a long venue address wraps instead of overflowing.
+
         Expanded(
           child: Text(
             text,

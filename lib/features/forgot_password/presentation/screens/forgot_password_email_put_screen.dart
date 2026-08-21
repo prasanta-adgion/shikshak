@@ -50,13 +50,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       forgotPasswordNotifierProvider.select((s) => s.isSubmitting),
     );
 
-    // Advance to OTP entry once the code has been sent.
+    // Advance to step 2 once the code has been sent.
     ref.listen(forgotPasswordNotifierProvider.select((s) => s.stage), (
       previous,
       next,
     ) {
-      if (next == PasswordResetStage.verifyOtp && previous != next) {
-        context.push(RoutePaths.forgotPasswordOtp);
+      if (next == PasswordResetStage.resetPassword && previous != next) {
+        context.push(RoutePaths.newPasswordSet);
       }
     });
 

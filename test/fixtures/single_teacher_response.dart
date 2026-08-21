@@ -1,0 +1,161 @@
+/// A `GET /api/v1/user/student/teachers/{id}` payload.
+///
+/// One teacher with everything filled in, and three class slots chosen for
+/// their spread: an in-person class with a venue and a price, a free online
+/// one, and a paused row the student view has to leave out.
+Map<String, dynamic> singleTeacherResponseJson() => {
+  'success': true,
+  'code': 200,
+  'message': 'Teacher fetched successfully',
+  'data': <String, dynamic>{
+    'user': <String, dynamic>{
+      'id': 'b71172f9-b201-4aed-bea1-2151d783cf73',
+      'name': 'Bartholomew Fitzgerald-Montgomery Wellington',
+      'email': 'prasanta.adgion@gmail.com',
+      'role': 'teacher',
+      'verified': true,
+      'phoneNo': '8250527100',
+      'isLocked': false,
+      'isDeleted': false,
+      'createdAt': '2026-08-13T10:22:47.380Z',
+      'updatedAt': '2026-08-19T11:43:50.811Z',
+    },
+    'profile': <String, dynamic>{
+      'id': 'a104a09a-7c21-4e88-9cfe-3e968e936138',
+      'userAuthId': 'b71172f9-b201-4aed-bea1-2151d783cf73',
+      'profilePhotoUrl': null,
+      'gender': 'male',
+      'addressLine1': 'NEWTOWN KOLKATA',
+      'addressLine2': null,
+      'city': 'Kolkata',
+      'state': 'West Bengal',
+      'country': 'India',
+      'postalCode': '700156',
+      'isProfileComplete': true,
+      'status': 'approved',
+      'submittedAt': '2026-08-13T10:38:24.927Z',
+      'reviewedAt': '2026-08-13T10:38:56.079Z',
+      'reviewNotes': null,
+      'createdAt': '2026-08-13T10:23:04.934Z',
+      'updatedAt': '2026-08-14T09:55:48.055Z',
+    },
+    'aboutYou': <String, dynamic>{
+      'id': '2bb56e9b-3c0d-4d56-b94c-8416e603d770',
+      'teacherProfileId': 'a104a09a-7c21-4e88-9cfe-3e968e936138',
+      'shortBio':
+          'Fifteen years of board-exam coaching across Mathematics, Physics '
+          'and Biology, with weekend doubt-clearing sessions and a question '
+          'bank built from two decades of past papers.',
+      'teachingApproach': 'Practical / Activity Based',
+      'whatMakesYouUnique':
+          'Every student leaves with a written plan for the week, and I mark '
+          'it with them the following Saturday.',
+      'subjectsTaught': <String>['Mathematics', 'Physics', 'Biology'],
+      'classesTaught': <String>[
+        'Class 6',
+        'Class 7',
+        'Class 8',
+        'Class 9',
+        'Class 10',
+      ],
+      'languagesKnown': <String>['Bengali', 'English', 'Hindi'],
+      'createdAt': '2026-08-13T10:24:35.824Z',
+      'updatedAt': '2026-08-13T10:38:23.411Z',
+    },
+    'classSlots': <Map<String, dynamic>>[
+      <String, dynamic>{
+        'id': '6f0c5e2a-3a1f-4f7c-8f0a-9d2b1e5c7a01',
+        'teacherProfileId': 'a104a09a-7c21-4e88-9cfe-3e968e936138',
+        'title': 'Board Mathematics — problem solving',
+        'description': 'Past-paper drills with a doubt round at the end.',
+        'subjects': <String>['Mathematics'],
+        'classes': <String>['Class 10'],
+        'dayOfWeek': 1,
+        'startTime': '17:30',
+        'endTime': '19:00',
+        'validFrom': '2026-08-01T00:00:00.000Z',
+        'validUntil': null,
+        'mode': 'offline',
+        'venueName': 'Newtown Study Centre',
+        'venueAddress': 'DB Block, Newtown',
+        'colorTag': 'amber',
+        'paymentAmount': '500.00',
+        'isActive': true,
+        'createdAt': '2026-08-14T09:55:48.055Z',
+        'updatedAt': null,
+      },
+      // Free, online, and no end time — the open-ended case.
+      <String, dynamic>{
+        'id': '6f0c5e2a-3a1f-4f7c-8f0a-9d2b1e5c7a02',
+        'teacherProfileId': 'a104a09a-7c21-4e88-9cfe-3e968e936138',
+        'title': 'Physics doubt clearing',
+        'description': null,
+        'subjects': <String>['Physics'],
+        'classes': <String>['Class 9', 'Class 10'],
+        'dayOfWeek': 6,
+        'startTime': '09:00',
+        'endTime': null,
+        'validFrom': null,
+        'validUntil': null,
+        'mode': 'online',
+        'venueName': null,
+        'venueAddress': null,
+        'colorTag': 'emerald',
+        'paymentAmount': 0,
+        'isActive': true,
+        'createdAt': '2026-08-14T09:56:10.000Z',
+        'updatedAt': null,
+      },
+      // Paused: filed by the teacher, but not something to offer a student.
+      <String, dynamic>{
+        'id': '6f0c5e2a-3a1f-4f7c-8f0a-9d2b1e5c7a03',
+        'teacherProfileId': 'a104a09a-7c21-4e88-9cfe-3e968e936138',
+        'title': 'Biology revision',
+        'description': null,
+        'subjects': <String>['Biology'],
+        'classes': <String>['Class 8'],
+        'dayOfWeek': 3,
+        'startTime': '16:00',
+        'endTime': '17:00',
+        'validFrom': null,
+        'validUntil': null,
+        'mode': 'online',
+        'venueName': null,
+        'venueAddress': null,
+        'colorTag': null,
+        'paymentAmount': null,
+        'isActive': false,
+        'createdAt': '2026-08-14T09:57:02.000Z',
+        'updatedAt': null,
+      },
+    ],
+    'profilePhotoSignedUrl': null,
+  },
+};
+
+/// Signed up, approved, and filled in nothing else — every optional block on
+/// the profile has to collapse, and the class list falls back to its empty
+/// state.
+Map<String, dynamic> sparseSingleTeacherResponseJson() => {
+  'success': true,
+  'code': 200,
+  'message': 'Teacher fetched successfully',
+  'data': <String, dynamic>{
+    'user': <String, dynamic>{
+      'id': '5c2f1a77-1d5e-4f2a-8f3b-1c9d0e7a4b21',
+      'name': 'Anita Sen',
+      'email': 'anita.sen@example.com',
+      'role': 'teacher',
+      'verified': false,
+      'phoneNo': null,
+      'isLocked': false,
+      'isDeleted': false,
+      'createdAt': '2026-08-20T06:10:11.000Z',
+      'updatedAt': null,
+    },
+    'profile': null,
+    'aboutYou': null,
+    'classSlots': <Map<String, dynamic>>[],
+    'profilePhotoSignedUrl': null,
+  },
+};
