@@ -65,6 +65,26 @@ class ClassSlot with ClassTiming, ClassVenue {
 
   final bool isActive;
 
+  /// Only the field the app flips locally, so the switch can repaint before
+  /// the PATCH lands. Everything else is server-owned.
+  ClassSlot copyWith({bool? isActive}) => ClassSlot(
+    id: id,
+    title: title,
+    day: day,
+    startTime: startTime,
+    endTime: endTime,
+    description: description,
+    subjects: subjects,
+    classes: classes,
+    validFrom: validFrom,
+    validUntil: validUntil,
+    mode: mode,
+    venueName: venueName,
+    venueAddress: venueAddress,
+    colorTag: colorTag,
+    isActive: isActive ?? this.isActive,
+  );
+
   /// True once [validUntil] is in the past — the recurrence has run out even
   /// though the row is still on the schedule.
   bool isExpired({DateTime? asOf}) {
@@ -80,12 +100,6 @@ class ClassSlot with ClassTiming, ClassVenue {
     return from.isAfter(_startOfDay(asOf ?? DateTime.now()));
   }
 
-  /// Why this slot produced no class in the week on screen. Null when it is
-  /// running normally, in which case its absence needs no explanation.
-  ///
-  /// [asOf] should be the end of the displayed week, not today: a slot that
-  /// starts after the week ends is "not started yet" for that week even if it
-  /// has started by now.
   SlotDormancy? dormancy({DateTime? asOf}) {
     if (!isActive) return SlotDormancy.paused;
     if (isExpired(asOf: asOf)) return SlotDormancy.ended;

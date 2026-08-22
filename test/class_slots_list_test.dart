@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shiksak/core/network/api_exception.dart';
 import 'package:shiksak/core/network/api_result.dart';
@@ -8,17 +11,26 @@ import 'package:shiksak/features/teacher/class_schedule/data/model/class_slot_mo
 import 'package:shiksak/features/teacher/class_schedule/data/repository/class_schedule_repository_impl.dart';
 import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_slot.dart';
 import 'package:shiksak/features/teacher/class_schedule/domain/entities/date_range.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/schedule_calendar.dart';
 import 'package:shiksak/features/teacher/class_schedule/domain/entities/schedule_day.dart';
 import 'package:shiksak/features/teacher/class_schedule/domain/entities/slot_time.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/repositories/class_schedule_repository.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/notifier/class_slots_notifier.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/providers/class_schedule_providers.dart';
 import 'package:shiksak/features/teacher/class_schedule/presentation/state/class_slots_state.dart';
 
 import 'fixtures/class_slot_list_response.dart';
 
 class _FakeDataSource implements ClassScheduleRemoteDataSource {
-  _FakeDataSource({this.models = const [], this.throws});
+  _FakeDataSource({this.models = const [], this.throws, this.toggled});
 
   final List<ClassSlotModel> models;
   final Object? throws;
+
+  /// What the PATCH echoes back. Null stands for the envelope-only reply.
+  final ClassSlotModel? toggled;
+
+  ({String slotId, bool isActive})? toggleRequest;
 
   @override
   Future<List<ClassSlotModel>> fetchSlots() async {
@@ -30,6 +42,17 @@ class _FakeDataSource implements ClassScheduleRemoteDataSource {
   @override
   Future<ClassCalendarDataModel> fetchWeeklyCalendar(DateRange range) async =>
       const ClassCalendarDataModel();
+
+  @override
+  Future<ClassSlotModel?> setSlotActive({
+    required String slotId,
+    required bool isActive,
+  }) async {
+    toggleRequest = (slotId: slotId, isActive: isActive);
+    final error = throws;
+    if (error != null) throw error;
+    return toggled;
+  }
 }
 
 List<ClassSlotModel> _fixtureModels() => ClassSlotListResponseModel.fromJson(
@@ -121,6 +144,49 @@ void main() {
     });
   });
 
+  group('setSlotActive', () {
+    test('sends the requested value and returns the echoed slot', () async {
+      final remote = _FakeDataSource(
+        toggled: const ClassSlotModel(
+          id: 'slot-1',
+          title: 'Physics',
+          dayOfWeek: 1,
+          startTime: '09:00',
+          isActive: false,
+        ),
+      );
+
+      final result = await ClassScheduleRepositoryImpl(
+        remoteDataSource: remote,
+      ).setSlotActive(slotId: 'slot-1', isActive: false);
+
+      expect(remote.toggleRequest, (slotId: 'slot-1', isActive: false));
+      expect(result.dataOrNull?.isActive, isFalse);
+    });
+
+    test('an envelope-only reply succeeds with no slot', () async {
+      final result = await ClassScheduleRepositoryImpl(
+        remoteDataSource: _FakeDataSource(),
+      ).setSlotActive(slotId: 'slot-1', isActive: true);
+
+      expect(result, isA<ApiSuccess<ClassSlot?>>());
+      expect(result.dataOrNull, isNull);
+    });
+
+    test('a rejected toggle comes back as ApiFailure', () async {
+      const exception = ApiException(
+        message: 'Could not update the slot.',
+        type: ApiExceptionType.server,
+      );
+
+      final result = await ClassScheduleRepositoryImpl(
+        remoteDataSource: _FakeDataSource(throws: exception),
+      ).setSlotActive(slotId: 'slot-1', isActive: false);
+
+      expect(result, isA<ApiFailure<ClassSlot?>>());
+    });
+  });
+
   group('ClassSlotsState', () {
     Future<ClassSlotsState> fixtureState() async => ClassSlotsState(
       slots: await _slotsFrom(_FakeDataSource(models: _fixtureModels())),
@@ -188,6 +254,110 @@ void main() {
       expect(state.weeklyDurationLabel, '0m');
     });
   });
+
+  group('ClassSlotsNotifier.toggleActive', () {
+    /// A container holding a live subscription, so the auto-disposed notifier
+    /// survives the awaits in these tests.
+    (ProviderContainer, ClassSlotsNotifier) boot(_FakeRepository repository) {
+      final container = ProviderContainer(
+        overrides: [
+          classScheduleRepositoryProvider.overrideWithValue(repository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final subscription = container.listen(
+        classSlotsNotifierProvider,
+        (_, _) {},
+      );
+      addTearDown(subscription.close);
+
+      return (container, container.read(classSlotsNotifierProvider.notifier));
+    }
+
+    test('flips the card before the request lands, then takes the '
+        'server\'s row', () async {
+      final pending = Completer<ApiResult<ClassSlot?>>();
+
+      final (container, notifier) = boot(
+        _FakeRepository(
+          slots: [_slot(id: 'slot-1')],
+          toggle: () => pending.future,
+        ),
+      );
+      await notifier.load();
+
+      final toggling = notifier.toggleActive(
+        container.read(classSlotsNotifierProvider).slots.single,
+      );
+
+      // In flight: already off on screen, and locked against a second tap.
+      var state = container.read(classSlotsNotifierProvider);
+      expect(state.slots.single.isActive, isFalse);
+      expect(state.isToggling('slot-1'), isTrue);
+
+      pending.complete(
+        ApiResult.success(_slot(id: 'slot-1', isActive: false)),
+      );
+      await toggling;
+
+      state = container.read(classSlotsNotifierProvider);
+      expect(state.slots.single.isActive, isFalse);
+      expect(state.isToggling('slot-1'), isFalse);
+      expect(state.error, isNull);
+    });
+
+    test('a rejected toggle flips the card back and reports why', () async {
+      const exception = ApiException(
+        message: 'Could not update the slot.',
+        type: ApiExceptionType.server,
+      );
+
+      final (container, notifier) = boot(
+        _FakeRepository(
+          slots: [_slot(id: 'slot-1')],
+          toggle: () async => const ApiResult.failure(exception),
+        ),
+      );
+      await notifier.load();
+
+      await notifier.toggleActive(
+        container.read(classSlotsNotifierProvider).slots.single,
+      );
+
+      final state = container.read(classSlotsNotifierProvider);
+      expect(state.slots.single.isActive, isTrue);
+      expect(state.isToggling('slot-1'), isFalse);
+      expect(state.error?.message, exception.message);
+    });
+  });
+}
+
+/// Serves the notifier directly, so the toggle tests exercise the optimistic
+/// flip rather than the transport under it.
+class _FakeRepository implements ClassScheduleRepository {
+  _FakeRepository({this.slots = const [], this.toggle});
+
+  final List<ClassSlot> slots;
+
+  /// Completes with what the PATCH resolved to. Left null, the toggle
+  /// succeeds immediately with no echoed slot.
+  final Future<ApiResult<ClassSlot?>> Function()? toggle;
+
+  @override
+  Future<ApiResult<List<ClassSlot>>> fetchSlots() async =>
+      ApiResult.success(slots);
+
+  @override
+  Future<ApiResult<ScheduleCalendar>> fetchWeeklyCalendar(
+    DateRange range,
+  ) async => ApiResult.success(ScheduleCalendar(range: range));
+
+  @override
+  Future<ApiResult<ClassSlot?>> setSlotActive({
+    required String slotId,
+    required bool isActive,
+  }) async => toggle == null ? const ApiResult.success(null) : await toggle!();
 }
 
 ClassSlot _slot({

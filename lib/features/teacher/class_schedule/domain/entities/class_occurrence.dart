@@ -3,12 +3,6 @@ import 'class_timing.dart';
 import 'date_range.dart';
 import 'slot_time.dart';
 
-/// One class on one date — the server's expansion of a recurring slot across
-/// the requested range.
-///
-/// It carries its own copy of the title, subjects, venue and so on rather than
-/// pointing back at the slot, because a single occurrence can be edited
-/// without touching the recurrence ([isException]).
 class ClassOccurrence with ClassTiming, ClassVenue {
   const ClassOccurrence({
     required this.slotId,
@@ -56,25 +50,20 @@ class ClassOccurrence with ClassTiming, ClassVenue {
 
   final String? colorTag;
 
-  /// True when this one class was changed away from its recurrence — moved,
-  /// re-timed, or otherwise edited on its own.
   final bool isException;
 
   DateTime get startsAt => DateTime(
     date.year,
+
     date.month,
     date.day,
     startTime.hour,
     startTime.minute,
   );
 
-  /// When the class finishes, rolling into the next day for a slot that runs
-  /// past midnight.
   DateTime get endsAt => startsAt.add(duration ?? Duration.zero);
 
   bool isOn(DateTime day) => date == DateRange.dateOnly(day);
 
-  /// Already finished. Used to dim today's earlier classes so the next one to
-  /// teach is the one that stands out.
   bool isPast({DateTime? now}) => endsAt.isBefore(now ?? DateTime.now());
 }

@@ -155,9 +155,15 @@ class SeededSlotsNotifier extends ClassSlotsNotifier {
 
   final ClassSlotsState seed;
 
+  /// Slots the tab asked to flip, in tap order.
+  final toggled = <String>[];
+
   @override
   ClassSlotsState build() => seed;
 
   @override
   Future<void> load() async {}
+
+  @override
+  Future<void> toggleActive(ClassSlot slot) async => toggled.add(slot.id);
 }

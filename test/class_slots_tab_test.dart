@@ -12,7 +12,12 @@ import 'fixtures/schedule_test_data.dart';
 void main() {
   final sample = ScheduleSample.currentWeek();
 
-  Future<void> pumpSlots(WidgetTester tester, ClassSlotsState seed) async {
+  Future<SeededSlotsNotifier> pumpSlots(
+    WidgetTester tester,
+    ClassSlotsState seed,
+  ) async {
+    final notifier = SeededSlotsNotifier(seed);
+
     tester.view.devicePixelRatio = 1.0;
     // Tall, so the lazily built sliver list lays out in full rather than
     // stopping at the fold.
@@ -23,9 +28,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          classSlotsNotifierProvider.overrideWith(
-            () => SeededSlotsNotifier(seed),
-          ),
+          classSlotsNotifierProvider.overrideWith(() => notifier),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -34,6 +37,8 @@ void main() {
       ),
     );
     await tester.pump();
+
+    return notifier;
   }
 
   group('ClassSlotsTab', () {
@@ -47,9 +52,35 @@ void main() {
       expect(find.text('3h'), findsOneWidget);
       expect(find.text('Slots'), findsOneWidget);
       expect(find.text('Per week'), findsOneWidget);
-      // Only the stat says "Active": a running slot carries no badge, so the
-      // word appears once on the whole screen.
-      expect(find.text('Active'), findsOneWidget);
+      // The stat, plus the switch label on each of the two running cards.
+      expect(find.text('Active'), findsNWidgets(3));
+      expect(find.text('Inactive'), findsOneWidget);
+    });
+
+    testWidgets('the footer switch asks to flip that slot', (tester) async {
+      final notifier = await pumpSlots(tester, sample.slotsState);
+
+      // Cards are grouped by day: Monday's physics slot comes first.
+      await tester.tap(find.byType(Switch).first);
+      await tester.pump();
+
+      expect(notifier.toggled, ['physics']);
+    });
+
+    testWidgets('a slot mid-request ignores a second tap', (tester) async {
+      final notifier = await pumpSlots(
+        tester,
+        ClassSlotsState(
+          slots: sample.slotsState.slots,
+          hasLoaded: true,
+          togglingSlotIds: const {'physics'},
+        ),
+      );
+
+      await tester.tap(find.byType(Switch).first);
+      await tester.pump();
+
+      expect(notifier.toggled, isEmpty);
     });
 
     testWidgets('calls out the slots that are not running', (tester) async {

@@ -31,6 +31,13 @@ class _FakeDataSource implements ClassScheduleRemoteDataSource {
   /// The all-slots endpoint has its own tests; nothing here calls it.
   @override
   Future<List<ClassSlotModel>> fetchSlots() async => const [];
+
+  /// Same — the toggle is exercised from the slots tests.
+  @override
+  Future<ClassSlotModel?> setSlotActive({
+    required String slotId,
+    required bool isActive,
+  }) async => null;
 }
 
 final _week = DateRange(from: DateTime(2026, 8, 3), to: DateTime(2026, 8, 9));

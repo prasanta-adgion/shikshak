@@ -6,6 +6,7 @@ import '../../data/repository/class_schedule_repository_impl.dart';
 import '../../domain/repositories/class_schedule_repository.dart';
 import '../../domain/usecases/get_class_calendar_usecase.dart';
 import '../../domain/usecases/get_class_slots_usecase.dart';
+import '../../domain/usecases/active_inactive_toggle_usecase.dart';
 import '../notifier/class_schedule_notifier.dart';
 import '../notifier/class_slots_notifier.dart';
 import '../state/class_schedule_state.dart';
@@ -31,6 +32,13 @@ final getClassCalendarUseCaseProvider = Provider<GetClassCalendarUseCase>(
 final getClassSlotsUseCaseProvider = Provider<GetClassSlotsUseCase>(
   (ref) => GetClassSlotsUseCase(ref.watch(classScheduleRepositoryProvider)),
 );
+
+final classActiveInactiveToggleProvider =
+    Provider<ClassActiveInactiveToggleUseCase>(
+      (ref) => ClassActiveInactiveToggleUseCase(
+        ref.watch(classScheduleRepositoryProvider),
+      ),
+    );
 
 /// Dropped with the screen, so reopening the Schedule tab re-reads the server
 /// rather than showing what the last visit left behind.

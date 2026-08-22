@@ -80,7 +80,11 @@ class _ClassSlotsTabState extends ConsumerState<ClassSlotsTab> {
                       _DayGroupHeading(day: day, slotCount: daySlots.length),
                       AppSpacing.gapMd,
                       for (final slot in daySlots) ...[
-                        ClassSlotCard(slot: slot),
+                        ClassSlotCard(
+                          slot: slot,
+                          isToggling: state.isToggling(slot.id),
+                          onToggleActive: () => notifier.toggleActive(slot),
+                        ),
                         AppSpacing.gapMd,
                       ],
                       AppSpacing.gapLg,

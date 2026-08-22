@@ -8,6 +8,7 @@ class ClassSlotsState {
     this.slots = const [],
     this.isLoading = false,
     this.hasLoaded = false,
+    this.togglingSlotIds = const {},
     this.error,
   });
 
@@ -15,6 +16,10 @@ class ClassSlotsState {
   final List<ClassSlot> slots;
 
   final bool isLoading;
+
+  /// Slots with an active/paused PATCH in flight. Per-slot rather than a
+  /// single flag, so toggling one card does not freeze the rest.
+  final Set<String> togglingSlotIds;
 
   /// Separates "not fetched yet" from "fetched and there is nothing", which
   /// decides between the spinner and the empty state.
@@ -55,16 +60,20 @@ class ClassSlotsState {
 
   bool get isEmpty => slots.isEmpty;
 
+  bool isToggling(String slotId) => togglingSlotIds.contains(slotId);
+
   ClassSlotsState copyWith({
     List<ClassSlot>? slots,
     bool? isLoading,
     bool? hasLoaded,
+    Set<String>? togglingSlotIds,
     ApiException? error,
     bool clearError = false,
   }) => ClassSlotsState(
     slots: slots ?? this.slots,
     isLoading: isLoading ?? this.isLoading,
     hasLoaded: hasLoaded ?? this.hasLoaded,
+    togglingSlotIds: togglingSlotIds ?? this.togglingSlotIds,
     // `error ?? this.error` alone could never clear it.
     error: clearError ? null : (error ?? this.error),
   );
