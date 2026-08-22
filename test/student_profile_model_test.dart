@@ -1,7 +1,7 @@
-import 'package:Shikshak/features/auth/domain/entities/user_role.dart';
-import 'package:Shikshak/features/student/profile/data/model/student_profile_response_model.dart';
-import 'package:Shikshak/features/student/profile/domain/entities/student_profile.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/features/auth/domain/entities/user_role.dart';
+import 'package:shiksak/features/student/profile/data/model/student_profile_response_model.dart';
+import 'package:shiksak/features/student/profile/domain/entities/student_profile.dart';
 
 import 'fixtures/student_profile_response.dart';
 
@@ -144,8 +144,10 @@ void main() {
     });
 
     test('names the language, and falls back to the raw code', () {
-      expect(parse(completeStudentProfileResponseJson()).languageLabel,
-          'Bengali');
+      expect(
+        parse(completeStudentProfileResponseJson()).languageLabel,
+        'Bengali',
+      );
       expect(parse(studentProfileResponseJson()).languageLabel, 'English');
 
       final json = studentProfileResponseJson();

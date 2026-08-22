@@ -19,8 +19,6 @@ class ClassScheduleRepositoryImpl implements ClassScheduleRepository {
   ) => ApiResult.guard(() async {
     final data = await _remote.fetchWeeklyCalendar(range);
 
-    // Sorted once here so every consumer — the date strip, the week
-    // summary, the day's list — reads the same order without re-sorting.
     final occurrences =
         [
           // Null-aware element: rows the model could not place are dropped.
@@ -43,6 +41,21 @@ class ClassScheduleRepositoryImpl implements ClassScheduleRepository {
   @override
   Future<ApiResult<List<ClassSlot>>> fetchSlots() =>
       ApiResult.guard(() async => _sortedSlots(await _remote.fetchSlots()));
+
+  @override
+  Future<ApiResult<ClassSlot?>> classActiveInactiveToggle({
+    required String slotId,
+    required bool isActive,
+  }) => ApiResult.guard(() async {
+    final model = await _remote.classActiveInactiveToggle(
+      slotId: slotId,
+      isActive: isActive,
+    );
+
+    // Null when the response carried no slot, or carried one the app cannot
+    // place — either way the caller keeps the value it sent.
+    return model?.toEntity();
+  });
 
   static List<ClassSlot> _sortedSlots(List<ClassSlotModel> models) =>
       [for (final model in models) ?model.toEntity()]..sort((a, b) {

@@ -1,5 +1,5 @@
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/date_range.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/date_range.dart';
 
 void main() {
   group('DateRange.weekOf', () {

@@ -1,4 +1,4 @@
-/// The two account types supported by Shikshak.
+/// The two account types supported by shiksak.
 enum UserRole {
   teacher,
   student;

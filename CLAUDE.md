@@ -1,4 +1,4 @@
-# Shikshak
+# shiksak
 
 Flutter app serving two roles from one binary: **teacher** and **student**. Riverpod 3 for state and
 DI, go_router for navigation, Dio for networking. No code generation.
@@ -53,7 +53,7 @@ lands. Do not create empty layer folders in advance.
 
 ## Conventions
 
-- **Imports inside `lib/` are relative.** Tests import via `package:Shikshak/...`. Keep directive
+- **Imports inside `lib/` are relative.** Tests import via `package:shiksak/...`. Keep directive
   sections sorted — `directives_ordering` is on.
 - **State**: `ConsumerStatefulWidget` for pages, `ConsumerWidget` for read-only widgets. Scope
   rebuilds with `ref.watch(provider.select((s) => s.field))`. Local form state uses `ValueNotifier` +

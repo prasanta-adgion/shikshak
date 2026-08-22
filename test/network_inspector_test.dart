@@ -1,8 +1,8 @@
-import 'package:Shikshak/core/flavor/app_flavor.dart';
-import 'package:Shikshak/core/network/network_inspector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:network_logger/network_logger.dart';
+import 'package:shiksak/core/flavor/app_flavor.dart';
+import 'package:shiksak/core/network/network_inspector.dart';
 
 /// Pumps a page that attaches the inspector from its own context — the same
 /// position `SplashPage` calls it from.

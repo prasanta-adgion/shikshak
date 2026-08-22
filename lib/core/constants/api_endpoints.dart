@@ -33,10 +33,15 @@ abstract final class ApiEndpoints {
   static const String getClassSlotsCalendar =
       '/api/v1/user/teacher/class-slot/calendar';
 
+  static String activeDeactiveToggle({required String classId}) =>
+      '$classSlots/$classId';
+
   // Student account
   static const String getStudentProfile = '/api/v1/user/profile';
   static const String getAvailableTeacher = '/api/v1/user/student/teachers';
 
   static String availableTeacherById(String teacherId) =>
       '$getAvailableTeacher/$teacherId';
+
+  static const String getConverstionsList = '/api/v1/chat/conversations';
 }

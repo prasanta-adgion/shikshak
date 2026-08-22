@@ -1,16 +1,16 @@
-import 'package:Shikshak/core/network/api_exception.dart';
-import 'package:Shikshak/core/theme/app_colors.dart';
-import 'package:Shikshak/core/theme/app_theme.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/date_range.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/schedule_calendar.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/schedule_calendar_tab.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/providers/class_schedule_providers.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/state/class_schedule_state.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/widgets/schedule_date_strip.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/widgets/schedule_week_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/network/api_exception.dart';
+import 'package:shiksak/core/theme/app_colors.dart';
+import 'package:shiksak/core/theme/app_theme.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/date_range.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/schedule_calendar.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/pages/schedule_calendar_tab.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/providers/class_schedule_providers.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/state/class_schedule_state.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/widgets/schedule_date_strip.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/widgets/schedule_week_header.dart';
 
 import 'fixtures/schedule_test_data.dart';
 

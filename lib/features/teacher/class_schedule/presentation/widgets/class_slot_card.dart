@@ -1,12 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_icons.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/utils/date_time_picker_func.dart';
-import '../../../../../shared/widgets/app_button.dart';
 import '../../../../../shared/widgets/app_card.dart';
+import '../../../../../shared/widgets/app_popover_menu.dart';
 import '../../domain/entities/class_slot.dart';
 import 'schedule_chips.dart';
 import 'slot_accent.dart';
@@ -15,6 +14,7 @@ class ClassSlotCard extends StatelessWidget {
   const ClassSlotCard({
     super.key,
     required this.slot,
+    this.isToggling = false,
     this.onTap,
     this.onMessage,
     this.onEdit,
@@ -23,6 +23,10 @@ class ClassSlotCard extends StatelessWidget {
   });
 
   final ClassSlot slot;
+
+  /// True while this slot's active/paused PATCH is in flight — the switch
+  /// stops accepting taps until it lands.
+  final bool isToggling;
 
   final VoidCallback? onTap;
   final VoidCallback? onMessage;
@@ -130,18 +134,9 @@ class ClassSlotCard extends StatelessWidget {
 
                           const SizedBox(width: AppSpacing.md),
 
-                          SizedBox(
-                            height: 40,
-                            child: AppButton(
-                              color: AppColors.success,
-                              foregroundColor: Colors.white,
-                              disabledColor: AppColors.success,
-                              disabledForegroundColor: Colors.white,
-                              icon: CupertinoIcons.chat_bubble_text_fill,
-                              label: 'Message',
-                              onPressed: onMessage,
-                              expanded: false,
-                            ),
+                          _SlotActiveSwitch(
+                            isActive: slot.isActive,
+                            onToggle: isToggling ? null : onToggleActive,
                           ),
                         ],
                       ),
@@ -157,15 +152,6 @@ class ClassSlotCard extends StatelessWidget {
   }
 }
 
-///
-/// Header
-///
-/// Contains:
-/// - Time
-/// - Duration
-/// - Dormancy status
-/// - More menu
-///
 class _HeaderRow extends StatelessWidget {
   const _HeaderRow({
     required this.slot,
@@ -265,101 +251,57 @@ class _SlotMoreButton extends StatelessWidget {
   final VoidCallback? onToggleActive;
 
   Future<void> _showActions(BuildContext context) async {
-    final buttonContext = context;
-
-    final RenderBox button = buttonContext.findRenderObject()! as RenderBox;
-
-    final RenderBox overlay =
-        Overlay.of(buttonContext).context.findRenderObject()! as RenderBox;
-
-    final buttonPosition = button.localToGlobal(Offset.zero, ancestor: overlay);
-
-    final buttonBottomRight = button.localToGlobal(
-      button.size.bottomRight(Offset.zero),
-      ancestor: overlay,
-    );
-
-    final position = RelativeRect.fromRect(
-      Rect.fromPoints(buttonPosition, buttonBottomRight),
-      Offset.zero & overlay.size,
-    );
-
-    final result = await showMenu<String>(
+    final result = await showAppPopoverMenu<_SlotAction>(
       context: context,
-      position: position,
-      elevation: 8,
-      color: Theme.of(context).colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       items: [
-        // ---------------------------------------------------------------
-        // MESSAGE
-        // ---------------------------------------------------------------
-        const PopupMenuItem<String>(
-          value: 'message',
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(Icons.message_outlined),
-            title: Text('Message'),
-          ),
+        const AppPopoverMenuItem(
+          value: _SlotAction.message,
+          icon: AppIcons.students,
+          label: 'All Students',
+          color: AppColors.success,
         ),
 
-        // ---------------------------------------------------------------
-        // EDIT
-        // ---------------------------------------------------------------
-        const PopupMenuItem<String>(
-          value: 'edit',
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(Icons.edit_outlined),
-            title: Text('Edit'),
-          ),
+        // const AppPopoverMenuItem(
+        //   value: _SlotAction.message,
+        //   icon: AppIcons.message,
+        //   label: 'Message',
+        //   color: AppColors.success,
+        // ),
+        const AppPopoverMenuItem(
+          value: _SlotAction.edit,
+          icon: Icons.edit_outlined,
+          label: 'Edit',
+          color: AppColors.primary,
         ),
 
-        // ---------------------------------------------------------------
-        // DELETE
-        // ---------------------------------------------------------------
-        const PopupMenuItem<String>(
-          value: 'delete',
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(Icons.delete_outline),
-            title: Text('Delete'),
-          ),
+        const AppPopoverMenuItem(
+          value: _SlotAction.delete,
+          icon: Icons.delete_outline,
+          label: 'Delete',
+          color: AppColors.error,
         ),
 
-        // ---------------------------------------------------------------
-        // ACTIVE / DEACTIVE
-        // ---------------------------------------------------------------
-        PopupMenuItem<String>(
-          value: 'toggle',
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(
-              slot.isActive
-                  ? Icons.toggle_on_outlined
-                  : Icons.toggle_off_outlined,
-            ),
-            title: Text(slot.isActive ? 'Deactivate' : 'Activate'),
-          ),
+        AppPopoverMenuItem(
+          value: _SlotAction.toggle,
+          icon: slot.isActive
+              ? Icons.toggle_on_outlined
+              : Icons.toggle_off_outlined,
+          label: slot.isActive ? 'Deactivate' : 'Activate',
         ),
       ],
     );
 
     switch (result) {
-      case 'message':
+      case _SlotAction.message:
         onMessage?.call();
-        break;
-
-      case 'edit':
+      case _SlotAction.edit:
         onEdit?.call();
-        break;
-
-      case 'delete':
+      case _SlotAction.delete:
         onDelete?.call();
-        break;
-
-      case 'toggle':
+      case _SlotAction.toggle:
         onToggleActive?.call();
+      case _SlotAction.students:
+      case null:
         break;
     }
   }
@@ -371,6 +313,48 @@ class _SlotMoreButton extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       icon: const Icon(Icons.more_vert),
       onPressed: () => _showActions(context),
+    );
+  }
+}
+
+enum _SlotAction { message, edit, delete, toggle, students }
+
+/// Footer control that flips the slot between active and paused.
+///
+/// The switch is the tap target — [onToggle] fires on either polarity, since
+/// the caller already knows the current value from [ClassSlot.isActive].
+class _SlotActiveSwitch extends StatelessWidget {
+  const _SlotActiveSwitch({required this.isActive, this.onToggle});
+
+  final bool isActive;
+  final VoidCallback? onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final tint = isActive
+        ? AppColors.success
+        : theme.colorScheme.onSurfaceVariant;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          isActive ? 'Active' : 'Inactive',
+          style: theme.textTheme.labelLarge?.copyWith(color: tint),
+        ),
+
+        AppSpacing.hGapXs,
+
+        Switch(
+          value: isActive,
+          onChanged: onToggle == null ? null : (_) => onToggle!(),
+          activeThumbColor: Colors.white,
+          activeTrackColor: AppColors.success,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ],
     );
   }
 }

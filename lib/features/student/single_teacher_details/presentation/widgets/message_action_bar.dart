@@ -6,12 +6,6 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../shared/widgets/app_button.dart';
 import '../../domain/entities/teacher_class_slot.dart';
 
-/// The screen's one action, pinned to the bottom so it is reachable however
-/// far down the profile the student has scrolled.
-///
-/// It stays visible but disabled until a class is picked: a button that
-/// appears only after selection would leave the student with nothing telling
-/// them what to do first.
 class MessageActionBar extends StatelessWidget {
   const MessageActionBar({
     super.key,
@@ -19,15 +13,10 @@ class MessageActionBar extends StatelessWidget {
     required this.onMessage,
   });
 
-  /// In the order they are listed on the page, not the order they were
-  /// tapped — the summary should read like the list above it.
   final List<TeacherClassSlot> selectedClasses;
 
-  /// Called with at least one class picked. Null disables the button.
   final VoidCallback? onMessage;
 
-  /// One class names itself; several are counted, then named as far as the
-  /// line fits.
   String get _summary => switch (selectedClasses.length) {
     0 => 'Select one or more classes to message this teacher',
     1 => selectedClasses.single.displayTitle,

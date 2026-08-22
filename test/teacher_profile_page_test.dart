@@ -1,25 +1,25 @@
-import 'package:Shikshak/core/media/i_media_picker.dart';
-import 'package:Shikshak/core/media/picked_media.dart';
-import 'package:Shikshak/core/network/api_exception.dart';
-import 'package:Shikshak/core/network/api_result.dart';
-import 'package:Shikshak/core/providers/core_providers.dart';
-import 'package:Shikshak/core/theme/app_icons.dart';
-import 'package:Shikshak/core/theme/app_theme.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/about_you/domain/repositories/profile_image_repository.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/about_you/presentation/providers/about_you_providers.dart';
-import 'package:Shikshak/features/teacher/profile/data/model/teacher_profile_response_model.dart';
-import 'package:Shikshak/features/teacher/profile/domain/entities/teacher_profile.dart';
-import 'package:Shikshak/features/teacher/profile/presentation/notifier/teacher_profile_notifier.dart';
-import 'package:Shikshak/features/teacher/profile/presentation/pages/teacher_profile_page.dart';
-import 'package:Shikshak/features/teacher/profile/presentation/providers/teacher_profile_providers.dart';
-import 'package:Shikshak/features/teacher/profile/presentation/state/teacher_profile_state.dart';
-import 'package:Shikshak/features/teacher/profile/presentation/widgets/profile_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // `Override` — the type of a ProviderScope override — lives here in Riverpod 3.
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:shiksak/core/media/i_media_picker.dart';
+import 'package:shiksak/core/media/picked_media.dart';
+import 'package:shiksak/core/network/api_exception.dart';
+import 'package:shiksak/core/network/api_result.dart';
+import 'package:shiksak/core/providers/core_providers.dart';
+import 'package:shiksak/core/theme/app_icons.dart';
+import 'package:shiksak/core/theme/app_theme.dart';
+import 'package:shiksak/features/teacher/create_profile_account/about_you/domain/repositories/profile_image_repository.dart';
+import 'package:shiksak/features/teacher/create_profile_account/about_you/presentation/providers/about_you_providers.dart';
+import 'package:shiksak/features/teacher/profile/data/model/teacher_profile_response_model.dart';
+import 'package:shiksak/features/teacher/profile/domain/entities/teacher_profile.dart';
+import 'package:shiksak/features/teacher/profile/presentation/notifier/teacher_profile_notifier.dart';
+import 'package:shiksak/features/teacher/profile/presentation/pages/teacher_profile_page.dart';
+import 'package:shiksak/features/teacher/profile/presentation/providers/teacher_profile_providers.dart';
+import 'package:shiksak/features/teacher/profile/presentation/state/teacher_profile_state.dart';
+import 'package:shiksak/features/teacher/profile/presentation/widgets/profile_tab_bar.dart';
 
 import 'fixtures/teacher_profile_response.dart';
 
@@ -165,15 +165,16 @@ void main() {
       await pumpLoaded(
         tester,
         profile: TeacherProfile(
-          user: base.user.copyWith(
-            avatarUrl: 'https://example.com/avatar.png',
-          ),
+          user: base.user.copyWith(avatarUrl: 'https://example.com/avatar.png'),
           status: base.status,
         ),
       );
 
       final image = tester.widget<Image>(find.byType(Image));
-      expect((image.image as NetworkImage).url, 'https://example.com/avatar.png');
+      expect(
+        (image.image as NetworkImage).url,
+        'https://example.com/avatar.png',
+      );
       // The bytes never arrive in a test, so the initials still hold the disc —
       // which is the point: it is never blank.
       expect(find.text('RT'), findsOneWidget);

@@ -1,21 +1,21 @@
-import 'package:Shikshak/core/constants/api_endpoints.dart';
-import 'package:Shikshak/core/network/api_exception.dart';
-import 'package:Shikshak/core/network/api_result.dart';
-import 'package:Shikshak/core/network/i_api_client.dart';
-import 'package:Shikshak/core/providers/core_providers.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/class_mode.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/schedule_day.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/slot_time.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/data/datasource/create_class_remote_datasource_impl.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/data/datasource/i_create_class_remote_datasource.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/data/mapper/create_class_mapper.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/data/repositories/create_class_repository_impl.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/domain/params/create_class_params.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/presentation/controller/class_slot_form_controller.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/presentation/providers/create_class_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/constants/api_endpoints.dart';
+import 'package:shiksak/core/network/api_exception.dart';
+import 'package:shiksak/core/network/api_result.dart';
+import 'package:shiksak/core/network/i_api_client.dart';
+import 'package:shiksak/core/providers/core_providers.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_mode.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/schedule_day.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/slot_time.dart';
+import 'package:shiksak/features/teacher/create_class_slot/data/datasource/create_class_remote_datasource_impl.dart';
+import 'package:shiksak/features/teacher/create_class_slot/data/datasource/i_create_class_remote_datasource.dart';
+import 'package:shiksak/features/teacher/create_class_slot/data/mapper/create_class_mapper.dart';
+import 'package:shiksak/features/teacher/create_class_slot/data/repositories/create_class_repository_impl.dart';
+import 'package:shiksak/features/teacher/create_class_slot/domain/params/create_class_params.dart';
+import 'package:shiksak/features/teacher/create_class_slot/presentation/controller/class_slot_form_controller.dart';
+import 'package:shiksak/features/teacher/create_class_slot/presentation/providers/create_class_providers.dart';
 
 /// The sample class from the API docs, in domain terms.
 CreateClassParams _params({

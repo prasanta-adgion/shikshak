@@ -1,11 +1,11 @@
-import 'package:Shikshak/app/router/route_paths.dart';
-import 'package:Shikshak/core/constants/app_constants.dart';
-import 'package:Shikshak/core/constants/app_images_const.dart';
-import 'package:Shikshak/features/splash/presentation/widgets/section_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shiksak/app/router/route_paths.dart';
+import 'package:shiksak/core/constants/app_constants.dart';
+import 'package:shiksak/core/constants/app_images_const.dart';
+import 'package:shiksak/features/splash/presentation/widgets/section_indicator.dart';
 
 import '../../../../core/network/network_inspector.dart';
 import '../../../../core/responsive/responsive.dart';

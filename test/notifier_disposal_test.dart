@@ -1,13 +1,13 @@
-import 'package:Shikshak/core/network/i_api_client.dart';
-import 'package:Shikshak/core/providers/core_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/about_you/presentation/providers/about_you_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/basic_info/presentation/providers/basic_info_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/documents/presentation/providers/document_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/education/presentation/providers/education_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/experience/presentation/providers/experience_providers.dart';
-import 'package:Shikshak/features/teacher/profile/presentation/providers/teacher_profile_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/network/i_api_client.dart';
+import 'package:shiksak/core/providers/core_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/about_you/presentation/providers/about_you_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/basic_info/presentation/providers/basic_info_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/documents/presentation/providers/document_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/education/presentation/providers/education_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/experience/presentation/providers/experience_providers.dart';
+import 'package:shiksak/features/teacher/profile/presentation/providers/teacher_profile_providers.dart';
 
 /// Answers after a delay, so a request can still be in flight when the
 /// provider that started it is disposed.

@@ -1,9 +1,9 @@
-import 'package:Shikshak/core/theme/app_icons.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/presentation/controller/class_slot_form_controller.dart';
-import 'package:Shikshak/features/teacher/create_class_slot/presentation/pages/create_class_slot_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/theme/app_icons.dart';
+import 'package:shiksak/features/teacher/create_class_slot/presentation/controller/class_slot_form_controller.dart';
+import 'package:shiksak/features/teacher/create_class_slot/presentation/pages/create_class_slot_page.dart';
 
 void main() {
   Future<void> pumpForm(WidgetTester tester) async {

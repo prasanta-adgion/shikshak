@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Shikshak/core/network/api_result.dart';
+import 'package:shiksak/core/network/api_result.dart';
 
 abstract interface class IFileUploader {
   Future<ApiResult<Map<String, dynamic>>> upload(

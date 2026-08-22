@@ -1,10 +1,10 @@
-import 'package:Shikshak/core/theme/app_theme.dart';
-import 'package:Shikshak/core/utils/validators.dart';
-import 'package:Shikshak/features/auth/presentation/widgets/auth_scaffold.dart';
-import 'package:Shikshak/shared/widgets/adaptive_navigation_scaffold.dart';
-import 'package:Shikshak/shared/widgets/app_loading_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/theme/app_theme.dart';
+import 'package:shiksak/core/utils/validators.dart';
+import 'package:shiksak/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:shiksak/shared/widgets/adaptive_navigation_scaffold.dart';
+import 'package:shiksak/shared/widgets/app_loading_button.dart';
 
 void main() {
   group('Validators', () {

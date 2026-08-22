@@ -1,4 +1,4 @@
-# Static analysis configuration for Shikshak.
+# Static analysis configuration for shiksak.
 #
 # Based on the recommended Flutter lint set, with a couple of project-wide
 # conventions enforced.

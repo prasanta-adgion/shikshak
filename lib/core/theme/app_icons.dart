@@ -27,7 +27,7 @@ abstract final class AppIcons {
   static const IconData search = Icons.search_rounded;
   static const IconData filter = Icons.tune_rounded;
   static const IconData notifications = Icons.notifications_none_rounded;
-  static const IconData message = Icons.chat_bubble_outline_rounded;
+  static const IconData message = Icons.chat_sharp;
   static const IconData logout = Icons.logout_rounded;
   static const IconData more = Icons.more_horiz_rounded;
 

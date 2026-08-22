@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 /// Corner radius scale.
 abstract final class AppRadius {
+  static const double s = 5.0;
   static const double xs = 8;
   static const double sm = 12;
   static const double md = 16;
@@ -16,4 +17,5 @@ abstract final class AppRadius {
     top: Radius.circular(xl),
   );
   static const BorderRadius chip = BorderRadius.all(Radius.circular(pill));
+  static const BorderRadius dailogRadius = BorderRadius.all(Radius.circular(s));
 }

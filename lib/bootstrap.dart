@@ -18,5 +18,5 @@ Future<void> bootstrap(AppFlavor flavor) async {
     ),
   );
 
-  runApp(const ProviderScope(child: ShikshakApp()));
+  runApp(const ProviderScope(child: ShiksakApp()));
 }
