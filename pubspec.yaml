@@ -1,5 +1,5 @@
-name: Shikshak
-description: "Shikshak — Find the Right Teacher. Learn Without Limits."
+name: shiksak
+description: "Shiksak — Find the Right Teacher. Learn Without Limits."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -52,7 +52,14 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   json_serializable: ^6.11.2
   build_runner: ^2.15.1
+  flutter_launcher_icons: ^0.14.4
   # Pinned below 2.15.2, which requires Dart ^3.11.0 — this project is on 3.10.0.
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/shared_images/logo-with-text-removebg.png"
  
 
 flutter:

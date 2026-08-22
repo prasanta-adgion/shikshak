@@ -1,6 +1,6 @@
-import 'package:Shikshak/features/auth/domain/entities/user_entity.dart';
-import 'package:Shikshak/features/auth/domain/entities/user_role.dart';
 import 'package:equatable/equatable.dart';
+import 'package:shiksak/features/auth/domain/entities/user_entity.dart';
+import 'package:shiksak/features/auth/domain/entities/user_role.dart';
 
 class ProfileUserModel extends Equatable {
   const ProfileUserModel({

@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:Shikshak/core/constants/api_endpoints.dart';
-import 'package:Shikshak/core/network/dio_client.dart';
-import 'package:Shikshak/core/network/token_refresher.dart';
-import 'package:Shikshak/core/storage/secure_storage_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/constants/api_endpoints.dart';
+import 'package:shiksak/core/network/dio_client.dart';
+import 'package:shiksak/core/network/token_refresher.dart';
+import 'package:shiksak/core/storage/secure_storage_service.dart';
 
 const _baseUrl = 'https://api.test/';
 const _protected = 'api/v1/user/teacher/profile/basic-info';

@@ -1,9 +1,9 @@
-import 'package:Shikshak/core/constants/api_endpoints.dart';
-import 'package:Shikshak/core/network/i_api_client.dart';
-import 'package:Shikshak/core/providers/core_providers.dart';
-import 'package:Shikshak/features/student/all_teachers/presentation/providers/all_teachers_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/constants/api_endpoints.dart';
+import 'package:shiksak/core/network/i_api_client.dart';
+import 'package:shiksak/core/providers/core_providers.dart';
+import 'package:shiksak/features/student/all_teachers/presentation/providers/all_teachers_providers.dart';
 
 /// Serves one teacher per page, exactly as `limit=1` does on the real
 /// endpoint: three teachers, three pages, `page` counting up with each call.
@@ -30,20 +30,21 @@ class _PagingApiClient implements IApiClient {
     requestedPages.add(page);
 
     return <String, dynamic>{
-      'success': true,
-      'code': 200,
-      'message': 'Teachers fetched successfully',
-      'data': <String, dynamic>{
-        'teachers': <Map<String, dynamic>>[_teacher(page)],
-        'pagination': <String, dynamic>{
-          'page': page,
-          'limit': 1,
-          'total': total,
-          'totalPages': totalPages,
-          'sortOrder': 'desc',
-        },
-      },
-    } as T;
+          'success': true,
+          'code': 200,
+          'message': 'Teachers fetched successfully',
+          'data': <String, dynamic>{
+            'teachers': <Map<String, dynamic>>[_teacher(page)],
+            'pagination': <String, dynamic>{
+              'page': page,
+              'limit': 1,
+              'total': total,
+              'totalPages': totalPages,
+              'sortOrder': 'desc',
+            },
+          },
+        }
+        as T;
   }
 
   static Map<String, dynamic> _teacher(int page) => <String, dynamic>{
@@ -144,10 +145,16 @@ void main() {
       final notifier = container.read(allTeachersNotifierProvider.notifier);
 
       await notifier.load();
-      expect(container.read(allTeachersNotifierProvider).teachers, hasLength(1));
+      expect(
+        container.read(allTeachersNotifierProvider).teachers,
+        hasLength(1),
+      );
 
       await notifier.loadMore();
-      expect(container.read(allTeachersNotifierProvider).teachers, hasLength(2));
+      expect(
+        container.read(allTeachersNotifierProvider).teachers,
+        hasLength(2),
+      );
     });
 
     test('a single-page result never asks for page 2', () async {
@@ -172,15 +179,18 @@ void main() {
       expect(client.requestedPages, [1, 2]);
 
       await notifier.applyQuery(
-        container.read(allTeachersNotifierProvider).query.copyWith(
-          search: 'rahul',
-          page: 4,
-        ),
+        container
+            .read(allTeachersNotifierProvider)
+            .query
+            .copyWith(search: 'rahul', page: 4),
       );
 
       // Page 4 of the old result set means nothing to a new one.
       expect(client.requestedPages.last, 1);
-      expect(container.read(allTeachersNotifierProvider).teachers, hasLength(1));
+      expect(
+        container.read(allTeachersNotifierProvider).teachers,
+        hasLength(1),
+      );
     });
 
     test('refresh re-reads page 1 rather than continuing', () async {
@@ -193,7 +203,10 @@ void main() {
       await notifier.refresh();
 
       expect(client.requestedPages, [1, 2, 1]);
-      expect(container.read(allTeachersNotifierProvider).teachers, hasLength(1));
+      expect(
+        container.read(allTeachersNotifierProvider).teachers,
+        hasLength(1),
+      );
     });
   });
 }

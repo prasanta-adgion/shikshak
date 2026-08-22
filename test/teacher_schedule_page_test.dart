@@ -1,12 +1,12 @@
-import 'package:Shikshak/core/theme/app_icons.dart';
-import 'package:Shikshak/core/theme/app_theme.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/class_slots_tab.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/schedule_calendar_tab.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/pages/teacher_schedule_page.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/providers/class_schedule_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/theme/app_icons.dart';
+import 'package:shiksak/core/theme/app_theme.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/pages/class_slots_tab.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/pages/schedule_calendar_tab.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/pages/teacher_schedule_page.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/providers/class_schedule_providers.dart';
 
 import 'fixtures/schedule_test_data.dart';
 

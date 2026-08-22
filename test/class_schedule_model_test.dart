@@ -1,13 +1,13 @@
-import 'package:Shikshak/features/teacher/class_schedule/data/model/class_calendar_response_model.dart';
-import 'package:Shikshak/features/teacher/class_schedule/data/model/class_occurrence_model.dart';
-import 'package:Shikshak/features/teacher/class_schedule/data/model/class_slot_model.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/class_mode.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/class_occurrence.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/class_slot.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/date_range.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/schedule_day.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/slot_time.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/features/teacher/class_schedule/data/model/class_calendar_response_model.dart';
+import 'package:shiksak/features/teacher/class_schedule/data/model/class_occurrence_model.dart';
+import 'package:shiksak/features/teacher/class_schedule/data/model/class_slot_model.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_mode.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_occurrence.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_slot.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/date_range.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/schedule_day.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/slot_time.dart';
 
 import 'fixtures/class_calendar_response.dart';
 

@@ -1,14 +1,14 @@
-import 'package:Shikshak/core/network/api_exception.dart';
-import 'package:Shikshak/core/theme/app_theme.dart';
-import 'package:Shikshak/features/student/profile/data/model/student_profile_response_model.dart';
-import 'package:Shikshak/features/student/profile/domain/entities/student_profile.dart';
-import 'package:Shikshak/features/student/profile/presentation/notifier/student_profile_notifier.dart';
-import 'package:Shikshak/features/student/profile/presentation/pages/student_profile_page.dart';
-import 'package:Shikshak/features/student/profile/presentation/providers/student_profile_providers.dart';
-import 'package:Shikshak/features/student/profile/presentation/state/student_profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/network/api_exception.dart';
+import 'package:shiksak/core/theme/app_theme.dart';
+import 'package:shiksak/features/student/profile/data/model/student_profile_response_model.dart';
+import 'package:shiksak/features/student/profile/domain/entities/student_profile.dart';
+import 'package:shiksak/features/student/profile/presentation/notifier/student_profile_notifier.dart';
+import 'package:shiksak/features/student/profile/presentation/pages/student_profile_page.dart';
+import 'package:shiksak/features/student/profile/presentation/providers/student_profile_providers.dart';
+import 'package:shiksak/features/student/profile/presentation/state/student_profile_state.dart';
 
 import 'fixtures/student_profile_response.dart';
 
@@ -103,10 +103,13 @@ void main() {
           .widgetList<Image>(find.byType(Image))
           .map((image) => (image.image as NetworkImage).url);
 
-      expect(urls, containsAll(<String>[
-        'https://example.com/avatar.png',
-        'https://example.com/cover.png',
-      ]));
+      expect(
+        urls,
+        containsAll(<String>[
+          'https://example.com/avatar.png',
+          'https://example.com/cover.png',
+        ]),
+      );
     });
 
     testWidgets('shows how far off a complete profile is', (tester) async {
@@ -114,10 +117,7 @@ void main() {
 
       expect(find.text('Complete your profile'), findsOneWidget);
       expect(find.text('17%'), findsOneWidget);
-      expect(
-        find.textContaining('1 of 6 details added'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('1 of 6 details added'), findsOneWidget);
 
       // Every unanswered detail is named, so the nudge is actionable.
       expect(find.text('Profile photo'), findsOneWidget);
@@ -181,10 +181,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('No links added yet.'), findsOneWidget);
-      expect(
-        find.textContaining('Using the default alerts'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Using the default alerts'), findsOneWidget);
       // Unanswered fields read as an em dash rather than vanishing.
       expect(find.text('—'), findsWidgets);
     });

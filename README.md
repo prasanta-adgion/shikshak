@@ -1,4 +1,4 @@
-# Shikshak
+# shiksak
 
 **Find the Right Teacher. Learn Without Limits.**
 
@@ -19,9 +19,9 @@ cannot drift.
 
 | Flavor | Entrypoint | Base URL | Application ID |
 |---|---|---|---|
-| dev | `lib/main_dev.dart` | `http://192.168.1.12:5001` | `…Shikshak.dev` |
-| staging | `lib/main_staging.dart` | *(not provisioned)* | `…Shikshak.staging` |
-| prod | `lib/main_prod.dart` | *(not provisioned)* | `…Shikshak` |
+| dev | `lib/main_dev.dart` | `http://192.168.1.12:5001` | `…shiksak.dev` |
+| staging | `lib/main_staging.dart` | *(not provisioned)* | `…shiksak.staging` |
+| prod | `lib/main_prod.dart` | *(not provisioned)* | `…shiksak` |
 
 The Android `productFlavors` in `app/build.gradle.kts` use these same names.
 **Always pass both `--flavor` and `-t`** — Gradle picks the native flavor, `-t`
@@ -35,7 +35,7 @@ flutter build apk --flavor prod -t lib/main_prod.dart --release
 The `.vscode/launch.json` configurations already pair them correctly.
 
 dev and staging carry an `applicationIdSuffix` and their own launcher label
-("Shikshak Dev" / "Shikshak Staging"), so all three install side by side on one
+("shiksak Dev" / "shiksak Staging"), so all three install side by side on one
 device. A bare `flutter run` (via `lib/main.dart`) targets **dev** but builds no
 native flavor.
 

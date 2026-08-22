@@ -1,8 +1,8 @@
-import 'package:Shikshak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
-import 'package:Shikshak/features/forgot_password/presentation/screens/new_password_set.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shiksak/features/forgot_password/presentation/screens/forgot_password_email_put_screen.dart';
+import 'package:shiksak/features/forgot_password/presentation/screens/new_password_set.dart';
 
 import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/pages/login_page.dart';

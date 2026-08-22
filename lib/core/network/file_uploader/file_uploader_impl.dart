@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:Shikshak/core/network/file_uploader/i_file_uploader.dart';
 import 'package:dio/dio.dart';
+import 'package:shiksak/core/network/file_uploader/i_file_uploader.dart';
 
 import '../api_exception.dart';
 import '../api_result.dart';

@@ -1,14 +1,14 @@
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/class_mode.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/class_occurrence.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/class_slot.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/date_range.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/schedule_calendar.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/schedule_day.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/slot_time.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/notifier/class_schedule_notifier.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/notifier/class_slots_notifier.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/state/class_schedule_state.dart';
-import 'package:Shikshak/features/teacher/class_schedule/presentation/state/class_slots_state.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_mode.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_occurrence.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_slot.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/date_range.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/schedule_calendar.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/schedule_day.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/slot_time.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/notifier/class_schedule_notifier.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/notifier/class_slots_notifier.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/state/class_schedule_state.dart';
+import 'package:shiksak/features/teacher/class_schedule/presentation/state/class_slots_state.dart';
 
 /// Schedule data pinned to whichever week the suite runs in.
 ///

@@ -1,18 +1,18 @@
-import 'package:Shikshak/core/theme/app_theme.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/experience/data/model/experience_response_model.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/experience/presentation/notifier/experience_list_notifier.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/experience/presentation/providers/experience_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/experience/presentation/state/experience_list_state.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/experience/presentation/widgets/experience_display_screen.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/experience/presentation/widgets/experience_edit_sheet.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/notifier/account_create_notifier.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/pages/create_teacher_account_page.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/providers/account_create_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/state/account_create_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/theme/app_theme.dart';
+import 'package:shiksak/features/teacher/create_profile_account/experience/data/model/experience_response_model.dart';
+import 'package:shiksak/features/teacher/create_profile_account/experience/presentation/notifier/experience_list_notifier.dart';
+import 'package:shiksak/features/teacher/create_profile_account/experience/presentation/providers/experience_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/experience/presentation/state/experience_list_state.dart';
+import 'package:shiksak/features/teacher/create_profile_account/experience/presentation/widgets/experience_display_screen.dart';
+import 'package:shiksak/features/teacher/create_profile_account/experience/presentation/widgets/experience_edit_sheet.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/presentation/notifier/account_create_notifier.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/presentation/pages/create_teacher_account_page.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/presentation/providers/account_create_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/presentation/state/account_create_state.dart';
 
 /// Two rows as the experience endpoint returns them.
 const _first = ExperienceItem(

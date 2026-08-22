@@ -1,13 +1,13 @@
-import 'package:Shikshak/core/constants/api_endpoints.dart';
-import 'package:Shikshak/core/flavor/app_flavor.dart';
-import 'package:Shikshak/core/network/dio_client.dart';
-import 'package:Shikshak/core/network/i_api_client.dart';
-import 'package:Shikshak/core/providers/core_providers.dart';
-import 'package:Shikshak/core/storage/secure_storage_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/constants/api_endpoints.dart';
+import 'package:shiksak/core/flavor/app_flavor.dart';
+import 'package:shiksak/core/network/dio_client.dart';
+import 'package:shiksak/core/network/i_api_client.dart';
+import 'package:shiksak/core/providers/core_providers.dart';
+import 'package:shiksak/core/storage/secure_storage_service.dart';
 
 void main() {
   group('AppFlavor', () {

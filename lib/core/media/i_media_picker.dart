@@ -1,5 +1,5 @@
-import 'package:Shikshak/core/media/picked_media.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:shiksak/core/media/picked_media.dart';
 
 abstract interface class IMediaPicker {
   Future<PickedMedia?> pickImage({

@@ -1,5 +1,5 @@
-import 'package:Shikshak/features/teacher/profile/data/model/user_profile_model.dart';
 import 'package:equatable/equatable.dart';
+import 'package:shiksak/features/teacher/profile/data/model/user_profile_model.dart';
 
 import '../../../../auth/domain/entities/user_entity.dart';
 import '../../../../auth/domain/entities/user_role.dart';

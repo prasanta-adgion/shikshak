@@ -1,7 +1,7 @@
-import 'package:Shikshak/core/network/api_response.dart';
-import 'package:Shikshak/features/auth/data/models/register_request_model.dart';
-import 'package:Shikshak/features/auth/data/models/register_response_model.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/network/api_response.dart';
+import 'package:shiksak/features/auth/data/models/register_request_model.dart';
+import 'package:shiksak/features/auth/data/models/register_response_model.dart';
 
 /// Pins the signup request/response contract exactly as the backend returns
 /// it, so a refactor cannot silently change the wire format.

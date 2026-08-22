@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Shikshak brand mark: a gradient rounded square with the book icon.
+/// shiksak brand mark: a gradient rounded square with the book icon.
 ///
 /// Wrapped in a [Hero] by default so the logo glides between splash, role
 /// selection and auth screens.
@@ -9,7 +9,7 @@ class AppLogo extends StatelessWidget {
   final bool withHero;
   final bool withGlow;
 
-  static const String _heroTag = 'Shikshak-logo';
+  static const String _heroTag = 'shiksak-logo';
 
   final String image;
   const AppLogo({

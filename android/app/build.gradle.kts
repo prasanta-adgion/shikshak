@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.Shikshak"
+    namespace = "com.example.shiksak"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.Shikshak"
+        applicationId = "com.example.shiksak"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -44,17 +44,17 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            resValue("string", "app_name", "Shikshak Dev")
+            resValue("string", "app_name", "shiksak Dev")
         }
         create("staging") {
             dimension = "environment"
             applicationIdSuffix = ".staging"
             versionNameSuffix = "-staging"
-            resValue("string", "app_name", "Shikshak Staging")
+            resValue("string", "app_name", "shiksak Staging")
         }
         create("prod") {
             dimension = "environment"
-            resValue("string", "app_name", "Shikshak")
+            resValue("string", "app_name", "shiksak")
         }
     }
 

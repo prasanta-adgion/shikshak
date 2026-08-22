@@ -1,11 +1,13 @@
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
 
 import '../core/constants/app_constants.dart';
 import '../core/theme/app_theme.dart';
 import 'router/app_router.dart';
 
-class ShikshakApp extends StatelessWidget {
-  const ShikshakApp({super.key});
+class ShiksakApp extends StatelessWidget {
+  const ShiksakApp({super.key});
 
   @override
   Widget build(BuildContext context) {

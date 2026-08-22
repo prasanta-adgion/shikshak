@@ -1,18 +1,18 @@
-import 'package:Shikshak/core/theme/app_theme.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/education/data/model/education_response_model.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/education/presentation/notifier/education_list_notifier.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/education/presentation/providers/education_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/education/presentation/state/education_list_state.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/education/presentation/widgets/education_display_screen.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/education/presentation/widgets/education_edit_sheet.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/notifier/account_create_notifier.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/pages/create_teacher_account_page.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/providers/account_create_providers.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/shared/presentation/state/account_create_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/theme/app_theme.dart';
+import 'package:shiksak/features/teacher/create_profile_account/education/data/model/education_response_model.dart';
+import 'package:shiksak/features/teacher/create_profile_account/education/presentation/notifier/education_list_notifier.dart';
+import 'package:shiksak/features/teacher/create_profile_account/education/presentation/providers/education_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/education/presentation/state/education_list_state.dart';
+import 'package:shiksak/features/teacher/create_profile_account/education/presentation/widgets/education_display_screen.dart';
+import 'package:shiksak/features/teacher/create_profile_account/education/presentation/widgets/education_edit_sheet.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/domain/entities/profile_step.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/presentation/notifier/account_create_notifier.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/presentation/pages/create_teacher_account_page.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/presentation/providers/account_create_providers.dart';
+import 'package:shiksak/features/teacher/create_profile_account/shared/presentation/state/account_create_state.dart';
 
 /// A row as the education endpoint returns it.
 const _bsc = EducationItem(

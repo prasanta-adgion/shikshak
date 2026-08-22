@@ -1,7 +1,7 @@
-import 'package:Shikshak/core/media/i_media_picker.dart';
-import 'package:Shikshak/core/network/file_uploader/i_file_uploader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shiksak/core/media/i_media_picker.dart';
+import 'package:shiksak/core/network/file_uploader/i_file_uploader.dart';
 
 import '../flavor/app_flavor.dart';
 import '../media/media_picker.dart';

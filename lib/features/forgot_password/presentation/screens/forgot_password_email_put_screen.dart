@@ -1,20 +1,20 @@
-import 'package:Shikshak/app/router/route_paths.dart';
-import 'package:Shikshak/core/constants/app_images_const.dart';
-import 'package:Shikshak/core/responsive/responsive.dart';
-import 'package:Shikshak/core/theme/app_icons.dart';
-import 'package:Shikshak/core/theme/app_spacing.dart';
-import 'package:Shikshak/core/utils/validators.dart';
-import 'package:Shikshak/features/forgot_password/presentation/providers/forgot_password_providers.dart';
-import 'package:Shikshak/features/forgot_password/presentation/state/forgot_password_state.dart';
-import 'package:Shikshak/features/forgot_password/presentation/widgets/forgot_password_bg.dart';
-import 'package:Shikshak/shared/widgets/app_card.dart';
-import 'package:Shikshak/shared/widgets/app_loading_button.dart';
-import 'package:Shikshak/shared/widgets/app_snackbar.dart';
-import 'package:Shikshak/shared/widgets/app_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shiksak/app/router/route_paths.dart';
+import 'package:shiksak/core/constants/app_images_const.dart';
+import 'package:shiksak/core/responsive/responsive.dart';
+import 'package:shiksak/core/theme/app_icons.dart';
+import 'package:shiksak/core/theme/app_spacing.dart';
+import 'package:shiksak/core/utils/validators.dart';
+import 'package:shiksak/features/forgot_password/presentation/providers/forgot_password_providers.dart';
+import 'package:shiksak/features/forgot_password/presentation/state/forgot_password_state.dart';
+import 'package:shiksak/features/forgot_password/presentation/widgets/forgot_password_bg.dart';
+import 'package:shiksak/shared/widgets/app_card.dart';
+import 'package:shiksak/shared/widgets/app_loading_button.dart';
+import 'package:shiksak/shared/widgets/app_snackbar.dart';
+import 'package:shiksak/shared/widgets/app_text_field.dart';
 
 /// Step 1 of the reset flow: collect the registered email address.
 class ForgotPasswordScreen extends ConsumerStatefulWidget {

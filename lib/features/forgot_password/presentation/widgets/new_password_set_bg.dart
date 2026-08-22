@@ -1,7 +1,7 @@
-import 'package:Shikshak/core/constants/app_images_const.dart';
-import 'package:Shikshak/core/responsive/responsive.dart';
-import 'package:Shikshak/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:shiksak/core/constants/app_images_const.dart';
+import 'package:shiksak/core/responsive/responsive.dart';
+import 'package:shiksak/core/theme/app_spacing.dart';
 
 class NewPasswordSetBg extends StatelessWidget {
   final Widget child;

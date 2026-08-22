@@ -1,14 +1,14 @@
-import 'package:Shikshak/core/network/api_exception.dart';
-import 'package:Shikshak/core/network/api_result.dart';
-import 'package:Shikshak/features/teacher/class_schedule/data/datasource/class_schedule_remote_datasource.dart';
-import 'package:Shikshak/features/teacher/class_schedule/data/model/class_calendar_response_model.dart';
-import 'package:Shikshak/features/teacher/class_schedule/data/model/class_occurrence_model.dart';
-import 'package:Shikshak/features/teacher/class_schedule/data/model/class_slot_model.dart';
-import 'package:Shikshak/features/teacher/class_schedule/data/repository/class_schedule_repository_impl.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/class_slot.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/date_range.dart';
-import 'package:Shikshak/features/teacher/class_schedule/domain/entities/schedule_calendar.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/network/api_exception.dart';
+import 'package:shiksak/core/network/api_result.dart';
+import 'package:shiksak/features/teacher/class_schedule/data/datasource/class_schedule_remote_datasource.dart';
+import 'package:shiksak/features/teacher/class_schedule/data/model/class_calendar_response_model.dart';
+import 'package:shiksak/features/teacher/class_schedule/data/model/class_occurrence_model.dart';
+import 'package:shiksak/features/teacher/class_schedule/data/model/class_slot_model.dart';
+import 'package:shiksak/features/teacher/class_schedule/data/repository/class_schedule_repository_impl.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/class_slot.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/date_range.dart';
+import 'package:shiksak/features/teacher/class_schedule/domain/entities/schedule_calendar.dart';
 
 import 'fixtures/class_calendar_response.dart';
 

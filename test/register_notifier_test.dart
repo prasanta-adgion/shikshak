@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:Shikshak/core/network/api_exception.dart';
-import 'package:Shikshak/core/network/api_result.dart';
-import 'package:Shikshak/features/auth/domain/entities/user_entity.dart';
-import 'package:Shikshak/features/auth/domain/entities/user_role.dart';
-import 'package:Shikshak/features/auth/domain/params/auth_params.dart';
-import 'package:Shikshak/features/auth/domain/repositories/auth_repository.dart';
-import 'package:Shikshak/features/auth/domain/usecases/auth_usecases.dart';
-import 'package:Shikshak/features/auth/presentation/providers_di/auth_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/network/api_exception.dart';
+import 'package:shiksak/core/network/api_result.dart';
+import 'package:shiksak/features/auth/domain/entities/user_entity.dart';
+import 'package:shiksak/features/auth/domain/entities/user_role.dart';
+import 'package:shiksak/features/auth/domain/params/auth_params.dart';
+import 'package:shiksak/features/auth/domain/repositories/auth_repository.dart';
+import 'package:shiksak/features/auth/domain/usecases/auth_usecases.dart';
+import 'package:shiksak/features/auth/presentation/providers_di/auth_providers.dart';
 
 void main() {
   const params = RegisterParams(

@@ -1,8 +1,8 @@
-import 'package:Shikshak/features/auth/domain/entities/user_role.dart';
-import 'package:Shikshak/features/teacher/create_profile_account/basic_info/domain/entities/gender.dart';
-import 'package:Shikshak/features/teacher/profile/data/model/teacher_profile_response_model.dart';
-import 'package:Shikshak/features/teacher/profile/domain/entities/teacher_profile.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/features/auth/domain/entities/user_role.dart';
+import 'package:shiksak/features/teacher/create_profile_account/basic_info/domain/entities/gender.dart';
+import 'package:shiksak/features/teacher/profile/data/model/teacher_profile_response_model.dart';
+import 'package:shiksak/features/teacher/profile/domain/entities/teacher_profile.dart';
 
 import 'fixtures/teacher_profile_response.dart';
 
@@ -65,8 +65,9 @@ void main() {
         'avatarUrl': 'https://example.com/avatar.png',
       };
 
-      final profile = TeacherProfileResponseModel.fromJson(json).data!
-          .toEntity();
+      final profile = TeacherProfileResponseModel.fromJson(
+        json,
+      ).data!.toEntity();
 
       expect(profile.user.avatarUrl, 'https://example.com/avatar.png');
     });

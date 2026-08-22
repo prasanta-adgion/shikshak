@@ -1,10 +1,10 @@
-import 'package:Shikshak/core/constants/api_endpoints.dart';
-import 'package:Shikshak/core/network/i_api_client.dart';
-import 'package:Shikshak/core/providers/core_providers.dart';
-import 'package:Shikshak/features/student/single_teacher_details/domain/entities/teacher_class_slot.dart';
-import 'package:Shikshak/features/student/single_teacher_details/presentation/providers/single_teacher_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shiksak/core/constants/api_endpoints.dart';
+import 'package:shiksak/core/network/i_api_client.dart';
+import 'package:shiksak/core/providers/core_providers.dart';
+import 'package:shiksak/features/student/single_teacher_details/domain/entities/teacher_class_slot.dart';
+import 'package:shiksak/features/student/single_teacher_details/presentation/providers/single_teacher_providers.dart';
 
 import 'fixtures/single_teacher_response.dart';
 
